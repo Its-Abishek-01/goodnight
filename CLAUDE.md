@@ -53,3 +53,5 @@ Flutter UI with Riverpod, Firebase (anonymous auth, Firestore) as the only backe
 **Moments (selfies)** (`features/selfie/`): the compressed JPEG lives in the Firestore doc (`selfies/{id}.image` blob, rules cap it at 800 KB), not Firebase Storage. Only the receiver can set `seenAt` (the read receipt). `selfieSyncProvider` writes the partner's latest photo to a file and calls `home_widget`; native side is `SelfieWidgetProvider.kt` (layout `res/layout/selfie_widget.xml`). A data-only FCM push from `selfieAlert` runs `goodnightBackgroundHandler` so the widget updates while the app is closed. Own selfies older than 7 days are deleted client-side.
 
 Grace/block durations are constants in `Blocker` (Dart); they are not yet configurable per couple.
+
+See also `docs/NEW_MACHINE.md` for setting up on a fresh computer.
