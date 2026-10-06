@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../pairing/pair.dart';
+import '../pairing/partner_color.dart';
 import 'schedule.dart';
 import 'schedule_providers.dart';
 
@@ -94,7 +95,13 @@ class BedtimeCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
+            Row(
+              children: [
+                PartnerAvatar(name: pair.nameOf(owner), color: pair.colorOf(owner), size: 28),
+                const SizedBox(width: 10),
+                Text(title, style: Theme.of(context).textTheme.titleMedium),
+              ],
+            ),
             const SizedBox(height: 8),
             ...lines,
             if (actions.isNotEmpty) ...[

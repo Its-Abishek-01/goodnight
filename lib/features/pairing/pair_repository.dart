@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'pair.dart';
+import 'partner_color.dart';
 
 class PairException implements Exception {
   PairException(this.message);
@@ -42,7 +43,11 @@ class PairRepository {
       .map((s) => s.exists ? Pair.fromDoc(s) : null);
 
   /// Creates a waiting pair and returns its join code.
-  Future<String> createPair({required String uid, required String name}) async {
+  Future<String> createPair({
+    required String uid,
+    required String name,
+    required PartnerColor color,
+  }) async {
     final code = generateCode();
     await _db.runTransaction((tx) async {
       final codeRef = _db.doc('pairCodes/$code');
@@ -54,6 +59,7 @@ class PairRepository {
         'code': code,
         'members': [uid],
         'names': {uid: name},
+        'colors': {uid: color.name},
         'status': 'waiting',
         'createdAt': FieldValue.serverTimestamp(),
       });
@@ -62,6 +68,9 @@ class PairRepository {
     });
     return code;
   }
+
+  Future<void> setColor(String pairId, String uid, PartnerColor color) =>
+      _db.doc('pairs/$pairId').update({'colors.$uid': color.name});
 
   /// Every collection stored under a pair.
   static const pairCollections = [
@@ -104,6 +113,7 @@ class PairRepository {
     required String uid,
     required String name,
     required String rawCode,
+    required PartnerColor color,
   }) async {
     final code = normalizeCode(rawCode);
     if (code.length != codeLength) {
@@ -127,6 +137,7 @@ class PairRepository {
       tx.update(pairRef, {
         'members': [...members, uid],
         'names.$uid': name,
+        'colors.$uid': color.name,
         'status': 'active',
       });
       tx.delete(codeRef);

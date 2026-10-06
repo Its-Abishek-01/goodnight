@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/firebase_providers.dart';
+import '../../core/theme.dart';
 import 'pair_providers.dart';
 import 'pair_repository.dart';
+import 'partner_color.dart';
 
 class PairingScreen extends ConsumerStatefulWidget {
   const PairingScreen({super.key});
@@ -17,6 +19,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
   final _code = TextEditingController();
   bool _busy = false;
   String? _error;
+  PartnerColor _color = PartnerColor.sky;
 
   @override
   void dispose() {
@@ -54,19 +57,25 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
   @override
   Widget build(BuildContext context) {
     final repo = ref.read(pairRepositoryProvider);
+    final text = Theme.of(context).textTheme;
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
           children: [
-            const SizedBox(height: 32),
-            Center(child: Image.asset('assets/logo.png', width: 120, height: 120)),
-            const SizedBox(height: 24),
-            Text('GoodNight 🌙',
-                style: Theme.of(context).textTheme.headlineLarge),
-            const SizedBox(height: 8),
-            const Text(
-              'A sleep pact for two. One of you creates a code, the other enters it.',
+            const SizedBox(height: 12),
+            const Center(child: _FloatingLogo()),
+            const SizedBox(height: 20),
+            Text(
+              'GoodNight',
+              textAlign: TextAlign.center,
+              style: text.displaySmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'A sleep pact for two',
+              textAlign: TextAlign.center,
+              style: text.titleMedium?.copyWith(color: GnColors.moon),
             ),
             const SizedBox(height: 32),
             TextField(
@@ -74,27 +83,44 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
               textCapitalization: TextCapitalization.words,
               decoration: const InputDecoration(
                 labelText: 'Your name',
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person_outline),
               ),
             ),
-            const SizedBox(height: 24),
-            FilledButton(
+            const SizedBox(height: 20),
+            Text('Your colour', style: text.titleSmall),
+            const SizedBox(height: 10),
+            PartnerColorPicker(
+              selected: _color,
+              onChanged: (c) => setState(() => _color = c),
+            ),
+            const SizedBox(height: 28),
+            FilledButton.icon(
               onPressed: _busy
                   ? null
                   : () => _run(
-                        (uid, name) => repo.createPair(uid: uid, name: name),
+                        (uid, name) => repo.createPair(uid: uid, name: name, color: _color),
                       ),
-              child: const Text('Create a pair code'),
+              icon: const Icon(Icons.favorite),
+              label: const Text('Create a pair code'),
             ),
-            const SizedBox(height: 32),
-            const Divider(),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                const Expanded(child: Divider()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('or join your partner', style: TextStyle(color: GnColors.muted)),
+                ),
+                const Expanded(child: Divider()),
+              ],
+            ),
             const SizedBox(height: 24),
             TextField(
               controller: _code,
               textCapitalization: TextCapitalization.characters,
               decoration: const InputDecoration(
                 labelText: "Partner's code",
-                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.vpn_key_outlined),
               ),
             ),
             const SizedBox(height: 12),
@@ -106,6 +132,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                           uid: uid,
                           name: name,
                           rawCode: _code.text,
+                          color: _color,
                         ),
                       ),
               child: const Text('Join with code'),
@@ -114,6 +141,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
               const SizedBox(height: 16),
               Text(
                 _error!,
+                textAlign: TextAlign.center,
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ],
@@ -125,6 +153,39 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The logo bobbing gently, like the moon in the night sky.
+class _FloatingLogo extends StatefulWidget {
+  const _FloatingLogo();
+
+  @override
+  State<_FloatingLogo> createState() => _FloatingLogoState();
+}
+
+class _FloatingLogoState extends State<_FloatingLogo> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 3),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, child) => Transform.translate(
+        offset: Offset(0, -6 * Curves.easeInOut.transform(_c.value)),
+        child: child,
+      ),
+      child: Image.asset('assets/logo.png', width: 132, height: 132),
     );
   }
 }

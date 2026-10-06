@@ -10,6 +10,8 @@ import '../features/pairing/pairing_screen.dart';
 import '../features/pairing/waiting_screen.dart';
 import '../features/settings/delete_data.dart';
 import 'firebase_providers.dart';
+import 'theme.dart';
+import 'widgets/starry_sky.dart';
 
 class GoodNightApp extends StatelessWidget {
   const GoodNightApp({super.key});
@@ -19,11 +21,8 @@ class GoodNightApp extends StatelessWidget {
     return MaterialApp(
       title: 'GoodNight',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF3F3D8F),
-        brightness: Brightness.dark,
-        useMaterial3: true,
-      ),
+      theme: buildTheme(),
+      builder: (context, child) => StarrySky(child: child!),
       home: const _Gate(),
     );
   }

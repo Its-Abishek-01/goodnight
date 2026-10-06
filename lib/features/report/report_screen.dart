@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../checkin/night_log.dart';
 import '../checkin/night_providers.dart';
 import '../pairing/pair.dart';
+import '../pairing/partner_color.dart';
 import '../streak/streak.dart';
 import '../streak/streak_providers.dart';
 
@@ -60,7 +61,13 @@ class ReportScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(name, style: Theme.of(context).textTheme.titleSmall),
+            Row(
+              children: [
+                PartnerAvatar(name: pair.nameOf(who), color: pair.colorOf(who), size: 24),
+                const SizedBox(width: 8),
+                Text(name, style: Theme.of(context).textTheme.titleSmall),
+              ],
+            ),
             const SizedBox(height: 6),
             Text('On time: $onTime / ${week.length}'),
             Text('Avg snoozes: $avg'),

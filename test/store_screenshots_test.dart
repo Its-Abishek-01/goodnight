@@ -11,6 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:goodnight/core/firebase_providers.dart';
+import 'package:goodnight/core/theme.dart';
+import 'package:goodnight/core/widgets/starry_sky.dart';
 import 'package:goodnight/features/alarm/alarm_providers.dart';
 import 'package:goodnight/features/bedtime/schedule.dart';
 import 'package:goodnight/features/bedtime/schedule_providers.dart';
@@ -44,6 +46,7 @@ const _pair = Pair(
   members: [_me, _partner],
   names: {_me: 'Sam', _partner: 'Alex'},
   status: PairStatus.active,
+  colors: {_me: 'sky', _partner: 'rose'},
 );
 
 // 1080x1920 portrait, a common Android phone size.
@@ -82,7 +85,7 @@ DateTime _at(String key, int minuteOfDay, {int dayShift = 0}) {
   return DateTime(d.year, d.month, d.day + shift + dayShift, minuteOfDay ~/ 60, minuteOfDay % 60);
 }
 
-List<Night> _nights(Map<String, SleepWindow> w) {
+List<Night> _nights(Map<String, SleepWindow> w, {bool together = false}) {
   final today = nightKey(DateTime.now());
   PlayerNight good(String key, SleepWindow s, int early, int snoozes) => PlayerNight(
         checkedInAt: _at(key, s.bedtime).subtract(Duration(minutes: early)),
@@ -95,6 +98,7 @@ List<Night> _nights(Map<String, SleepWindow> w) {
   final out = <Night>[
     Night(key: today, players: {
       _partner: PlayerNight(checkedInAt: DateTime.now().subtract(const Duration(minutes: 12))),
+      if (together) _me: PlayerNight(checkedInAt: DateTime.now().subtract(const Duration(minutes: 2))),
     }),
   ];
   var key = today;
@@ -113,7 +117,7 @@ String _prev(String key) {
   return formatNightKey(DateTime(d.year, d.month, d.day - 1));
 }
 
-Widget _app(Widget home) {
+Widget _app(Widget home, {bool together = false}) {
   final windows = {_me: _window(0), _partner: _window(-30)};
   return ProviderScope(
     overrides: [
@@ -123,7 +127,7 @@ Widget _app(Widget home) {
       schedulesProvider.overrideWith((ref) => Stream.value({
             for (final e in windows.entries) e.key: Schedule(owner: e.key, current: e.value),
           })),
-      nightsProvider.overrideWith((ref) => Stream.value(_nights(windows))),
+      nightsProvider.overrideWith((ref) => Stream.value(_nights(windows, together: together))),
       couponsProvider.overrideWith((ref) => Stream.value(const [
             Coupon(id: 'c1', holder: _me, milestone: 7, status: CouponStatus.ready),
             Coupon(
@@ -146,18 +150,19 @@ Widget _app(Widget home) {
     ],
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
-      // Same theme as GoodNightApp, with the fonts loaded above.
-      theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF3F3D8F),
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        fontFamily: 'Roboto',
-        fontFamilyFallback: const ['Emoji'],
-      ),
+      // Same theme and sky as GoodNightApp, with the fonts loaded above.
+      theme: _withFonts(buildTheme()),
+      builder: (context, child) => StarrySky(child: child!),
       home: home,
     ),
   );
 }
+
+ThemeData _withFonts(ThemeData t) => t.copyWith(
+      textTheme: t.textTheme.apply(fontFamily: 'Roboto', fontFamilyFallback: const ['Emoji']),
+      primaryTextTheme:
+          t.primaryTextTheme.apply(fontFamily: 'Roboto', fontFamilyFallback: const ['Emoji']),
+    );
 
 final _boundary = GlobalKey();
 
@@ -168,7 +173,8 @@ Future<void> _shoot(WidgetTester tester, String name) async {
       await precacheImage((e.widget as Image).image, e);
     }
   });
-  for (var i = 0; i < 5; i++) {
+  // Let the moon journey animations finish.
+  for (var i = 0; i < 20; i++) {
     await tester.pump(const Duration(milliseconds: 100));
   }
   await tester.runAsync(() async {
@@ -180,11 +186,11 @@ Future<void> _shoot(WidgetTester tester, String name) async {
   });
 }
 
-Future<void> _show(WidgetTester tester, Widget home) async {
+Future<void> _show(WidgetTester tester, Widget home, {bool together = false}) async {
   tester.view.physicalSize = _size * _dpr;
   tester.view.devicePixelRatio = _dpr;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(RepaintBoundary(key: _boundary, child: _app(home)));
+  await tester.pumpWidget(RepaintBoundary(key: _boundary, child: _app(home, together: together)));
 }
 
 void main() {
@@ -208,6 +214,11 @@ void main() {
   testWidgets('1 tonight', skip: !enabled, (tester) async {
     await _show(tester, const HomeScreen(pair: _pair, uid: _me));
     await _shoot(tester, '1-tonight');
+  });
+
+  testWidgets('1b together', skip: !enabled, (tester) async {
+    await _show(tester, const HomeScreen(pair: _pair, uid: _me), together: true);
+    await _shoot(tester, '1b-together');
   });
 
   testWidgets('2 report', skip: !enabled, (tester) async {

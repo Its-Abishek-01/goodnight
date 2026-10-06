@@ -5,6 +5,8 @@ import 'package:permission_handler/permission_handler.dart';
 import '../alarm/alarm_qr_screen.dart';
 import '../blocking/blocker_channel.dart';
 import '../pairing/pair.dart';
+import '../pairing/pair_providers.dart';
+import '../pairing/partner_color.dart';
 import '../settings/features.dart';
 import '../settings/features_providers.dart';
 import '../settings/delete_data.dart';
@@ -116,6 +118,35 @@ class _SetupScreenState extends ConsumerState<SetupScreen> with WidgetsBindingOb
       children: [
         Text('Setup', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 8),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    PartnerAvatar(
+                      name: widget.pair.nameOf(widget.uid),
+                      color: widget.pair.colorOf(widget.uid),
+                      size: 36,
+                    ),
+                    const SizedBox(width: 12),
+                    Text('Your colour', style: Theme.of(context).textTheme.titleMedium),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                PartnerColorPicker(
+                  selected: widget.pair.colorOf(widget.uid),
+                  taken: widget.pair.colorOf(widget.pair.partnerUid(widget.uid) ?? ''),
+                  onChanged: (c) =>
+                      ref.read(pairRepositoryProvider).setColor(widget.pair.id, widget.uid, c),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
         FeaturesSection(pair: widget.pair, uid: widget.uid),
         const SizedBox(height: 12),
         Text('Permissions', style: Theme.of(context).textTheme.titleMedium),

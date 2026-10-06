@@ -61,3 +61,10 @@ firebase-debug.log
 # Local release outputs from scripts/build-release.sh
 /goodnight-*.apk
 /goodnight-*.aab
+
+# Play signing key export (pepk); the zip holds the encrypted private key
+pepk.jar
+encryption_public_key.pem
+bcprov-*.jar
+pepk-bc.security
+goodnight-signing-key.zip

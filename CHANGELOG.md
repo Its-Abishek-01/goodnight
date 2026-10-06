@@ -4,6 +4,8 @@ All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
 ### Changed
+- New "journey to the moon" design: a starry night sky behind every screen, and on Tonight the two of you climb a dotted arc to the moon as you check in. The moon glows when you both arrive.
+- Each person picks their own colour when pairing (and can change it in Setup); avatars, bedtimes and the report use it.
 - New app icon (golden crescent heart) for the launcher, themed icons, notifications, the splash screen and the pairing screen.
 
 ## 0.2.0 - 2026-10-06

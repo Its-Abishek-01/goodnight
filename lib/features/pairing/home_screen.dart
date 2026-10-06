@@ -107,7 +107,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // A tab can disappear when the couple turns a feature off.
     final tab = _tab.clamp(0, tabs.length - 1);
     return Scaffold(
-      appBar: AppBar(title: const Text('GoodNight 🌙')),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset('assets/logo.png', width: 30, height: 30),
+            const SizedBox(width: 10),
+            const Text('GoodNight', style: TextStyle(fontWeight: FontWeight.w700)),
+          ],
+        ),
+      ),
       body: tabs[tab].$2,
       bottomNavigationBar: NavigationBar(
         selectedIndex: tab,
@@ -130,16 +138,27 @@ class _Tonight extends ConsumerWidget {
     final partnerUid = pair.partnerUid(uid) ?? '';
     final schedules = ref.watch(schedulesProvider).value ?? const {};
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
       children: [
-        Text(
-          'You & ${pair.nameOf(partnerUid)} are paired ❤️',
-          style: Theme.of(context).textTheme.titleLarge,
+        Row(
+          children: [
+            Text(
+              'Tonight',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const Spacer(),
+            if (streak) const StreakChip(),
+          ],
         ),
-        const SizedBox(height: 16),
-        if (streak) const StreakCard(),
-        StatusCard(pair: pair, uid: uid),
-        CheckInCard(pair: pair, uid: uid),
+        const SizedBox(height: 8),
+        TonightJourney(pair: pair, uid: uid),
+        const SizedBox(height: 12),
+        SnoozeNudge(pair: pair, uid: uid),
+        const SizedBox(height: 8),
+        CheckInButton(pair: pair, uid: uid),
+        const SizedBox(height: 24),
+        Text('Bedtimes', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 4),
         BedtimeCard(pair: pair, me: uid, owner: uid, schedule: schedules[uid]),
         BedtimeCard(pair: pair, me: uid, owner: partnerUid, schedule: schedules[partnerUid]),
       ],

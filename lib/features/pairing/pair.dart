@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'partner_color.dart';
+
 enum PairStatus { waiting, active }
 
 class Pair {
@@ -10,6 +12,7 @@ class Pair {
     required this.names,
     required this.status,
     this.closing = false,
+    this.colors = const {},
   });
 
   final String id;
@@ -22,6 +25,9 @@ class Pair {
   /// data are being removed.
   final bool closing;
 
+  /// Colour each person picked, keyed by uid ([PartnerColor] names).
+  final Map<String, String> colors;
+
   factory Pair.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data()!;
     return Pair(
@@ -31,6 +37,7 @@ class Pair {
       names: Map<String, String>.from(d['names'] as Map),
       status: d['status'] == 'active' ? PairStatus.active : PairStatus.waiting,
       closing: d['closing'] as bool? ?? false,
+      colors: Map<String, String>.from(d['colors'] as Map? ?? const {}),
     );
   }
 
@@ -42,4 +49,10 @@ class Pair {
   }
 
   String nameOf(String uid) => names[uid] ?? '';
+
+  /// The colour [uid] picked. Until then the creator is sky and the partner
+  /// rose, so the two always differ.
+  PartnerColor colorOf(String uid) =>
+      PartnerColor.tryParse(colors[uid]) ??
+      (members.indexOf(uid) == 1 ? PartnerColor.rose : PartnerColor.sky);
 }

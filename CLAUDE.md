@@ -33,6 +33,7 @@ Flutter UI with Riverpod, Firebase (anonymous auth, Firestore) as the only backe
 
 **Firestore model** (all under `pairs/{pairId}` unless noted; `firestore.rules` encodes who may write what):
 - `users/{uid}`: name, pairId, fcmToken. `pairCodes/{code}`: single-use join code.
+- The pair doc itself holds `members`, `names.{uid}`, `colors.{uid}` (a `PartnerColor` name; `Pair.colorOf` defaults to sky for the creator, rose for the partner), `status` and `closing`.
 - `schedules/{ownerUid}`: `current` (approved, locked window) + `proposal` (pending, with `by`). Only the person who did NOT propose can approve. A change proposal leaves `current` active until approved.
 - `nights/{nightKey}`: `players.{uid}` = checkedInAt, wokeAt, snoozes, blocks, usageMinutes; plus `forgiveBy`/`forgiven`. Each person writes only their own player entry.
 - `grants/{startKey_milestone}` (tombstone so a coupon is earned once) and `coupons/{grantId_uid}` (holder, status ready/redeemed).
@@ -58,6 +59,8 @@ Flutter UI with Riverpod, Firebase (anonymous auth, Firestore) as the only backe
 Grace/block durations are constants in `Blocker` (Dart); they are not yet configurable per couple.
 
 **Data deletion**: `PairRepository.deletePair` marks the pair `closing`, deletes every collection in `pairCollections` in small batches, then the pair, join code and user doc; the rules allow those deletes only while the pair is closing. Add any new pair subcollection to `pairCollections` and give it a `closingByMember` delete rule. The gate shows `_Closing` for a closing pair.
+
+**Look and feel**: `core/theme.dart` (`GnColors`, `buildTheme`) and `core/widgets/starry_sky.dart`, which `MaterialApp.builder` paints behind every screen, so scaffolds are transparent. The Tonight centrepiece is `checkin/moon_journey.dart`; its position and caption logic (`stageOf`, `journeyT`, `journeyCaption`) is pure and tested.
 
 **Icons and store graphics** all come from `store/icon-source.png`: `python scripts/make-icons.py` writes the launcher/adaptive/monochrome icons, `ic_notification` (used by local notifications, the alarm and FCM), the splash, `assets/logo.png` and the Play icon and feature graphic. Store screenshots are rendered from the real widgets with fake providers: `SCREENSHOTS=1 flutter test test/store_screenshots_test.dart` (skipped in normal runs).
 
