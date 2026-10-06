@@ -52,3 +52,8 @@ key.properties
 
 # Gradle build output
 /android/build/
+
+# Cloud Functions
+functions/node_modules/
+firebase-debug.log
+.firebase/

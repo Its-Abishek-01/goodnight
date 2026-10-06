@@ -10,10 +10,12 @@ Blaze (pay-as-you-go) plan. Light use stays inside the free quota, but Blaze nee
 billing account, so this is opt-in.
 
 ## Deploy
+`firebase.json` and `.firebaserc` (project `goodnight-27157`) are already in the repo.
+Using your own Firebase project? Change the id in `.firebaserc` first.
+
 ```bash
 npm install -g firebase-tools
-firebase login
-firebase use <your-project-id>
+firebase login --reauth
 cd functions && npm install && cd ..
 firebase deploy --only functions
 ```
