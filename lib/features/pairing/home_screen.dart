@@ -3,12 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../alarm/alarm_providers.dart';
 import '../bedtime/bedtime_card.dart';
-import '../blocking/blocker_providers.dart';
 import '../bedtime/schedule_providers.dart';
+import '../blocking/blocker_providers.dart';
+import '../checkin/tonight_cards.dart';
+import '../push/push_providers.dart';
+import '../reminders/reminder_providers.dart';
+import '../report/report_screen.dart';
 import '../setup/setup_screen.dart';
 import 'pair.dart';
 
-/// App shell with the main tabs. Report and coupons are added in later steps.
+/// App shell with the main tabs.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key, required this.pair, required this.uid});
 
@@ -45,8 +49,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget build(BuildContext context) {
     ref.watch(alarmSyncProvider);
     ref.watch(blockerSyncProvider);
+    ref.watch(reminderSyncProvider);
+    ref.watch(pushSyncProvider);
     final pages = <Widget>[
       _Tonight(pair: widget.pair, uid: widget.uid),
+      ReportScreen(pair: widget.pair, uid: widget.uid),
       const SetupScreen(),
     ];
     return Scaffold(
@@ -57,6 +64,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         onDestinationSelected: (i) => setState(() => _tab = i),
         destinations: const [
           NavigationDestination(icon: Icon(Icons.nights_stay_outlined), label: 'Tonight'),
+          NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Report'),
           NavigationDestination(icon: Icon(Icons.tune), label: 'Setup'),
         ],
       ),
@@ -82,6 +90,9 @@ class _Tonight extends ConsumerWidget {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 16),
+        const StreakCard(),
+        StatusCard(pair: pair, uid: uid),
+        CheckInCard(pair: pair, uid: uid),
         BedtimeCard(pair: pair, me: uid, owner: uid, schedule: schedules[uid]),
         BedtimeCard(pair: pair, me: uid, owner: partnerUid, schedule: schedules[partnerUid]),
       ],

@@ -5,10 +5,10 @@ String _pad(int n) => n.toString().padLeft(2, '0');
 /// The key of the night that [now] belongs to. A night starts at bedtime on
 /// day D and ends the next morning, so shifting by 12 hours keeps both
 /// 23:00 on D and 07:00 on D+1 inside night D.
-String nightKey(DateTime now) {
-  final d = now.subtract(const Duration(hours: 12));
-  return '${d.year}-${_pad(d.month)}-${_pad(d.day)}';
-}
+String nightKey(DateTime now) =>
+    formatNightKey(now.subtract(const Duration(hours: 12)));
+
+String formatNightKey(DateTime d) => '${d.year}-${_pad(d.month)}-${_pad(d.day)}';
 
 DateTime nightKeyToDate(String key) => DateTime.parse(key);
 
