@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../alarm/alarm_providers.dart';
 import '../bedtime/bedtime_card.dart';
+import '../blocking/blocker_providers.dart';
 import '../bedtime/schedule_providers.dart';
 import '../setup/setup_screen.dart';
 import 'pair.dart';
@@ -18,12 +19,32 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
   int _tab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    syncBlockStats(ref);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) syncBlockStats(ref);
+  }
 
   @override
   Widget build(BuildContext context) {
     ref.watch(alarmSyncProvider);
+    ref.watch(blockerSyncProvider);
     final pages = <Widget>[
       _Tonight(pair: widget.pair, uid: widget.uid),
       const SetupScreen(),

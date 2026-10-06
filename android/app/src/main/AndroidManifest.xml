@@ -6,6 +6,18 @@
         android:label="GoodNight"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <service
+            android:name=".BlockerService"
+            android:exported="true"
+            android:label="GoodNight night mode"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
         <activity
             android:name=".MainActivity"
             android:exported="true"

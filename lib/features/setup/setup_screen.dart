@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../alarm/alarm_qr_screen.dart';
+import '../blocking/blocker_channel.dart';
 
 /// Lists every permission GoodNight needs and lets the user grant them.
 class SetupScreen extends StatefulWidget {
@@ -38,11 +39,54 @@ class _SetupScreenState extends State<SetupScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) _refresh();
   }
 
+  bool _serviceOn = false;
+
   Future<void> _refresh() async {
     for (final i in _items) {
       _granted[i.permission] = await i.permission.isGranted;
     }
+    try {
+      _serviceOn = await Blocker.isServiceEnabled();
+    } catch (_) {
+      _serviceOn = false;
+    }
     if (mounted) setState(() {});
+  }
+
+  Future<void> _enableBlocking() async {
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Allow night mode blocking'),
+        content: const Text(
+          'GoodNight uses Android\'s Accessibility service to see which app or '
+          'website is in front, only during the bedtime hours you and your partner '
+          'agreed on. It pauses Instagram and YouTube Shorts after a short grace '
+          'time. It never reads messages, passwords or what you type, and it '
+          'collects nothing else.\n\n'
+          'If the switch is greyed out: tap "App info", open the three-dot menu, '
+          'choose "Allow restricted settings", then come back and turn on '
+          '"GoodNight night mode" under Accessibility.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Not now'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await Blocker.openAppDetails();
+            },
+            child: const Text('App info'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('I agree'),
+          ),
+        ],
+      ),
+    );
+    if (go == true) await Blocker.openAccessibilitySettings();
   }
 
   Future<void> _grant(_PermItem i) async {
@@ -68,6 +112,20 @@ class _SetupScreenState extends State<SetupScreen> with WidgetsBindingObserver {
                   : FilledButton(onPressed: () => _grant(i), child: const Text('Allow')),
             ),
           ),
+        Card(
+          child: ListTile(
+            title: const Text('Night mode blocking'),
+            subtitle: const Text(
+              'Pauses Instagram, instagram.com and YouTube Shorts after a short grace time at night.',
+            ),
+            trailing: _serviceOn
+                ? const Icon(Icons.check_circle, color: Colors.green)
+                : FilledButton(
+                    onPressed: _enableBlocking,
+                    child: const Text('Turn on'),
+                  ),
+          ),
+        ),
         Card(
           child: ListTile(
             title: const Text('Alarm QR code'),
