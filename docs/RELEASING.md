@@ -77,6 +77,30 @@ Same signed APK as the workflow, built on your own computer.
    (not the debug key). Use a build number higher than the last release's
    (GitHub Actions uses its run number), or Android will refuse to install it as an update.
 
+You can also run Flutter directly. With `android/key.properties` in place, release builds
+are signed with your release key:
+```bash
+flutter build appbundle --release --build-name=0.1.1 --build-number=20   # Play Store bundle
+flutter build apk --release --build-name=0.1.1 --build-number=20         # installable APK
+flutter build apk --debug                                                # debug, uses the debug key
+```
+Without the flags, the version comes from `pubspec.yaml` (`version: 1.0.0+1`). A higher
+build number is required for every update.
+
+### Firebase API key and SHA-1
+The Firebase API key is restricted to the package and certificate SHA-1 values. Each way of
+building signs with a different key, so each SHA-1 must be listed or Firebase calls (sign-in,
+Firestore) fail with "API key not valid" / "requests from this Android client application
+are blocked":
+
+| Build | SHA-1 to add (Google Cloud Console > APIs & Services > Credentials > the Android key) |
+|---|---|
+| Release APK / bundle you sign yourself | `keytool -list -v -keystore goodnight-release.jks -alias goodnight` |
+| Debug builds (differs on every computer) | `keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android` |
+| Play Store (if you publish there) | Play Console > Setup > App signing > "App signing key certificate" |
+
+Add the same SHA-1 values to the Android app in Firebase project settings too.
+
 Without `key.properties`, `flutter build apk --release` silently signs with the debug key.
 That APK installs fine but can never update a release install, so avoid it for sharing.
 
