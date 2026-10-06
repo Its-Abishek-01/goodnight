@@ -75,7 +75,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
             Text(
               'A sleep pact for two',
               textAlign: TextAlign.center,
-              style: text.titleMedium?.copyWith(color: GnColors.moon),
+              style: text.titleMedium?.copyWith(color: context.sky.accent),
             ),
             const SizedBox(height: 32),
             TextField(
@@ -109,7 +109,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 const Expanded(child: Divider()),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('or join your partner', style: TextStyle(color: GnColors.muted)),
+                  child: Text('or join your partner', style: TextStyle(color: context.sky.muted)),
                 ),
                 const Expanded(child: Divider()),
               ],

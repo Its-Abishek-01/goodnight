@@ -63,7 +63,7 @@ Grace/block durations are constants in `Blocker` (Dart); they are not yet config
 
 **Bottom bar**: `core/widgets/moon_nav_bar.dart` with Tonight as the raised moon; icons are painted in `core/widgets/cute_icons.dart` (32x32 space, `keyframe` tracks drive the tap animations).
 
-**Look and feel**: `core/theme.dart` (`GnColors`, `buildTheme`) and `core/widgets/starry_sky.dart`, which `MaterialApp.builder` paints behind every screen, so scaffolds are transparent. The Tonight centrepiece is `checkin/moon_journey.dart`; its position and caption logic (`stageOf`, `journeyT`, `journeyCaption`) is pure and tested.
+**Look and feel**: the app follows the time of day. `core/theme.dart` has `SkyPhase` (`skyPhaseAt`: night 21-05, dawn 05-08, day 08-17, dusk 17-21), the `SkyColors` theme extension (read with `context.sky`; never hard-code colours, they must work on both the light and dark palettes) and `buildTheme(phase)`. `skyPhaseProvider` (`core/sky_phase.dart`) ticks every minute; long-pressing the app-bar logo cycles a preview. `core/widgets/living_sky.dart` is painted behind every screen by `MaterialApp.builder`, so scaffolds are transparent. The Tonight centrepiece is `checkin/moon_journey.dart`; its position and caption logic (`stageOf`, `journeyT`, `journeyCaption`) is pure and tested.
 
 **Icons and store graphics** all come from `store/icon-source.png`: `python scripts/make-icons.py` writes the launcher/adaptive/monochrome icons, `ic_notification` (used by local notifications, the alarm and FCM), the splash, `assets/logo.png` and the Play icon and feature graphic. Store screenshots are rendered from the real widgets with fake providers: `SCREENSHOTS=1 flutter test test/store_screenshots_test.dart` (skipped in normal runs).
 

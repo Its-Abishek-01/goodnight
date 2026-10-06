@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/sky_phase.dart';
 import '../../core/widgets/cute_icons.dart';
 import '../../core/widgets/moon_nav_bar.dart';
 
@@ -83,7 +84,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset('assets/logo.png', width: 30, height: 30),
+            // Long-press the logo to preview dawn, day, dusk and night.
+            GestureDetector(
+              onLongPress: () {
+                final p = ref.read(skyPhaseProvider.notifier).cyclePreview();
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(SnackBar(
+                    content: Text(p == null ? 'Sky follows the time again' : 'Sky preview: ${p.name}'),
+                    duration: const Duration(seconds: 2),
+                  ));
+              },
+              child: Image.asset('assets/logo.png', width: 30, height: 30),
+            ),
             const SizedBox(width: 10),
             const Text('GoodNight', style: TextStyle(fontWeight: FontWeight.w700)),
           ],
@@ -127,7 +140,7 @@ class _Tonight extends ConsumerWidget {
         Row(
           children: [
             Text(
-              'Tonight',
+              Theme.of(context).brightness == Brightness.light ? 'Today' : 'Tonight',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
             const Spacer(),

@@ -58,8 +58,8 @@ class MoonNavBar extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.only(bottom: bottom),
               decoration: BoxDecoration(
-                color: GnColors.skyBottom.withValues(alpha: 0.96),
-                border: const Border(top: BorderSide(color: GnColors.outline, width: 0.6)),
+                color: context.sky.navBar.withValues(alpha: 0.96),
+                border: Border(top: BorderSide(color: context.sky.outline, width: 0.6)),
               ),
               child: Row(
                 children: [
@@ -86,12 +86,12 @@ class MoonNavBar extends StatelessWidget {
                     width: _moon,
                     height: _moon,
                     decoration: BoxDecoration(
-                      color: moonOn ? GnColors.moon : GnColors.surfaceHigh,
+                      color: moonOn ? context.sky.accent : context.sky.surfaceHigh,
                       shape: BoxShape.circle,
-                      border: Border.all(color: GnColors.skyBottom, width: 4),
+                      border: Border.all(color: context.sky.navBar, width: 4),
                       boxShadow: [
                         BoxShadow(
-                          color: GnColors.moon.withValues(alpha: moonOn ? 0.45 : 0.12),
+                          color: context.sky.accent.withValues(alpha: moonOn ? 0.45 : 0.12),
                           blurRadius: moonOn ? 22 : 10,
                         ),
                       ],
@@ -139,7 +139,7 @@ class MoonNavBar extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFFF0628F),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: GnColors.skyBottom, width: 1.5),
+                        border: Border.all(color: context.sky.navBar, width: 1.5),
                       ),
                       child: Text(
                         '${item.badge}',
@@ -154,7 +154,7 @@ class MoonNavBar extends StatelessWidget {
               duration: const Duration(milliseconds: 250),
               style: Theme.of(context).textTheme.labelSmall!.copyWith(
                 fontSize: 11,
-                color: on ? item.kind.color : GnColors.muted,
+                color: on ? item.kind.color : context.sky.muted,
                 fontWeight: on ? FontWeight.w700 : FontWeight.w400,
               ),
               child: Text(item.label, maxLines: 1),

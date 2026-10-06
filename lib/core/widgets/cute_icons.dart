@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../theme.dart';
+
 /// The five bottom-bar icons. Each has its own pastel colour and a short
 /// animation that plays when it is tapped.
 enum CuteIconKind {
@@ -17,7 +19,6 @@ enum CuteIconKind {
 }
 
 const _ink = Color(0xFF2B1B3A);
-const _muted = Color(0xFFA9A3DD);
 const _blush = Color(0xFFF7A1B5);
 const _heart = Color(0xFFF0628F);
 const _rose = Color(0xFFFFB7CF);
@@ -98,6 +99,8 @@ class _CuteIconState extends State<CuteIcon> with SingleTickerProviderStateMixin
             widget.selected,
             _c.isAnimating ? _c.value : null,
             widget.fillOverride,
+            muted: context.sky.muted,
+            day: Theme.of(context).brightness == Brightness.light,
           ),
         ),
       ),
@@ -106,7 +109,12 @@ class _CuteIconState extends State<CuteIcon> with SingleTickerProviderStateMixin
 }
 
 class _CutePainter extends CustomPainter {
-  _CutePainter(this.kind, this.selected, this.t, this.fillOverride);
+  _CutePainter(this.kind, this.selected, this.t, this.fillOverride, {required this.muted, required this.day});
+
+  /// Unselected line colour for the current time of day.
+  final Color muted;
+
+  /// By day the Tonight moon turns into a sun.
 
   final CuteIconKind kind;
   final bool selected;
@@ -114,9 +122,10 @@ class _CutePainter extends CustomPainter {
   /// Animation progress, or null when resting.
   final double? t;
   final Color? fillOverride;
+  final bool day;
 
-  Color get fill => selected ? (fillOverride ?? kind.color) : _muted.withValues(alpha: 0.12);
-  Color get line => selected ? _ink : _muted;
+  Color get fill => selected ? (fillOverride ?? kind.color) : muted.withValues(alpha: day ? 0.16 : 0.12);
+  Color get line => selected ? _ink : muted;
 
   Paint _fill(Color c) => Paint()..color = c;
   Paint _stroke(double w, [Color? c]) => Paint()
@@ -148,7 +157,7 @@ class _CutePainter extends CustomPainter {
     canvas.scale(size.width / 32);
     switch (kind) {
       case CuteIconKind.tonight:
-        _tonight(canvas);
+        day ? _sun(canvas) : _tonight(canvas);
       case CuteIconKind.week:
         _week(canvas);
       case CuteIconKind.moments:
@@ -186,6 +195,30 @@ class _CutePainter extends CustomPainter {
       ..lineTo(25.2, 8.9);
     _around(c, const Offset(23.6, 7.2), shift: shift, sx: zt == null ? 1 : .6 + .6 * zt, sy: zt == null ? 1 : .6 + .6 * zt, () {
       c.drawPath(z, _stroke(1.6, line.withValues(alpha: line.a * opacity)));
+    });
+  }
+
+  /// Daytime Tonight icon: a happy sun. Tapping spins its rays and it bounces.
+  void _sun(Canvas c) {
+    final v = t ?? 0;
+    final spin = t == null ? 0.0 : keyframe(v, [(0, 0), (1, 60)]);
+    final bounce = t == null ? 1.0 : keyframe(v, [(0, 1), (.25, 1.15), (.5, .95), (.75, 1.05), (1, 1)]);
+    const o = Offset(16, 16);
+    _around(c, o, angle: _deg(spin), () {
+      final ray = _stroke(2.2);
+      for (var i = 0; i < 8; i++) {
+        final a = i * pi / 4;
+        c.drawLine(o + Offset(cos(a), sin(a)) * 10.2, o + Offset(cos(a), sin(a)) * 13.4, ray);
+      }
+    });
+    _around(c, o, sx: bounce, sy: bounce, () {
+      _shape(c, Path()..addOval(Rect.fromCircle(center: o, radius: 7.6)));
+      final eye = _stroke(1.6);
+      c.drawArc(Rect.fromCircle(center: const Offset(13.3, 15.4), radius: 1.2), pi, pi, false, eye);
+      c.drawArc(Rect.fromCircle(center: const Offset(18.7, 15.4), radius: 1.2), pi, pi, false, eye);
+      c.drawPath(Path()..moveTo(14.3, 18.2)..quadraticBezierTo(16, 19.8, 17.7, 18.2), _stroke(1.6));
+      c.drawCircle(const Offset(11.8, 18.2), 1.1, _fill(_blush));
+      c.drawCircle(const Offset(20.2, 18.2), 1.1, _fill(_blush));
     });
   }
 
@@ -318,7 +351,12 @@ class _CutePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_CutePainter old) =>
-      old.t != t || old.selected != selected || old.kind != kind || old.fillOverride != fillOverride;
+      old.t != t ||
+      old.selected != selected ||
+      old.kind != kind ||
+      old.fillOverride != fillOverride ||
+      old.day != day ||
+      old.muted != muted;
 }
 
 /// A small heart whose bottom tip is at [tip]; [s] = 1 is about 5 units wide.

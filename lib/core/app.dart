@@ -11,18 +11,22 @@ import '../features/pairing/waiting_screen.dart';
 import '../features/settings/delete_data.dart';
 import 'firebase_providers.dart';
 import 'theme.dart';
-import 'widgets/starry_sky.dart';
+import 'sky_phase.dart';
+import 'widgets/living_sky.dart';
 
-class GoodNightApp extends StatelessWidget {
+class GoodNightApp extends ConsumerWidget {
   const GoodNightApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final phase = ref.watch(skyPhaseProvider);
     return MaterialApp(
       title: 'GoodNight',
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(),
-      builder: (context, child) => StarrySky(child: child!),
+      // Dressed for the time of day; MaterialApp glides between themes.
+      theme: buildTheme(phase),
+      themeAnimationDuration: const Duration(milliseconds: 2400),
+      builder: (context, child) => LivingSky(phase: phase, child: child!),
       home: const _Gate(),
     );
   }

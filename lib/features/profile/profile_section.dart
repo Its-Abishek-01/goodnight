@@ -68,13 +68,13 @@ class ProfileSection extends ConsumerWidget {
             clipBehavior: Clip.none,
             children: [
               PersonAvatar(uid: who, size: 76),
-              const Positioned(
+              Positioned(
                 right: -2,
                 bottom: -2,
                 child: CircleAvatar(
                   radius: 14,
-                  backgroundColor: GnColors.moon,
-                  child: Icon(Icons.photo_camera, size: 15, color: GnColors.onMoon),
+                  backgroundColor: context.sky.accent,
+                  child: Icon(Icons.photo_camera, size: 15, color: context.sky.onAccent),
                 ),
               ),
             ],
@@ -105,7 +105,7 @@ class ProfileSection extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('You', style: text.labelMedium?.copyWith(color: GnColors.muted)),
+                          Text('You', style: text.labelMedium?.copyWith(color: context.sky.muted)),
                           InkWell(
                             borderRadius: BorderRadius.circular(8),
                             onTap: () async {
@@ -122,11 +122,11 @@ class ProfileSection extends ConsumerWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                const Icon(Icons.edit, size: 16, color: GnColors.muted),
+                                Icon(Icons.edit, size: 16, color: context.sky.muted),
                               ],
                             ),
                           ),
-                          Text('Tap the photo to change it', style: text.bodySmall?.copyWith(color: GnColors.muted)),
+                          Text('Tap the photo to change it', style: text.bodySmall?.copyWith(color: context.sky.muted)),
                         ],
                       ),
                     ),
@@ -165,14 +165,14 @@ class ProfileSection extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Your partner', style: text.labelMedium?.copyWith(color: GnColors.muted)),
+                          Text('Your partner', style: text.labelMedium?.copyWith(color: context.sky.muted)),
                           Text(
                             partnerShown,
                             style: text.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                             overflow: TextOverflow.ellipsis,
                           ),
                           if (nickname.petName != null)
-                            Text('Real name: $partnerRealName', style: text.bodySmall?.copyWith(color: GnColors.muted)),
+                            Text('Real name: $partnerRealName', style: text.bodySmall?.copyWith(color: context.sky.muted)),
                         ],
                       ),
                     ),
@@ -195,7 +195,7 @@ class ProfileSection extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Only you see the pet name and photo you choose for $partnerRealName.',
-                  style: text.bodySmall?.copyWith(color: GnColors.muted),
+                  style: text.bodySmall?.copyWith(color: context.sky.muted),
                 ),
               ],
             ),

@@ -1,3 +1,4 @@
+import 'dart:math' show cos, sin;
 import 'dart:ui' show PathMetric;
 
 import 'dart:typed_data';
@@ -122,7 +123,7 @@ class MoonJourney extends StatelessWidget {
                     ),
                     Text(
                       _status(context, p),
-                      style: const TextStyle(color: GnColors.muted, fontSize: 11),
+                      style: TextStyle(color: context.sky.muted, fontSize: 11),
                     ),
                   ],
                 ),
@@ -138,7 +139,15 @@ class MoonJourney extends StatelessWidget {
                     duration: const Duration(milliseconds: 1600),
                     curve: Curves.easeOut,
                     builder: (context, glow, _) =>
-                        CustomPaint(painter: _ArcPainter(arc, _moonCenter(size), glow)),
+                        CustomPaint(
+                      painter: _ArcPainter(
+                        arc,
+                        _moonCenter(size),
+                        glow,
+                        context.sky,
+                        day: Theme.of(context).brightness == Brightness.light,
+                      ),
+                    ),
                   ),
                 ),
                 climber(me, myName, myColor, myPhoto, true),
@@ -153,7 +162,7 @@ class MoonJourney extends StatelessWidget {
             journeyCaption(myStage, theirStage, partnerName),
             key: ValueKey('$myStage$theirStage'),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: GnColors.muted, fontSize: 14),
+            style: TextStyle(color: context.sky.muted, fontSize: 14),
           ),
         ),
       ],
@@ -173,10 +182,14 @@ class MoonJourney extends StatelessWidget {
 }
 
 class _ArcPainter extends CustomPainter {
-  _ArcPainter(this.arc, this.moon, this.glow);
+  _ArcPainter(this.arc, this.moon, this.glow, this.sky, {required this.day});
 
   final Path arc;
   final Offset moon;
+  final SkyColors sky;
+
+  /// By day the moon at the top of the arc becomes the sun.
+  final bool day;
 
   /// 0..1, how brightly the moon glows (full when you are both asleep).
   final double glow;
@@ -184,7 +197,7 @@ class _ArcPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final dots = Paint()
-      ..color = GnColors.outline
+      ..color = sky.outline
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
     for (final m in arc.computeMetrics()) {
@@ -200,17 +213,21 @@ class _ArcPainter extends CustomPainter {
       halo,
       Paint()
         ..shader = RadialGradient(colors: [
-          GnColors.moon.withValues(alpha: 0.18 + 0.27 * glow),
-          GnColors.moon.withValues(alpha: 0),
+          sky.accent.withValues(alpha: 0.18 + 0.27 * glow),
+          sky.accent.withValues(alpha: 0),
         ]).createShader(Rect.fromCircle(center: moon, radius: halo)),
     );
+    if (day) {
+      _sun(canvas, r);
+      return;
+    }
     final crescent = Path.combine(
       PathOperation.difference,
       Path()..addOval(Rect.fromCircle(center: moon, radius: r)),
       Path()..addOval(Rect.fromCircle(center: moon + const Offset(12, -9), radius: r * 0.9)),
     );
-    canvas.drawPath(crescent, Paint()..color = GnColors.moon);
-    final star = Paint()..color = GnColors.moon.withValues(alpha: 0.9);
+    canvas.drawPath(crescent, Paint()..color = sky.accent);
+    final star = Paint()..color = sky.accent.withValues(alpha: 0.9);
     _sparkle(canvas, moon + const Offset(16, -2), 6, star);
     _sparkle(canvas, moon + const Offset(26, 10), 4, star);
   }
@@ -232,6 +249,33 @@ class _ArcPainter extends CustomPainter {
     );
   }
 
+  /// A smiling sun with short rays, in place of the moon.
+  void _sun(Canvas canvas, double r) {
+    final ray = Paint()
+      ..color = sky.accent.withValues(alpha: 0.8)
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 10; i++) {
+      final a = i * 3.14159265 / 5;
+      final dir = Offset(cos(a), sin(a));
+      canvas.drawLine(moon + dir * (r * 1.12), moon + dir * (r * 1.4), ray);
+    }
+    canvas.drawCircle(moon, r * 0.9, Paint()..color = sky.accent);
+    final face = Paint()
+      ..color = sky.onAccent.withValues(alpha: 0.8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round;
+    for (final dx in [-0.32, 0.32]) {
+      canvas.drawArc(Rect.fromCircle(center: moon + Offset(dx * r, -0.1 * r), radius: r * 0.14), 3.14159, 3.14159, false, face);
+    }
+    canvas.drawArc(Rect.fromCircle(center: moon + Offset(0, 0.12 * r), radius: r * 0.22), 0.25, 2.64, false, face);
+    final blush = Paint()..color = const Color(0xFFFF8FA3).withValues(alpha: 0.7);
+    canvas.drawCircle(moon + Offset(-0.5 * r, 0.18 * r), r * 0.11, blush);
+    canvas.drawCircle(moon + Offset(0.5 * r, 0.18 * r), r * 0.11, blush);
+  }
+
   @override
-  bool shouldRepaint(_ArcPainter old) => old.glow != glow || old.moon != moon;
+  bool shouldRepaint(_ArcPainter old) =>
+      old.glow != glow || old.moon != moon || old.day != day || old.sky != sky;
 }

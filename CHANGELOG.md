@@ -4,6 +4,7 @@ All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
 ### Added
+- The whole app follows the time of day: a full-screen animated sky with twinkling stars and shooting stars at night, a sunset at dusk, a sunrise at dawn and a smiling sun with drifting clouds by day. Colours, cards and icons switch with it, and the moon button becomes a sun in the morning. Long-press the logo to preview each time of day.
 - Profiles: your own photo and name (both of you see them), plus a private pet name and photo for your partner that only you see. Setup is now the Us tab.
 - Cute animated bottom bar: Tonight is a golden moon button in the middle, and every icon plays a little animation when tapped.
 

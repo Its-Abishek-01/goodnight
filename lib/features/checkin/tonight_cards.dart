@@ -32,8 +32,8 @@ class StreakChip extends ConsumerWidget {
     return ActionChip(
       avatar: const Icon(Icons.local_fire_department, color: Color(0xFFFFA45C), size: 18),
       label: Text(s.count == 0 ? 'No streak yet' : '${s.count} nights'),
-      backgroundColor: GnColors.surface,
-      side: const BorderSide(color: GnColors.outline),
+      backgroundColor: context.sky.surface,
+      side: BorderSide(color: context.sky.outline),
       shape: const StadiumBorder(),
       onPressed: () => showDialog<void>(
         context: context,
@@ -90,9 +90,9 @@ class SnoozeNudge extends ConsumerWidget {
     final p = _tonight(ref, partnerUid);
     if (p.wokeAt != null || p.snoozes < 2) return const SizedBox.shrink();
     return Card(
-      color: const Color(0xFF5A2236),
+      color: Theme.of(context).colorScheme.errorContainer,
       child: ListTile(
-        leading: const Icon(Icons.phone_in_talk, color: GnColors.moon),
+        leading: Icon(Icons.phone_in_talk, color: context.sky.accent),
         title: Text('${ref.watch(peopleProvider)[partnerUid]?.name ?? pair.nameOf(partnerUid)} has snoozed ${p.snoozes} times'),
         subtitle: const Text('Maybe give them a call.'),
       ),
@@ -117,6 +117,12 @@ class CheckInButton extends ConsumerWidget {
       );
     }
     final mine = _tonight(ref, uid);
+    if (mine.wokeAt != null) {
+      return _Hint(
+        icon: Icons.wb_sunny_outlined,
+        text: 'Up at ${_time(context, mine.wokeAt!)}. Have a lovely day.',
+      );
+    }
     if (mine.checkedInAt != null) {
       return _Hint(
         icon: Icons.check_circle,
@@ -161,13 +167,13 @@ class _Hint extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
-        color: GnColors.surface.withValues(alpha: 0.7),
+        color: context.sky.surface.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(29),
-        border: Border.all(color: GnColors.outline),
+        border: Border.all(color: context.sky.outline),
       ),
       child: Row(
         children: [
-          Icon(icon, color: GnColors.moon),
+          Icon(icon, color: context.sky.accent),
           const SizedBox(width: 12),
           Expanded(child: Text(text)),
         ],
