@@ -29,7 +29,7 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 ## Later
 - ⏳ Make grace and block durations configurable per couple, locked at pairing
 - ⏳ Photo-of-object alarm challenge
-- ⏳ App icon and splash screen
+- ⏳ Splash screen (app icon done in 0.2.0)
 - ⏳ Rules tests with the Firebase emulator, and a CI job for analyze and tests
 
 ## Known risks

@@ -4,13 +4,15 @@ The plan: closed test first (required), then production and open testing, so any
 install from the Play Store without the Play Protect block that stops the GitHub APK.
 
 ## 0. Before you start
-- [ ] Replace `[CONTACT EMAIL]` in `docs/privacy-policy.md` with a real address.
+- [x] Contact email in `docs/privacy-policy.md`.
 - [ ] Publish the privacy policy. Easiest: GitHub repo **Settings > Pages > Deploy from a
       branch > `main` / `/docs`**. The URL is then
       `https://its-abishek-01.github.io/goodnight/privacy-policy`.
-- [ ] Paste the current `firestore.rules` into the Firebase console (feature picker and
-      data deletion need it).
-- [ ] App icon (512×512 PNG), feature graphic (1024×500) and at least 2 phone screenshots.
+- [x] Deploy the current `firestore.rules` (`firebase deploy --only firestore:rules --project goodnight-27157`).
+- [x] App icon and feature graphic: `store/` (regenerate with `python scripts/make-icons.py`).
+- [ ] At least 2 phone screenshots.
+
+All the texts to paste into Play Console are in `store/play-console-answers.md`.
 
 ## 1. Developer account
 - Create one at <https://play.google.com/console> (one-time USD 25, ID verification).

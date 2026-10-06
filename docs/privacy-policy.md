@@ -11,7 +11,7 @@ why, and how to delete it. GoodNight is open source; you can read exactly what i
 <https://github.com/Its-Abishek-01/goodnight>.
 
 ## Who runs it
-GoodNight is published by an independent developer. Contact: **[CONTACT EMAIL]**.
+GoodNight is published by an independent developer. Contact: **abishek.mk.01@gmail.com**.
 
 ## What is stored, and why
 The app has no accounts or passwords. It signs in anonymously with Firebase
@@ -62,7 +62,7 @@ for it (bedtimes, nights, streak, coupons, selfies), your name and your anonymou
 and clears the alarms and reminders on your phone. Your partner's app returns to the
 pairing screen.
 
-If you no longer have the app, email **[CONTACT EMAIL]** with your name and your
+If you no longer have the app, email **abishek.mk.01@gmail.com** with your name and your
 partner's name, and the data will be deleted within 30 days.
 
 ## Children
