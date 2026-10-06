@@ -1,100 +1,96 @@
-"""Draws the GoodNight icon and Play Store graphics with Pillow.
+"""Builds every GoodNight icon and store graphic from one source image.
 
     python scripts/make-icons.py
 
-Writes the Android launcher icons (legacy PNGs plus an adaptive icon with a
-themed/monochrome layer) and store/icon-512.png, store/feature-graphic.png.
+Source: store/icon-source.png (square artwork on a flat indigo background).
+Writes:
+- Android launcher icons: legacy PNGs plus an adaptive icon (foreground on the
+  source's background colour) with a themed/monochrome layer
+- ic_notification: white silhouette for notifications (local, alarm, push)
+- splash_logo + launch_background: the start-up splash
+- assets/logo.png: the logo shown inside the app
+- store/icon-512.png and store/feature-graphic.png for Google Play
 """
 from pathlib import Path
+from statistics import median
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 RES = ROOT / 'android/app/src/main/res'
 STORE = ROOT / 'store'
-
-TOP = (42, 40, 110)      # indigo, close to the app's seed colour 0xFF3F3D8F
-BOTTOM = (16, 15, 46)
-MOON = (255, 224, 150)
-STAR = (255, 243, 210)
-SS = 4                   # supersampling for smooth edges
+SOURCE = STORE / 'icon-source.png'
 
 DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
+GOLD = (253, 226, 155)
 
 
-def gradient(w, h):
-    img = Image.new('RGB', (w, h))
+def background_colour(img):
+    """Median colour of the outer border, which is the flat background."""
+    w, h = img.size
     px = img.load()
-    for y in range(h):
-        t = y / max(h - 1, 1)
-        c = tuple(round(a + (b - a) * t) for a, b in zip(TOP, BOTTOM))
-        for x in range(w):
-            px[x, y] = c
-    return img
+    edge = [px[x, y] for x in range(w) for y in (0, 1, h - 2, h - 1)]
+    edge += [px[x, y] for y in range(h) for x in (0, 1, w - 2, w - 1)]
+    return tuple(round(median(c[i] for c in edge)) for i in range(3))
 
 
-def star(draw, cx, cy, r, fill):
-    """Four-pointed sparkle."""
-    k = r * 0.28
-    draw.polygon([(cx, cy - r), (cx + k, cy - k), (cx + r, cy), (cx + k, cy + k),
-                  (cx, cy + r), (cx - k, cy + k), (cx - r, cy), (cx - k, cy - k)], fill=fill)
-
-
-def emblem(size, moon=MOON, stars=STAR):
-    """Moon and two stars on a transparent square, art inside the middle ~60%."""
-    s = size * SS
-    img = Image.new('RGBA', (s, s), (0, 0, 0, 0))
-    # Crescent: a disc minus an offset disc.
-    mask = Image.new('L', (s, s), 0)
-    d = ImageDraw.Draw(mask)
-    r = s * 0.25
-    cx, cy = s * 0.46, s * 0.52
-    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=255)
-    off = r * 0.62
-    d.ellipse([cx - r + off, cy - r - off * 0.55, cx + r + off, cy + r - off * 0.55], fill=0)
-    img.paste(Image.new('RGBA', (s, s), moon + (255,)), (0, 0), mask)
-    # Two stars: the two of you.
-    d = ImageDraw.Draw(img)
-    star(d, s * 0.68, s * 0.36, s * 0.075, stars + (255,))
-    star(d, s * 0.76, s * 0.55, s * 0.045, stars + (255,))
-    return img.resize((size, size), Image.LANCZOS)
-
-
-def glow(art, radius):
-    a = art.split()[3].filter(ImageFilter.GaussianBlur(radius))
-    g = Image.new('RGBA', art.size, MOON + (0,))
-    g.putalpha(a.point(lambda v: v * 0.35))
-    return g
-
-
-def full_icon(size, rounded):
-    bg = gradient(size, size).convert('RGBA')
-    art = emblem(size)
-    bg.alpha_composite(glow(art, size * 0.04))
-    bg.alpha_composite(art)
-    if rounded:
-        m = Image.new('L', (size * SS, size * SS), 0)
-        ImageDraw.Draw(m).rounded_rectangle([0, 0, size * SS - 1, size * SS - 1],
-                                            radius=size * SS * 0.22, fill=255)
-        bg.putalpha(m.resize((size, size), Image.LANCZOS))
-    return bg
-
-
-def adaptive_foreground(px):
-    # 108dp canvas; round masks keep a circle of 66dp. Shrink the emblem so
-    # the small star stays inside that circle.
-    inner = round(px * 0.88)
-    out = Image.new('RGBA', (px, px), (0, 0, 0, 0))
-    out.paste(emblem(inner), ((px - inner) // 2, (px - inner) // 2))
+def key_out(img, bg, soft=60.0):
+    """Turns the background transparent, keeping anti-aliased edges smooth."""
+    out = Image.new('RGBA', img.size)
+    src, dst = img.load(), out.load()
+    for y in range(img.size[1]):
+        for x in range(img.size[0]):
+            r, g, b = src[x, y][:3]
+            dist = ((r - bg[0]) ** 2 + (g - bg[1]) ** 2 + (b - bg[2]) ** 2) ** 0.5
+            a = min(1.0, max(0.0, (dist - 12) / soft))
+            if a == 0:
+                dst[x, y] = (0, 0, 0, 0)
+                continue
+            # Remove the background that was blended into edge pixels.
+            c = [min(255, max(0, round((v - (1 - a) * bv) / a))) for v, bv in zip((r, g, b), bg)]
+            dst[x, y] = (*c, round(a * 255))
     return out
 
 
-def write_android():
-    for name, scale in DENSITIES.items():
-        d = RES / f'mipmap-{name}'
-        d.mkdir(parents=True, exist_ok=True)
-        full_icon(round(48 * scale), rounded=True).save(d / 'ic_launcher.png')
-        adaptive_foreground(round(108 * scale)).save(d / 'ic_launcher_foreground.png')
+def centred(art, canvas, fill):
+    """[art] scaled so its visible part spans [fill] of a square canvas."""
+    box = art.getbbox()
+    crop = art.crop(box)
+    scale = fill * canvas / max(crop.size)
+    crop = crop.resize((max(1, round(crop.width * scale)), max(1, round(crop.height * scale))), Image.LANCZOS)
+    out = Image.new('RGBA', (canvas, canvas), (0, 0, 0, 0))
+    out.paste(crop, ((canvas - crop.width) // 2, (canvas - crop.height) // 2), crop)
+    return out
+
+
+def rounded(img, radius):
+    m = Image.new('L', (img.width * 4, img.height * 4), 0)
+    ImageDraw.Draw(m).rounded_rectangle([0, 0, m.width - 1, m.height - 1], radius=radius * 4, fill=255)
+    out = img.convert('RGBA')
+    out.putalpha(m.resize(img.size, Image.LANCZOS))
+    return out
+
+
+def white(art):
+    out = Image.new('RGBA', art.size, (255, 255, 255, 0))
+    out.putalpha(art.split()[3])
+    return out
+
+
+def write_android(source, art, bg):
+    for name, s in DENSITIES.items():
+        mip = RES / f'mipmap-{name}'
+        mip.mkdir(parents=True, exist_ok=True)
+        size = round(48 * s)
+        rounded(source.resize((size, size), Image.LANCZOS), size * 0.22).save(mip / 'ic_launcher.png')
+        # 108dp canvas; round masks keep a 66dp circle, so the art spans ~56%.
+        centred(art, round(108 * s), 0.56).save(mip / 'ic_launcher_foreground.png')
+
+        draw = RES / f'drawable-{name}'
+        draw.mkdir(parents=True, exist_ok=True)
+        white(centred(art, round(24 * s), 0.92)).save(draw / 'ic_notification.png')
+        centred(art, round(160 * s), 1.0).save(draw / 'splash_logo.png')
+
     anydpi = RES / 'mipmap-anydpi-v26'
     anydpi.mkdir(exist_ok=True)
     (anydpi / 'ic_launcher.xml').write_text(
@@ -107,12 +103,23 @@ def write_android():
     (RES / 'values/ic_launcher_background.xml').write_text(
         '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'
         '    <color name="ic_launcher_background">#%02X%02X%02X</color>\n'
-        '</resources>\n' % TOP, encoding='utf-8')
+        '</resources>\n' % bg, encoding='utf-8')
+    splash = (
+        '<?xml version="1.0" encoding="utf-8"?>\n'
+        '<!-- Generated by scripts/make-icons.py: logo on the icon background. -->\n'
+        '<layer-list xmlns:android="http://schemas.android.com/apk/res/android">\n'
+        '    <item android:drawable="@color/ic_launcher_background" />\n'
+        '    <item>\n'
+        '        <bitmap android:gravity="center" android:src="@drawable/splash_logo" />\n'
+        '    </item>\n'
+        '</layer-list>\n')
+    for folder in ('drawable', 'drawable-v21'):
+        (RES / folder / 'launch_background.xml').write_text(splash, encoding='utf-8')
 
 
 def font(size, bold=False):
-    for name in (['segoeuib.ttf', 'arialbd.ttf', 'DejaVuSans-Bold.ttf'] if bold
-                 else ['segoeui.ttf', 'arial.ttf', 'DejaVuSans.ttf']):
+    names = ['segoeuib.ttf', 'arialbd.ttf', 'DejaVuSans-Bold.ttf'] if bold else ['segoeui.ttf', 'arial.ttf', 'DejaVuSans.ttf']
+    for name in names:
         for base in ('C:/Windows/Fonts', '/usr/share/fonts/truetype/dejavu', '/Library/Fonts'):
             p = Path(base) / name
             if p.exists():
@@ -120,25 +127,30 @@ def font(size, bold=False):
     return ImageFont.load_default()
 
 
-def write_store():
-    STORE.mkdir(exist_ok=True)
-    full_icon(512, rounded=False).save(STORE / 'icon-512.png')
+def write_store(source, art, bg):
+    source.resize((512, 512), Image.LANCZOS).save(STORE / 'icon-512.png')
 
     w, h = 1024, 500
-    img = gradient(w, h).convert('RGBA')
-    art = emblem(420)
-    layer = Image.new('RGBA', (w, h), (0, 0, 0, 0))
-    layer.paste(art, (40, 40), art)
-    img.alpha_composite(glow(layer, 18))
-    img.alpha_composite(layer)
+    img = Image.new('RGBA', (w, h), bg + (255,))
+    logo = centred(art, 400, 1.0)
+    img.alpha_composite(logo, (50, 50))
     d = ImageDraw.Draw(img)
-    d.text((470, 150), 'GoodNight', font=font(96, bold=True), fill=(255, 255, 255))
-    d.text((474, 268), 'A sleep pact for two', font=font(44), fill=MOON)
-    d.text((474, 330), 'Agree on bedtimes. Keep the streak.', font=font(30), fill=(200, 200, 230))
+    d.text((480, 150), 'GoodNight', font=font(96, bold=True), fill=(255, 255, 255))
+    d.text((484, 268), 'A sleep pact for two', font=font(44), fill=GOLD)
+    d.text((484, 330), 'Agree on bedtimes. Keep the streak.', font=font(30), fill=(205, 205, 235))
     img.convert('RGB').save(STORE / 'feature-graphic.png')
 
 
+def write_flutter(art):
+    (ROOT / 'assets').mkdir(exist_ok=True)
+    centred(art, 512, 1.0).save(ROOT / 'assets/logo.png')
+
+
 if __name__ == '__main__':
-    write_android()
-    write_store()
-    print('Icons written to', RES, 'and', STORE)
+    source = Image.open(SOURCE).convert('RGB')
+    bg = background_colour(source)
+    art = key_out(source, bg)
+    write_android(source, art, bg)
+    write_store(source, art, bg)
+    write_flutter(art)
+    print('Background #%02X%02X%02X; icons written.' % bg)

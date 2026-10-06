@@ -3,6 +3,8 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+### Changed
+- New app icon (golden crescent heart) for the launcher, themed icons, notifications, the splash screen and the pairing screen.
 
 ## 0.2.0 - 2026-10-06
 ### Added

@@ -45,7 +45,11 @@ class AlarmScheduler {
         fadeDuration: level == 0 ? 15 : 0,
         warningNotificationOnKill: true,
         androidFullScreenIntent: true,
-        notificationSettings: NotificationSettings(title: title, body: body),
+        notificationSettings: NotificationSettings(
+          title: title,
+          body: body,
+          icon: 'ic_notification',
+        ),
       ),
     );
   }

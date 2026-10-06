@@ -1,8 +1,10 @@
 # Play Console: what to paste where
 
 Everything for the GoodNight listing, in the order Play Console asks for it. Graphics are
-in this folder: `icon-512.png` and `feature-graphic.png`. Screenshots have to come from a
-real phone (see the end).
+in this folder: `icon-512.png`, `feature-graphic.png` and `screenshots/1-tonight.png` to
+`5-pairing.png` (1080x1920). All of them come from `icon-source.png`
+(`python scripts/make-icons.py`, then
+`SCREENSHOTS=1 flutter test test/store_screenshots_test.dart`).
 
 ---
 
@@ -44,7 +46,9 @@ GoodNight is open source: github.com/Its-Abishek-01/goodnight
 
 **App icon:** `store/icon-512.png`
 **Feature graphic:** `store/feature-graphic.png`
-**Phone screenshots:** at least 2 (see section 9)
+**Phone screenshots:** upload all five from `store/screenshots/`, in order:
+`1-tonight`, `2-report`, `3-coupons`, `4-setup`, `5-pairing`.
+Leave Video, Tablet, Desktop and Android XR empty.
 
 **Store settings** (Grow users > Store presence > Store settings)
 - App category: **Health & Fitness**
@@ -63,12 +67,19 @@ https://its-abishek-01.github.io/goodnight/privacy-policy
 
 **Ads:** No, my app does not contain ads.
 
-**App access:** "All or some functionality is restricted" is NOT needed. Choose
-**All functionality is available without special access**, and if there is an
-instructions box, paste:
+**Sign in details** (was "App access"): choose **Yes**. The form lists "QR codes" and
+"actions to be carried out on another device", and GoodNight has both (pairing needs a
+second phone; the hardest alarm challenge scans a QR code). Then click **Add instructions**:
+- Password: leave empty.
+- Any other information (max 500 characters). Without a reviewer code (428 chars):
 ```
-No login is needed; the app signs in anonymously. To try pairing, install on two devices: on the first tap "Create a pair code", on the second enter that code. Bedtimes are set on the Tonight tab; the partner device approves them. Night-mode blocking is enabled from the Setup tab (it shows a disclosure first, then opens Accessibility settings).
+No login: the app signs in anonymously. Pairing needs 2 devices: on one tap "Create a pair code", on the other tap "Join with code" and enter it. Set a bedtime on the Tonight tab; approve it on the other device. The QR code is an optional alarm challenge the app makes itself (Setup > Alarm QR code); without it the alarm uses typing. Night mode: Setup > Night mode blocking > Turn on > I agree, then enable it in Accessibility.
 ```
+  With a code from a test phone left on the waiting screen (replace ABC123):
+```
+No login: the app signs in anonymously. Pairing needs 2 devices: on one tap "Create a pair code", on the other "Join with code". Or join our waiting test phone with code ABC123. Set a bedtime on the Tonight tab; the other device approves it. QR is an optional alarm challenge the app makes itself (Setup > Alarm QR code); without it the alarm uses typing. Night mode: Setup > Night mode blocking > Turn on > I agree, then enable in Accessibility.
+```
+- Tick "Sign in details in this declaration provide full access to all the features" (there is no paid content).
 
 **Content rating:** start the questionnaire.
 - Category: **All other app types**
@@ -198,7 +209,8 @@ Please don't leave the test early: Google needs 12 people to stay in for 14 days
 Dashboard > **Apply for production**. Answer honestly: how many testers, what they used,
 what you changed. After approval: Production > Create release (same .aab or newer), roll out.
 
-## 9. Screenshots (you, on a real phone)
-At least 2, ideally 4–6, portrait. Good ones: Tonight tab with both checked in, the
-streak card, the weekly Report, Setup with the feature picker, the alarm challenge
-screen, the Moments tab. Power + volume-down takes a screenshot.
+## 9. Screenshots
+`store/screenshots/` has five 1080x1920 screenshots of the real screens, rendered with
+sample data (a couple called Sam and Alex on a 9-night streak). Four or more at 1080px
+make the app eligible for promotion. Real-phone screenshots of the alarm or Moments can
+be added later (power + volume-down).

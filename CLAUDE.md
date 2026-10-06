@@ -59,4 +59,6 @@ Grace/block durations are constants in `Blocker` (Dart); they are not yet config
 
 **Data deletion**: `PairRepository.deletePair` marks the pair `closing`, deletes every collection in `pairCollections` in small batches, then the pair, join code and user doc; the rules allow those deletes only while the pair is closing. Add any new pair subcollection to `pairCollections` and give it a `closingByMember` delete rule. The gate shows `_Closing` for a closing pair.
 
+**Icons and store graphics** all come from `store/icon-source.png`: `python scripts/make-icons.py` writes the launcher/adaptive/monochrome icons, `ic_notification` (used by local notifications, the alarm and FCM), the splash, `assets/logo.png` and the Play icon and feature graphic. Store screenshots are rendered from the real widgets with fake providers: `SCREENSHOTS=1 flutter test test/store_screenshots_test.dart` (skipped in normal runs).
+
 See also `docs/NEW_MACHINE.md` for setting up on a fresh computer, `docs/PLAY_STORE.md` for Google Play, and `docs/privacy-policy.md` (published on GitHub Pages; keep it in step with what the app stores).

@@ -60,6 +60,8 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
           padding: const EdgeInsets.all(24),
           children: [
             const SizedBox(height: 32),
+            Center(child: Image.asset('assets/logo.png', width: 120, height: 120)),
+            const SizedBox(height: 24),
             Text('GoodNight 🌙',
                 style: Theme.of(context).textTheme.headlineLarge),
             const SizedBox(height: 8),

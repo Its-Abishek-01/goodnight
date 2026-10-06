@@ -1,3 +1,5 @@
+<img src="store/icon-512.png" alt="GoodNight icon" width="96" align="right">
+
 # GoodNight 🌙
 
 A mutual sleep pact for two people. You agree on each other's bedtimes, night mode
