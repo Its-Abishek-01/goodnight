@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme.dart';
 import '../pairing/pair.dart';
+import '../profile/profile.dart';
 import '../settings/features.dart';
 import '../settings/features_providers.dart';
 import '../streak/streak.dart';
@@ -62,13 +63,16 @@ class TonightJourney extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final partnerUid = pair.partnerUid(uid) ?? '';
+    final people = ref.watch(peopleProvider);
     return MoonJourney(
       me: _tonight(ref, uid),
       partner: _tonight(ref, partnerUid),
-      myName: pair.nameOf(uid),
-      partnerName: pair.nameOf(partnerUid),
+      myName: people[uid]?.name ?? pair.nameOf(uid),
+      partnerName: people[partnerUid]?.name ?? pair.nameOf(partnerUid),
       myColor: pair.colorOf(uid),
       partnerColor: pair.colorOf(partnerUid),
+      myPhoto: people[uid]?.photo,
+      partnerPhoto: people[partnerUid]?.photo,
     );
   }
 }
@@ -89,7 +93,7 @@ class SnoozeNudge extends ConsumerWidget {
       color: const Color(0xFF5A2236),
       child: ListTile(
         leading: const Icon(Icons.phone_in_talk, color: GnColors.moon),
-        title: Text('${pair.nameOf(partnerUid)} has snoozed ${p.snoozes} times'),
+        title: Text('${ref.watch(peopleProvider)[partnerUid]?.name ?? pair.nameOf(partnerUid)} has snoozed ${p.snoozes} times'),
         subtitle: const Text('Maybe give them a call.'),
       ),
     );

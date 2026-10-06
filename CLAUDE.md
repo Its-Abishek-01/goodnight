@@ -33,6 +33,7 @@ Flutter UI with Riverpod, Firebase (anonymous auth, Firestore) as the only backe
 
 **Firestore model** (all under `pairs/{pairId}` unless noted; `firestore.rules` encodes who may write what):
 - `users/{uid}`: name, pairId, fcmToken. `pairCodes/{code}`: single-use join code.
+- `profiles/{uid}`: that person's photo (blob, under 200 KB), readable by both. `nicknames/{uid}`: the pet name and photo uid gave their partner, readable only by uid (so `deletePair` deletes it by id rather than listing). `peopleProvider` resolves what to show for each member.
 - The pair doc itself holds `members`, `names.{uid}`, `colors.{uid}` (a `PartnerColor` name; `Pair.colorOf` defaults to sky for the creator, rose for the partner), `status` and `closing`.
 - `schedules/{ownerUid}`: `current` (approved, locked window) + `proposal` (pending, with `by`). Only the person who did NOT propose can approve. A change proposal leaves `current` active until approved.
 - `nights/{nightKey}`: `players.{uid}` = checkedInAt, wokeAt, snoozes, blocks, usageMinutes; plus `forgiveBy`/`forgiven`. Each person writes only their own player entry.
@@ -59,6 +60,8 @@ Flutter UI with Riverpod, Firebase (anonymous auth, Firestore) as the only backe
 Grace/block durations are constants in `Blocker` (Dart); they are not yet configurable per couple.
 
 **Data deletion**: `PairRepository.deletePair` marks the pair `closing`, deletes every collection in `pairCollections` in small batches, then the pair, join code and user doc; the rules allow those deletes only while the pair is closing. Add any new pair subcollection to `pairCollections` and give it a `closingByMember` delete rule. The gate shows `_Closing` for a closing pair.
+
+**Bottom bar**: `core/widgets/moon_nav_bar.dart` with Tonight as the raised moon; icons are painted in `core/widgets/cute_icons.dart` (32x32 space, `keyframe` tracks drive the tap animations).
 
 **Look and feel**: `core/theme.dart` (`GnColors`, `buildTheme`) and `core/widgets/starry_sky.dart`, which `MaterialApp.builder` paints behind every screen, so scaffolds are transparent. The Tonight centrepiece is `checkin/moon_journey.dart`; its position and caption logic (`stageOf`, `journeyT`, `journeyCaption`) is pure and tested.
 

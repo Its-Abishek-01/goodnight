@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../pairing/pair.dart';
-import '../pairing/partner_color.dart';
+import '../profile/person_avatar.dart';
+import '../profile/profile.dart';
 import 'schedule.dart';
 import 'schedule_providers.dart';
 
@@ -36,7 +37,8 @@ class BedtimeCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final repo = ref.read(scheduleRepositoryProvider);
     final otherName = pair.nameOf(_isMine ? pair.partnerUid(me) ?? '' : me);
-    final title = _isMine ? 'Your bedtime' : "${pair.nameOf(owner)}'s bedtime";
+    final ownerName = ref.watch(peopleProvider)[owner]?.name ?? pair.nameOf(owner);
+    final title = _isMine ? 'Your bedtime' : "$ownerName's bedtime";
     final current = schedule?.current;
     final proposal = schedule?.proposal;
 
@@ -97,7 +99,7 @@ class BedtimeCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                PartnerAvatar(name: pair.nameOf(owner), color: pair.colorOf(owner), size: 28),
+                PersonAvatar(uid: owner, size: 28),
                 const SizedBox(width: 10),
                 Text(title, style: Theme.of(context).textTheme.titleMedium),
               ],

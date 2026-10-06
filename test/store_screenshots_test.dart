@@ -25,6 +25,7 @@ import 'package:goodnight/features/pairing/home_screen.dart';
 import 'package:goodnight/features/pairing/pair.dart';
 import 'package:goodnight/features/pairing/pair_providers.dart';
 import 'package:goodnight/features/pairing/pairing_screen.dart';
+import 'package:goodnight/features/profile/profile.dart';
 import 'package:goodnight/features/push/push_providers.dart';
 import 'package:goodnight/features/reminders/reminder_providers.dart';
 import 'package:goodnight/features/selfie/selfie.dart';
@@ -139,6 +140,8 @@ Widget _app(Widget home, {bool together = false}) {
             ),
           ])),
       selfiesProvider.overrideWith((ref) => Stream.value(const <Selfie>[])),
+      profilePhotosProvider.overrideWith((ref) => Stream.value(const {})),
+      nicknameProvider.overrideWith((ref) => Stream.value(Nickname.none)),
       personalFeaturesProvider.overrideWith((ref) => Stream.value(const {_me: PersonalFeatures.all})),
       sharedSettingsProvider.overrideWith((ref) => Stream.value(SharedSettings.initial)),
       alarmSyncProvider.overrideWith((ref) {}),
@@ -224,7 +227,7 @@ void main() {
   testWidgets('2 report', skip: !enabled, (tester) async {
     await _show(tester, const HomeScreen(pair: _pair, uid: _me));
     await tester.pump();
-    await tester.tap(find.text('Report'));
+    await tester.tap(find.text('Our week'));
     await _shoot(tester, '2-report');
   });
 
@@ -238,7 +241,7 @@ void main() {
   testWidgets('4 setup', skip: !enabled, (tester) async {
     await _show(tester, const HomeScreen(pair: _pair, uid: _me));
     await tester.pump();
-    await tester.tap(find.text('Setup'));
+    await tester.tap(find.text('Us'));
     await _shoot(tester, '4-setup');
   });
 

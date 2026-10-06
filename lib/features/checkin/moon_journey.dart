@@ -1,5 +1,7 @@
 import 'dart:ui' show PathMetric;
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
@@ -55,6 +57,8 @@ class MoonJourney extends StatelessWidget {
     required this.partnerName,
     required this.myColor,
     required this.partnerColor,
+    this.myPhoto,
+    this.partnerPhoto,
   });
 
   final PlayerNight me;
@@ -63,6 +67,8 @@ class MoonJourney extends StatelessWidget {
   final String partnerName;
   final PartnerColor myColor;
   final PartnerColor partnerColor;
+  final Uint8List? myPhoto;
+  final Uint8List? partnerPhoto;
 
   static const _height = 230.0;
   static const _avatar = 46.0;
@@ -79,7 +85,7 @@ class MoonJourney extends StatelessWidget {
           child: LayoutBuilder(builder: (context, box) {
             final size = Size(box.maxWidth, _height);
             final arc = _arc(size);
-            Widget climber(PlayerNight p, String name, PartnerColor color, bool isMe) {
+            Widget climber(PlayerNight p, String name, PartnerColor color, Uint8List? photo, bool isMe) {
               final stage = stageOf(p);
               return TweenAnimationBuilder<double>(
                 tween: Tween(end: journeyT(stage, isMe: isMe)),
@@ -99,6 +105,7 @@ class MoonJourney extends StatelessWidget {
                     PartnerAvatar(
                       name: name,
                       color: color,
+                      photo: photo,
                       size: _avatar,
                       badge: switch (stage) {
                         JourneyStage.asleep => Icons.bedtime,
@@ -134,8 +141,8 @@ class MoonJourney extends StatelessWidget {
                         CustomPaint(painter: _ArcPainter(arc, _moonCenter(size), glow)),
                   ),
                 ),
-                climber(me, myName, myColor, true),
-                climber(partner, partnerName, partnerColor, false),
+                climber(me, myName, myColor, myPhoto, true),
+                climber(partner, partnerName, partnerColor, partnerPhoto, false),
               ],
             );
           }),

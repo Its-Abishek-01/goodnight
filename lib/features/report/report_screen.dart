@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../checkin/night_log.dart';
 import '../checkin/night_providers.dart';
 import '../pairing/pair.dart';
-import '../pairing/partner_color.dart';
+import '../profile/person_avatar.dart';
 import '../streak/streak.dart';
 import '../streak/streak_providers.dart';
 
@@ -63,7 +63,7 @@ class ReportScreen extends ConsumerWidget {
           children: [
             Row(
               children: [
-                PartnerAvatar(name: pair.nameOf(who), color: pair.colorOf(who), size: 24),
+                PersonAvatar(uid: who, size: 24),
                 const SizedBox(width: 8),
                 Text(name, style: Theme.of(context).textTheme.titleSmall),
               ],

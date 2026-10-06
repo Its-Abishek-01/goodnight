@@ -80,6 +80,7 @@ class PairRepository {
     'grants',
     'coupons',
     'selfies',
+    'profiles',
   ];
 
   /// Ends the pact and deletes everything stored for it: every collection
@@ -102,6 +103,11 @@ class PairRepository {
         }
         await batch.commit();
       }
+    }
+    // Each person can only read their own nicknames doc, so it cannot be
+    // listed; delete both by id instead.
+    for (final m in pair.members) {
+      await pairRef.collection('nicknames').doc(m).delete();
     }
     if (pair.code.isNotEmpty) await _db.doc('pairCodes/${pair.code}').delete();
     await pairRef.delete();

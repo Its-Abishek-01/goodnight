@@ -169,6 +169,43 @@ service cloud.firestore {
           );
       }
 
+      // Profile photo per person: both can see it, only the owner changes it.
+      match /profiles/{uid} {
+        allow delete: if closingByMember(pairId);
+
+        allow read: if request.auth != null
+          && request.auth.uid in pairMembers(pairId);
+
+        allow create, update: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && uid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['photo', 'updatedAt'])
+          && (request.resource.data.photo == null
+              || request.resource.data.photo.size() < 200000);
+      }
+
+      // What you privately call your partner (pet name, your photo of them).
+      // Only the owner can read or write their own doc.
+      match /nicknames/{uid} {
+        allow delete: if closingByMember(pairId);
+
+        allow read: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && uid == request.auth.uid;
+
+        allow create, update: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && uid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['petName', 'photo', 'updatedAt'])
+          && (!('petName' in request.resource.data)
+              || request.resource.data.petName == null
+              || (request.resource.data.petName is string
+                  && request.resource.data.petName.size() <= 40))
+          && (!('photo' in request.resource.data)
+              || request.resource.data.photo == null
+              || request.resource.data.photo.size() < 200000);
+      }
+
       // One schedule per person. A person proposes a window; only the OTHER
       // person can approve it, which moves it into `current` (locked).
       match /schedules/{owner} {

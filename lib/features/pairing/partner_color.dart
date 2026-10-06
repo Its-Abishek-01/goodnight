@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 /// The colour each person picks for themselves. Stored on the pair as
@@ -82,7 +84,8 @@ class PartnerColorPicker extends StatelessWidget {
   }
 }
 
-/// A round avatar with the person's initial in their colour.
+/// A round avatar: the person's photo, or their initial, ringed in their
+/// colour.
 class PartnerAvatar extends StatelessWidget {
   const PartnerAvatar({
     super.key,
@@ -90,11 +93,13 @@ class PartnerAvatar extends StatelessWidget {
     required this.color,
     this.size = 44,
     this.badge,
+    this.photo,
   });
 
   final String name;
   final PartnerColor color;
   final double size;
+  final Uint8List? photo;
 
   /// Small icon in the corner, for example a moon when asleep.
   final IconData? badge;
@@ -114,11 +119,17 @@ class PartnerAvatar extends StatelessWidget {
             decoration: BoxDecoration(
               color: color.color,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withValues(alpha: 0.85), width: 2),
+              border: Border.all(
+                color: photo == null ? Colors.white.withValues(alpha: 0.85) : color.color,
+                width: photo == null ? 2 : size * 0.06 + 1,
+              ),
               boxShadow: [BoxShadow(color: color.color.withValues(alpha: 0.45), blurRadius: 12)],
+              image: photo == null
+                  ? null
+                  : DecorationImage(image: MemoryImage(photo!), fit: BoxFit.cover),
             ),
             alignment: Alignment.center,
-            child: Text(
+            child: photo != null ? null : Text(
               initial,
               style: TextStyle(
                 color: color.onColor,
