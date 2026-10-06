@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 GoodNight is an Android-only Flutter app for two people (a couple) who make a mutual sleep pact. Package `com.wiozen.goodnight`, Firebase project `goodnight-27157`. The repo is public and releases ship as APKs on GitHub Releases. See `README.md` for the user-facing feature list and `docs/RELEASING.md` for releasing.
 
+Project docs: `docs/ARCHITECTURE.md` (diagram and data flows), `docs/ROADMAP.md` (done / next / later; keep it updated when finishing work), `CHANGELOG.md` (add an entry under Unreleased for user-visible changes).
+
 ## Commands
 ```bash
 flutter pub get

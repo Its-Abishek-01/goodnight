@@ -71,6 +71,9 @@ flutter analyze && flutter test
 cd android && ./gradlew :app:testDebugUnitTest
 ```
 
+## Project docs
+[Architecture](docs/ARCHITECTURE.md) · [Roadmap and progress](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Push alerts](docs/PUSH.md)
+
 ## Releasing
 See [docs/RELEASING.md](docs/RELEASING.md). Pushing a `v*` tag builds a signed APK and
 publishes a GitHub Release.
