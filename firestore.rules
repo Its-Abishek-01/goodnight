@@ -83,6 +83,28 @@ service cloud.firestore {
           && resource.data.holder != request.auth.uid;
       }
 
+      // Private selfies between the two partners. The image is stored in the
+      // document. Only the receiver can set the read receipt (seenAt), once.
+      match /selfies/{id} {
+        allow read: if request.auth != null
+          && request.auth.uid in pairMembers(pairId);
+
+        allow create: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && request.resource.data.from == request.auth.uid
+          && request.resource.data.image.size() < 800000
+          && request.resource.data.seenAt == null;
+
+        allow update: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && resource.data.from != request.auth.uid
+          && resource.data.seenAt == null
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seenAt']);
+
+        allow delete: if request.auth != null
+          && resource.data.from == request.auth.uid;
+      }
+
       // One schedule per person. A person proposes a window; only the OTHER
       // person can approve it, which moves it into `current` (locked).
       match /schedules/{owner} {

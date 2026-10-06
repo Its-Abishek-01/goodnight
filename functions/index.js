@@ -1,6 +1,10 @@
 // OPTIONAL push alerts. The app works without this; deploying it needs the
 // Firebase Blaze (pay-as-you-go) plan. See docs/PUSH.md.
-const { onDocumentWritten } = require('firebase-functions/v2/firestore');
+const {
+  onDocumentWritten,
+  onDocumentCreated,
+  onDocumentUpdated,
+} = require('firebase-functions/v2/firestore');
 const admin = require('firebase-admin');
 
 admin.initializeApp();
@@ -57,4 +61,39 @@ exports.couponAlert = onDocumentWritten('pairs/{pairId}/coupons/{id}', async (ev
     `${name} used a coupon 💌`,
     `${after.title} - no questions asked.`,
   );
+});
+
+async function userDoc(uid) {
+  return (await db.doc(`users/${uid}`).get()).data() || {};
+}
+
+// A new selfie: a data-only push so the app can refresh the home-screen widget
+// even when it is closed. The app builds the notification itself.
+exports.selfieAlert = onDocumentCreated('pairs/{pairId}/selfies/{id}', async (event) => {
+  const selfie = event.data.data();
+  const token = await partnerToken(event.params.pairId, selfie.from);
+  if (!token) return;
+  const name = (await userDoc(selfie.from)).name || 'Your partner';
+  await admin.messaging().send({
+    token,
+    data: {
+      type: 'selfie',
+      pairId: event.params.pairId,
+      selfieId: event.params.id,
+      name,
+    },
+    android: { priority: 'high' },
+  });
+});
+
+// The receiver opened the selfie: tell the sender (the read receipt).
+exports.selfieSeenAlert = onDocumentUpdated('pairs/{pairId}/selfies/{id}', async (event) => {
+  const before = event.data.before.data();
+  const after = event.data.after.data();
+  if (before.seenAt || !after.seenAt) return;
+  const pair = (await db.doc(`pairs/${event.params.pairId}`).get()).data();
+  const viewer = (pair?.members || []).find((m) => m !== after.from);
+  if (!viewer) return;
+  const name = (await userDoc(viewer)).name || 'Your partner';
+  await push((await userDoc(after.from)).fcmToken, '👀 Seen', `${name} saw your selfie.`);
 });

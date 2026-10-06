@@ -28,5 +28,9 @@ pushes that arrive while it is open. The functions in `functions/index.js` send:
 | Snooze count reaches 2 or 3 and not yet up | "{name} is still asleep" |
 | New or changed bedtime proposal | "Bedtime to approve" |
 | Coupon redeemed | "{name} used a coupon" |
+| New selfie | data-only push that refreshes the home-screen widget and shows a notification |
+| Selfie opened | "{name} saw your selfie" (the read receipt) |
 
-These functions have not been tested against a live project yet.
+First deploy of 2nd-gen functions can fail with an Eventarc permission error. Wait a few minutes and run the deploy again.
+
+These functions have not been tested end to end on real phones yet.

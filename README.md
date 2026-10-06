@@ -29,19 +29,22 @@ blocking, and Firebase for syncing the two phones.
   coupon to use on the other. They cannot say no, and it is deleted once they confirm.
   Once a week you can ask to forgive a bad night, if your partner agrees.
 - **Weekly report.** Last 7 nights for both of you.
+- **Moments.** Send each other a random selfie. The latest one from your partner shows on a home-screen widget, and you see "Seen" once they open it. Photos are private to the two of you and disappear after a week (5 per person per day).
 
 ## Install (Android)
 1. Open the [latest release](https://github.com/Its-Abishek-01/goodnight/releases/latest) on your phone and download the `.apk`.
 2. Open it and allow "Install unknown apps" for your browser when asked. If Play Protect warns about an unrecognised app, choose "Install anyway".
 3. Open GoodNight and go to **Setup**. Allow notifications, exact alarms, running in the background and the camera.
 4. Turn on **Night mode blocking**. On Android 13 or later, if the Accessibility switch is greyed out, open Settings > Apps > GoodNight, tap the three-dot menu, choose **Allow restricted settings**, then enable "GoodNight night mode" under Accessibility.
-5. On phones from Xiaomi, Oppo, Vivo, Samsung and similar makers, also set GoodNight to "No restrictions" for battery, or the system may kill the alarm and blocker.
+5. To use the selfie widget, long-press your home screen, choose Widgets, and add **GoodNight - Partner selfie**.
+6. On phones from Xiaomi, Oppo, Vivo, Samsung and similar makers, also set GoodNight to "No restrictions" for battery, or the system may kill the alarm and blocker.
 
 Both of you need the app. One creates a pair code and the other joins with it.
 
 ## Privacy
 The released app syncs through a shared Firebase project. It stores only your name,
-your pair, bedtimes, check-ins, snooze and block counts, and coupons. The Accessibility
+your pair, bedtimes, check-ins, snooze and block counts, coupons, and the selfies you
+choose to send (readable only by your partner, deleted after a week). The Accessibility
 service checks which app or website address is in front, only during your approved night
 hours, to pause Instagram and Shorts. It never reads messages, passwords or what you
 type, and it does not record browsing history. To keep all data under your own control,
@@ -52,8 +55,8 @@ build from source with your own Firebase project.
   updates, which can break website and Shorts detection until it is updated here.
 - **It only works if you both want it.** Either person can still uninstall the app or
   turn the permission off. That is why setup is mutual.
-- **Push alerts are optional.** Without the Cloud Function you only see your partner's
-  snoozes while the app is open. See [docs/PUSH.md](docs/PUSH.md).
+- **Push alerts need the Cloud Functions** (Firebase Blaze plan). Without them you only see your partner's
+  snoozes, bedtime proposals and new selfies while the app is open. See [docs/PUSH.md](docs/PUSH.md).
 - **Coupon and streak rules are enforced by the two apps and Firestore rules**, not by
   a server, so they rely on honest partners.
 - Developed and unit tested, but real-device behaviour (especially blocking on

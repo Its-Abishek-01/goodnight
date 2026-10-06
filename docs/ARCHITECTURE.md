@@ -28,6 +28,7 @@
 ## Data flow examples
 - **Bedtime approval:** A writes `schedules/A.proposal` -> B sees it live -> B approves, which moves it to `current` -> A's `alarmSyncProvider`, `blockerSyncProvider` and `reminderSyncProvider` all react to the new `current` window.
 - **Night block:** service ticks every 5s -> `BlockEngine.tick` decides Allow or Block -> block counts stored natively -> uploaded to `nights/{key}.players.{uid}` when the app opens.
+- **Selfie:** A takes a photo (720px, compressed) -> stored as a blob in `pairs/{id}/selfies/{id}` -> `selfieAlert` sends B a data-only push -> B's background handler fetches it, saves a file and refreshes the home-screen widget -> B opens it in Moments, which sets `seenAt` -> `selfieSeenAlert` tells A.
 - **Coupon:** streak reaches a milestone -> `grants/{startKey_m}` plus two `coupons/*` created in one transaction -> holder redeems -> partner confirms and the coupon is deleted.
 
 ## Key decisions

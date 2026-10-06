@@ -12,6 +12,7 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Check-in, partner status, snooze nudge, bedtime and wrap-up reminders
 - ✅ Shared streak, weekly report, weekly mutual forgiveness
 - ✅ Streak coupons: single use, no questions asked, deleted when confirmed
+- ✅ Moments: selfies with read receipts and a home-screen widget 🔧
 - ✅ Release workflow (tag -> signed APK -> GitHub Release), README, privacy notes
 
 ## Next (before the first public release)
@@ -19,12 +20,12 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ⏳ Verify Firestore rules against the live project and fix any denied writes
 - ⏳ Generate the release keystore and add the 5 GitHub secrets (`docs/RELEASING.md`)
 - ⏳ Restrict the Firebase API key to the package and release SHA-1
+- ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
 - ⏳ Push local commits and tag `v0.1.0`
 
 ## Later
 - ⏳ Make grace and block durations configurable per couple, locked at pairing
 - ⏳ Photo-of-object alarm challenge
-- ⏳ Deploy and test the optional push Cloud Function
 - ⏳ App icon and splash screen
 - ⏳ Play Store: closed test (12 testers, 14 days) and Accessibility declaration
 - ⏳ Rules tests with the Firebase emulator, and a CI job for analyze and tests

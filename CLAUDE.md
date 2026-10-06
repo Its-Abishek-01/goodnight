@@ -50,4 +50,6 @@ Flutter UI with Riverpod, Firebase (anonymous auth, Firestore) as the only backe
 
 **Notifications**: local reminders (wrap-up call 30 min before bedtime, bedtime) via `core/notifications.dart`. Partner push is optional: `features/push` saves the FCM token; `functions/index.js` (needs the Blaze plan, untested) sends the alerts. See `docs/PUSH.md`.
 
+**Moments (selfies)** (`features/selfie/`): the compressed JPEG lives in the Firestore doc (`selfies/{id}.image` blob, rules cap it at 800 KB), not Firebase Storage. Only the receiver can set `seenAt` (the read receipt). `selfieSyncProvider` writes the partner's latest photo to a file and calls `home_widget`; native side is `SelfieWidgetProvider.kt` (layout `res/layout/selfie_widget.xml`). A data-only FCM push from `selfieAlert` runs `goodnightBackgroundHandler` so the widget updates while the app is closed. Own selfies older than 7 days are deleted client-side.
+
 Grace/block durations are constants in `Blocker` (Dart); they are not yet configurable per couple.

@@ -12,6 +12,8 @@ import '../coupons/coupons_screen.dart';
 import '../push/push_providers.dart';
 import '../reminders/reminder_providers.dart';
 import '../report/report_screen.dart';
+import '../selfie/moments_screen.dart';
+import '../selfie/selfie_providers.dart';
 import '../setup/setup_screen.dart';
 import 'pair.dart';
 
@@ -55,12 +57,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(reminderSyncProvider);
     ref.watch(pushSyncProvider);
     ref.watch(couponSyncProvider);
+    ref.watch(selfieSyncProvider);
+    final unseen = ref.watch(unseenSelfiesProvider);
     final pending = (ref.watch(couponsProvider).value ?? const <Coupon>[])
         .where((c) => c.status == CouponStatus.redeemed && c.holder != widget.uid)
         .length;
     final pages = <Widget>[
       _Tonight(pair: widget.pair, uid: widget.uid),
       ReportScreen(pair: widget.pair, uid: widget.uid),
+      MomentsScreen(pair: widget.pair, uid: widget.uid),
       CouponsScreen(pair: widget.pair, uid: widget.uid),
       const SetupScreen(),
     ];
@@ -73,6 +78,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         destinations: [
           const NavigationDestination(icon: Icon(Icons.nights_stay_outlined), label: 'Tonight'),
           const NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Report'),
+          NavigationDestination(
+            icon: Badge(
+              isLabelVisible: unseen > 0,
+              label: Text('$unseen'),
+              child: const Icon(Icons.photo_camera_front),
+            ),
+            label: 'Moments',
+          ),
           NavigationDestination(
             icon: Badge(
               isLabelVisible: pending > 0,

@@ -11,6 +11,7 @@ All notable changes to GoodNight. The format follows Keep a Changelog.
 - Check-ins, partner status, bedtime and call wrap-up reminders.
 - Shared streak, 7-night report and weekly mutual forgiveness.
 - Streak-earned, single-use coupons.
+- Moments: private selfies between partners with read receipts and an Android home-screen widget.
 - Tag-triggered release workflow that publishes a signed APK.
 - Optional Cloud Function for background push alerts.
 
