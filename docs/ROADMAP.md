@@ -19,12 +19,21 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ v0.1.0 tagged and released on GitHub
 - ✅ Play Store groundwork: `.aab` builds, privacy policy, in-app data deletion, checklist in `docs/PLAY_STORE.md` 🔧
 
+## Done since v0.2.0 (on main, not released yet)
+- ✅ Golden crescent-heart icon everywhere, store graphics and rendered screenshots
+- ✅ Redesign: journey to the moon, per-person colours, cute animated bottom bar with a moon button
+- ✅ Profiles: own photo and name, private pet name and photo for your partner (Us tab)
+- ✅ Whole app follows the time of day (night, dawn, day, dusk sky; long-press the logo to preview)
+- ✅ Firestore rules deployed (features, deletion, profiles, nicknames)
+- ✅ Running on two real vivo phones over adb, paired 🔧 (alarm, night mode, coupons, profiles still to try)
+
 ## Next
-- ⏳ Paste the updated `firestore.rules` (new `features` collection) into the Firebase console
-- ⏳ Test on two real Android phones (pairing, alarm, blocking, coupons, feature picker). Install with `adb install`: Play Protect blocks browser installs of apps with an Accessibility service in India
-- ⏳ Verify Firestore rules against the live project and fix any denied writes
+- ⏳ Try the rest on the two phones: bedtimes and approval, check-in journey, alarm and snoozes, night-mode blocking, profile photos, pet names, coupons
+- ⏳ Play signing key: upload the pepk zip (Bouncy Castle first on the classpath, see `docs/PLAY_STORE.md`)
+- ⏳ Release v0.2.1 (new icon and design) and upload its `.aab` to a closed test
+- ⏳ Closed test: 12 testers for 14 days, then apply for production and open testing (`store/play-console-answers.md` has every form answer)
 - ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
-- ⏳ Google Play, following `docs/PLAY_STORE.md`: contact email in the privacy policy, GitHub Pages, signing key choice, declarations, closed test (12 testers, 14 days), then production and open testing
+- ⏳ Maybe: block/report, a "send a goodnight hug" button (needs push)
 
 ## Later
 - ⏳ Make grace and block durations configurable per couple, locked at pairing

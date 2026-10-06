@@ -29,6 +29,16 @@ uninstalling (and losing their local alarm/QR settings).
 **Recommended:** when creating the app, under **App integrity > App signing**, choose to
 use your own key and upload `goodnight-release.jks` with Google's PEPK tool (the console
 shows the exact command). Then the Play build and the GitHub APK are interchangeable.
+
+On Oracle Java 17 the console's pepk command fails with "Cannot find any provider supporting
+RSA/NONE/OAEPWithSHA1AndMGF1Padding". Download `bcprov-jdk18on-1.78.1.jar` from Maven Central,
+create `pepk-bc.security` containing
+`security.provider.13=org.bouncycastle.jce.provider.BouncyCastleProvider`, and run (signed
+Bouncy Castle jar first on the classpath):
+
+```
+java "-Djava.security.properties=pepk-bc.security" -cp "bcprov-jdk18on-1.78.1.jar;pepk.jar" com.google.wireless.android.vending.developer.signing.tools.extern.export.ExportEncryptedPrivateKeyTool --keystore=goodnight-release.jks --alias=goodnight --output=goodnight-signing-key.zip --include-cert --rsa-aes-encryption --encryption-key-path=encryption_public_key.pem
+```
 Your upload key is the same keystore. This choice cannot be undone later.
 
 ## 3. Build the bundle
