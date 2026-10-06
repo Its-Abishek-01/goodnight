@@ -6,6 +6,9 @@ import '../bedtime/bedtime_card.dart';
 import '../bedtime/schedule_providers.dart';
 import '../blocking/blocker_providers.dart';
 import '../checkin/tonight_cards.dart';
+import '../coupons/coupon.dart';
+import '../coupons/coupon_providers.dart';
+import '../coupons/coupons_screen.dart';
 import '../push/push_providers.dart';
 import '../reminders/reminder_providers.dart';
 import '../report/report_screen.dart';
@@ -51,9 +54,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(blockerSyncProvider);
     ref.watch(reminderSyncProvider);
     ref.watch(pushSyncProvider);
+    ref.watch(couponSyncProvider);
+    final pending = (ref.watch(couponsProvider).value ?? const <Coupon>[])
+        .where((c) => c.status == CouponStatus.redeemed && c.holder != widget.uid)
+        .length;
     final pages = <Widget>[
       _Tonight(pair: widget.pair, uid: widget.uid),
       ReportScreen(pair: widget.pair, uid: widget.uid),
+      CouponsScreen(pair: widget.pair, uid: widget.uid),
       const SetupScreen(),
     ];
     return Scaffold(
@@ -62,10 +70,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.nights_stay_outlined), label: 'Tonight'),
-          NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Report'),
-          NavigationDestination(icon: Icon(Icons.tune), label: 'Setup'),
+        destinations: [
+          const NavigationDestination(icon: Icon(Icons.nights_stay_outlined), label: 'Tonight'),
+          const NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Report'),
+          NavigationDestination(
+            icon: Badge(
+              isLabelVisible: pending > 0,
+              label: Text('$pending'),
+              child: const Icon(Icons.card_giftcard),
+            ),
+            label: 'Coupons',
+          ),
+          const NavigationDestination(icon: Icon(Icons.tune), label: 'Setup'),
         ],
       ),
     );

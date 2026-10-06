@@ -50,6 +50,39 @@ service cloud.firestore {
                   && resource.data.get('forgiveBy', null) != request.auth.uid));
       }
 
+      // Streak milestones. A grant is kept forever so a coupon is earned once.
+      match /grants/{id} {
+        allow read: if request.auth != null
+          && request.auth.uid in pairMembers(pairId);
+        allow create: if request.auth != null
+          && request.auth.uid in pairMembers(pairId);
+      }
+
+      // Single-use coupons. Only the holder can use one; only the partner can
+      // delete it, after it has been used.
+      match /coupons/{id} {
+        allow read: if request.auth != null
+          && request.auth.uid in pairMembers(pairId);
+
+        allow create: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && request.resource.data.status == 'ready'
+          && request.resource.data.holder in pairMembers(pairId)
+          && existsAfter(/databases/$(database)/documents/pairs/$(pairId)/grants/$(request.resource.data.grantId));
+
+        allow update: if request.auth != null
+          && resource.data.holder == request.auth.uid
+          && resource.data.status == 'ready'
+          && request.resource.data.status == 'redeemed'
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['status', 'title', 'redeemedAt']);
+
+        allow delete: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && resource.data.status == 'redeemed'
+          && resource.data.holder != request.auth.uid;
+      }
+
       // One schedule per person. A person proposes a window; only the OTHER
       // person can approve it, which moves it into `current` (locked).
       match /schedules/{owner} {
