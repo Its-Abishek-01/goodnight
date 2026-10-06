@@ -63,6 +63,42 @@ class PairRepository {
     return code;
   }
 
+  /// Every collection stored under a pair.
+  static const pairCollections = [
+    'nights',
+    'schedules',
+    'features',
+    'grants',
+    'coupons',
+    'selfies',
+  ];
+
+  /// Ends the pact and deletes everything stored for it: every collection
+  /// under the pair, the pair, its join code and [uid]'s user doc. The rules
+  /// only allow these deletes once the pair is marked `closing`. The
+  /// partner's user doc is left pointing at a missing pair, which sends
+  /// their app back to pairing.
+  Future<void> deletePair(Pair pair, String uid) async {
+    final pairRef = _db.doc('pairs/${pair.id}');
+    await pairRef.update({'closing': true});
+    for (final name in pairCollections) {
+      // Small pages: selfie docs hold images, and every delete runs a rules
+      // lookup of the pair.
+      while (true) {
+        final page = await pairRef.collection(name).limit(10).get();
+        if (page.docs.isEmpty) break;
+        final batch = _db.batch();
+        for (final d in page.docs) {
+          batch.delete(d.reference);
+        }
+        await batch.commit();
+      }
+    }
+    if (pair.code.isNotEmpty) await _db.doc('pairCodes/${pair.code}').delete();
+    await pairRef.delete();
+    await _db.doc('users/$uid').delete();
+  }
+
   /// Joins the pair that owns [rawCode]. Codes are single use.
   Future<void> joinPair({
     required String uid,

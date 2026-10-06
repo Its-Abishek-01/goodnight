@@ -15,21 +15,25 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Moments: selfies with read receipts and a home-screen widget 🔧
 - ✅ Release workflow (tag -> signed APK -> GitHub Release), README, privacy notes
 - ✅ Release keystore, GitHub secrets and Firebase API key restriction, Blaze plan, repo public, Firestore rules deployed
+- ✅ Feature picker: personal (alarm, night mode, reminders) and shared with approval (streak & coupons, Moments) 🔧
+- ✅ v0.1.0 tagged and released on GitHub
+- ✅ Play Store groundwork: `.aab` builds, privacy policy, in-app data deletion, checklist in `docs/PLAY_STORE.md` 🔧
 
-## Next (before the first public release)
-- ⏳ Test on two real Android phones (pairing, alarm, blocking, coupons)
+## Next
+- ⏳ Paste the updated `firestore.rules` (new `features` collection) into the Firebase console
+- ⏳ Test on two real Android phones (pairing, alarm, blocking, coupons, feature picker). Install with `adb install`: Play Protect blocks browser installs of apps with an Accessibility service in India
 - ⏳ Verify Firestore rules against the live project and fix any denied writes
 - ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
-- ⏳ Push local commits and tag `v0.1.0`
+- ⏳ Google Play, following `docs/PLAY_STORE.md`: contact email in the privacy policy, GitHub Pages, signing key choice, declarations, closed test (12 testers, 14 days), then production and open testing
 
 ## Later
 - ⏳ Make grace and block durations configurable per couple, locked at pairing
 - ⏳ Photo-of-object alarm challenge
 - ⏳ App icon and splash screen
-- ⏳ Play Store: closed test (12 testers, 14 days) and Accessibility declaration
 - ⏳ Rules tests with the Firebase emulator, and a CI job for analyze and tests
 
 ## Known risks
+- Play Protect blocks installing the GitHub APK from a browser in India (enhanced fraud protection, because of the Accessibility service). Play Store or `adb install` are the ways around it.
 - Website and Shorts detection depends on third-party view ids that can change.
 - Some phone brands kill background services; the Setup tab asks for battery exemptions.
 - Streak and coupon integrity relies on honest partners (no server check).

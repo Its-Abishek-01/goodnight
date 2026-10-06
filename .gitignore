@@ -57,3 +57,7 @@ key.properties
 functions/node_modules/
 firebase-debug.log
 .firebase/
+
+# Local release outputs from scripts/build-release.sh
+/goodnight-*.apk
+/goodnight-*.aab

@@ -154,8 +154,8 @@ class ReportScreen extends ConsumerWidget {
                     Text(
                       '${m == uid ? 'You' : pair.nameOf(m)}: '
                       '${goodBedtime(n.playerOf(m), windows[m]) ? '✅' : '❌'} bedtime · '
-                      '${goodMorning(n.playerOf(m)) ? '✅' : '❌'} morning '
-                      '(${n.playerOf(m).snoozes} snoozes)',
+                      '${!n.playerOf(m).alarm ? 'no alarm' : '${goodMorning(n.playerOf(m)) ? '✅' : '❌'} morning '
+                          '(${n.playerOf(m).snoozes} snoozes)'}',
                     ),
                   if (!isGoodNight(n, windows, members))
                     _forgiveRow(context, n, nights, uid, pair, repo),

@@ -86,6 +86,32 @@ void main() {
     expect(canForgiveInWeek([forgiven], '2026-10-12'), isTrue);
   });
 
+  test('without the alarm only bedtime counts', () {
+    final noAlarm = PlayerNight(checkedInAt: DateTime(2026, 10, 6, 22, 50), alarm: false);
+    expect(goodMorning(noAlarm), isTrue);
+    expect(morningDone(noAlarm), isTrue);
+    expect(morningDone(const PlayerNight(alarm: false)), isFalse);
+    final late = PlayerNight(checkedInAt: DateTime(2026, 10, 6, 23, 30), alarm: false);
+    expect(isGoodNight(_night('2026-10-05', a: late), _windows, _members), isFalse);
+  });
+
+  test('tonight counts once the alarm user is up and the other checked in', () {
+    final noAlarm = PlayerNight(checkedInAt: DateTime(2026, 10, 6, 22, 20), alarm: false);
+    final asleep = Night(
+      key: '2026-10-06',
+      players: {'a': PlayerNight(checkedInAt: DateTime(2026, 10, 6, 22, 55)), 'b': noAlarm},
+    );
+    expect(computeStreak([asleep, _night('2026-10-05')], _windows, _members, '2026-10-06').count, 1);
+    final up = Night(key: '2026-10-06', players: {'a': _good('2026-10-06'), 'b': noAlarm});
+    expect(computeStreak([up, _night('2026-10-05')], _windows, _members, '2026-10-06').count, 2);
+  });
+
+  test('nights logged before the setting existed still need a wake-up', () {
+    final old = PlayerNight.fromMap({});
+    expect(old.alarm, isTrue);
+    expect(goodMorning(old), isFalse);
+  });
+
   test('previousKey crosses month boundaries', () {
     expect(previousKey('2026-10-01'), '2026-09-30');
     expect(previousKey('2026-01-01'), '2025-12-31');

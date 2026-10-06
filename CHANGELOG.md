@@ -4,6 +4,9 @@ All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
 ### Added
+- Delete my data: ends the pact and permanently deletes everything stored for the pair (Setup tab, or while waiting for a partner).
+- Releases also include an `.aab` for Google Play.
+- Pick your features on the Setup tab. Smart alarm, night-mode blocking and reminders are each person's own choice; streak & coupons and Moments are shared, so one of you proposes a change and the other approves it. Without the alarm, only your bedtime counts towards the streak.
 - Pairing with a single-use code and anonymous sign-in.
 - Bedtime proposals that the partner must approve, then lock.
 - Smart alarm that gets louder and harder with every snooze, plus a verify alarm and QR challenge.

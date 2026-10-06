@@ -21,7 +21,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.41.6'
+          flutter-version: '3.47.6'
           channel: stable
           cache: true
 
@@ -57,10 +57,20 @@ jobs:
             --build-number="$GITHUB_RUN_NUMBER"
           cp build/app/outputs/flutter-apk/app-release.apk "goodnight-${GITHUB_REF_NAME}.apk"
 
+      # The bundle is for Google Play uploads; phones install the .apk.
+      - name: Build release app bundle
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          flutter build appbundle --release \
+            --build-name="$VERSION" \
+            --build-number="$GITHUB_RUN_NUMBER"
+          cp build/app/outputs/bundle/release/app-release.aab "goodnight-${GITHUB_REF_NAME}.aab"
+
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "goodnight-${GITHUB_REF_NAME}.apk" \
+          gh release create "$GITHUB_REF_NAME" \
+            "goodnight-${GITHUB_REF_NAME}.apk" "goodnight-${GITHUB_REF_NAME}.aab" \
             --title "GoodNight $GITHUB_REF_NAME" \
             --generate-notes

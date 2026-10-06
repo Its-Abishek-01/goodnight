@@ -14,6 +14,7 @@ import '../reminders/reminder_providers.dart';
 import '../report/report_screen.dart';
 import '../selfie/moments_screen.dart';
 import '../selfie/selfie_providers.dart';
+import '../settings/features_providers.dart';
 import '../setup/setup_screen.dart';
 import 'pair.dart';
 
@@ -56,28 +57,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(blockerSyncProvider);
     ref.watch(reminderSyncProvider);
     ref.watch(pushSyncProvider);
-    ref.watch(couponSyncProvider);
-    ref.watch(selfieSyncProvider);
-    final unseen = ref.watch(unseenSelfiesProvider);
-    final pending = (ref.watch(couponsProvider).value ?? const <Coupon>[])
-        .where((c) => c.status == CouponStatus.redeemed && c.holder != widget.uid)
-        .length;
-    final pages = <Widget>[
-      _Tonight(pair: widget.pair, uid: widget.uid),
-      ReportScreen(pair: widget.pair, uid: widget.uid),
-      MomentsScreen(pair: widget.pair, uid: widget.uid),
-      CouponsScreen(pair: widget.pair, uid: widget.uid),
-      const SetupScreen(),
-    ];
-    return Scaffold(
-      appBar: AppBar(title: const Text('GoodNight 🌙')),
-      body: pages[_tab],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: [
-          const NavigationDestination(icon: Icon(Icons.nights_stay_outlined), label: 'Tonight'),
-          const NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Report'),
+    final shared = ref.watch(sharedFeaturesProvider);
+    if (shared.streak) ref.watch(couponSyncProvider);
+    if (shared.moments) ref.watch(selfieSyncProvider);
+    final unseen = shared.moments ? ref.watch(unseenSelfiesProvider) : 0;
+    final pending = !shared.streak
+        ? 0
+        : (ref.watch(couponsProvider).value ?? const <Coupon>[])
+            .where((c) => c.status == CouponStatus.redeemed && c.holder != widget.uid)
+            .length;
+    final tabs = <(NavigationDestination, Widget)>[
+      (
+        const NavigationDestination(icon: Icon(Icons.nights_stay_outlined), label: 'Tonight'),
+        _Tonight(pair: widget.pair, uid: widget.uid, streak: shared.streak),
+      ),
+      (
+        const NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Report'),
+        ReportScreen(pair: widget.pair, uid: widget.uid),
+      ),
+      if (shared.moments)
+        (
           NavigationDestination(
             icon: Badge(
               isLabelVisible: unseen > 0,
@@ -86,6 +85,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
             label: 'Moments',
           ),
+          MomentsScreen(pair: widget.pair, uid: widget.uid),
+        ),
+      if (shared.streak)
+        (
           NavigationDestination(
             icon: Badge(
               isLabelVisible: pending > 0,
@@ -94,18 +97,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
             label: 'Coupons',
           ),
-          const NavigationDestination(icon: Icon(Icons.tune), label: 'Setup'),
-        ],
+          CouponsScreen(pair: widget.pair, uid: widget.uid),
+        ),
+      (
+        const NavigationDestination(icon: Icon(Icons.tune), label: 'Setup'),
+        SetupScreen(pair: widget.pair, uid: widget.uid),
+      ),
+    ];
+    // A tab can disappear when the couple turns a feature off.
+    final tab = _tab.clamp(0, tabs.length - 1);
+    return Scaffold(
+      appBar: AppBar(title: const Text('GoodNight 🌙')),
+      body: tabs[tab].$2,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: tab,
+        onDestinationSelected: (i) => setState(() => _tab = i),
+        destinations: [for (final t in tabs) t.$1],
       ),
     );
   }
 }
 
 class _Tonight extends ConsumerWidget {
-  const _Tonight({required this.pair, required this.uid});
+  const _Tonight({required this.pair, required this.uid, required this.streak});
 
   final Pair pair;
   final String uid;
+  final bool streak;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -119,7 +137,7 @@ class _Tonight extends ConsumerWidget {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox(height: 16),
-        const StreakCard(),
+        if (streak) const StreakCard(),
         StatusCard(pair: pair, uid: uid),
         CheckInCard(pair: pair, uid: uid),
         BedtimeCard(pair: pair, me: uid, owner: uid, schedule: schedules[uid]),

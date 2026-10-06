@@ -5,7 +5,7 @@ fresh Claude Code session can pick up the project.
 
 ## Install
 - Git and the GitHub CLI (`gh auth login`)
-- Flutter **3.41.6** (stable) with the Android SDK and JDK 17
+- Flutter **3.47.6** (stable) with the Android SDK and JDK 17
 - Node 22 and the Firebase CLI (`npm i -g firebase-tools`, then `firebase login`)
 - Claude Code (optional): open the cloned folder and ask it to continue from `docs/ROADMAP.md`
 

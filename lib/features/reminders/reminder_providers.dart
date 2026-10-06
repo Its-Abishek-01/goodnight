@@ -3,20 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/notifications.dart';
 import '../../core/firebase_providers.dart';
 import '../bedtime/schedule_providers.dart';
+import '../settings/features_providers.dart';
 
 const wrapUpReminderId = 2001;
 const bedtimeReminderId = 2002;
 
 /// Daily reminders: a call wrap-up nudge 30 minutes before bedtime, then a
-/// gentle "time to sleep" at bedtime. Follows the approved bedtime.
+/// gentle "time to sleep" at bedtime. Follows the approved bedtime, and is
+/// off when this person turned reminders off.
 final reminderSyncProvider = Provider<void>((ref) {
   final uid = ref.watch(uidProvider).value;
-  ref.listen(schedulesProvider, (_, next) async {
-    final map = next.value;
-    if (uid == null || map == null) return;
+  Future<void> sync() async {
+    final map = ref.read(schedulesProvider).value;
+    final features = ref.read(myFeaturesProvider);
+    if (uid == null || map == null || features == null) return;
     final w = map[uid]?.current;
     try {
-      if (w == null) {
+      if (w == null || !features.reminders) {
         await Notifications.cancel(wrapUpReminderId);
         await Notifications.cancel(bedtimeReminderId);
         return;
@@ -36,5 +39,8 @@ final reminderSyncProvider = Provider<void>((ref) {
     } catch (_) {
       // Notification setup is best effort.
     }
-  }, fireImmediately: true);
+  }
+
+  ref.listen(schedulesProvider, (_, _) => sync(), fireImmediately: true);
+  ref.listen(myFeaturesProvider, (_, _) => sync());
 });

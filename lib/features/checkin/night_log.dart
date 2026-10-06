@@ -20,6 +20,7 @@ class PlayerNight {
     this.snoozes = 0,
     this.blocks = 0,
     this.usageMinutes = 0,
+    this.alarm = true,
   });
 
   final DateTime? checkedInAt;
@@ -28,12 +29,18 @@ class PlayerNight {
   final int blocks;
   final int usageMinutes;
 
+  /// Whether this person used the wake alarm that night, saved at check-in.
+  /// Without it there is no wake-up to judge, so only bedtime counts.
+  /// Nights logged before the setting existed count as alarm nights.
+  final bool alarm;
+
   factory PlayerNight.fromMap(Map<String, dynamic> m) => PlayerNight(
         checkedInAt: (m['checkedInAt'] as Timestamp?)?.toDate(),
         wokeAt: (m['wokeAt'] as Timestamp?)?.toDate(),
         snoozes: (m['snoozes'] as num?)?.toInt() ?? 0,
         blocks: (m['blocks'] as num?)?.toInt() ?? 0,
         usageMinutes: (m['usageMinutes'] as num?)?.toInt() ?? 0,
+        alarm: m['alarm'] as bool? ?? true,
       );
 }
 
@@ -97,11 +104,17 @@ class NightLogRepository {
     }, SetOptions(merge: true));
   }
 
-  Future<void> checkIn(String pairId, String uid, DateTime now) => _mergePlayer(
+  Future<void> checkIn(
+    String pairId,
+    String uid,
+    DateTime now, {
+    required bool alarm,
+  }) =>
+      _mergePlayer(
         pairId,
         uid,
         now,
-        {'checkedInAt': Timestamp.fromDate(now)},
+        {'checkedInAt': Timestamp.fromDate(now), 'alarm': alarm},
       );
 
   Future<void> recordSnooze(String pairId, String uid, DateTime now) =>

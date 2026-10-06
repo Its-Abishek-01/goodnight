@@ -30,7 +30,15 @@ bool goodBedtime(PlayerNight p, SleepWindow? w) {
   return d <= checkInGraceMinutes && d >= -checkInEarlyMinutes;
 }
 
-bool goodMorning(PlayerNight p) => p.wokeAt != null && p.snoozes <= maxGoodSnoozes;
+/// Woke up with few enough snoozes. Someone without the alarm that night has
+/// no wake-up to judge, so their morning always counts.
+bool goodMorning(PlayerNight p) =>
+    !p.alarm || (p.wokeAt != null && p.snoozes <= maxGoodSnoozes);
+
+/// Nothing more to wait for from this person tonight: they confirmed they are
+/// up, or they checked in without the alarm.
+bool morningDone(PlayerNight p) =>
+    p.wokeAt != null || (!p.alarm && p.checkedInAt != null);
 
 bool isGoodNight(
   Night n,
@@ -42,10 +50,11 @@ bool isGoodNight(
       return goodBedtime(p, windows[m]) && goodMorning(p);
     });
 
-/// True once everyone has confirmed they are up, or the night is in the past.
+/// True once everyone is done for the night (see [morningDone]), or the night
+/// is in the past.
 bool isComplete(Night n, Iterable<String> members, String currentKey) =>
     n.key.compareTo(currentKey) < 0 ||
-    members.every((m) => n.playerOf(m).wokeAt != null);
+    members.every((m) => morningDone(n.playerOf(m)));
 
 class StreakInfo {
   const StreakInfo(this.count, this.startKey);
@@ -72,7 +81,7 @@ StreakInfo computeStreak(
   String? start;
 
   final cur = byKey[currentKey];
-  if (cur != null && members.every((m) => cur.playerOf(m).wokeAt != null)) {
+  if (cur != null && members.every((m) => morningDone(cur.playerOf(m)))) {
     if (isGoodNight(cur, windows, members)) {
       count++;
       start = currentKey;

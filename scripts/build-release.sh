@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Manual signed release build, same result as the GitHub workflow.
-#   bash scripts/build-release.sh              -> goodnight-local.apk
-#   bash scripts/build-release.sh 0.1.1 20     -> goodnight-0.1.1.apk (name 0.1.1, build number 20)
+#   bash scripts/build-release.sh              -> goodnight-local.apk + .aab
+#   bash scripts/build-release.sh 0.1.1 20     -> goodnight-0.1.1.apk + .aab (name 0.1.1, build number 20)
+# The .apk is for GitHub Releases, the .aab is what you upload to Google Play.
+# Play needs a higher build number for every upload.
 # Works in Git Bash on Windows, macOS and Linux.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -34,6 +36,10 @@ flutter build apk "${args[@]}"
 out="goodnight-${VERSION:-local}.apk"
 cp build/app/outputs/flutter-apk/app-release.apk "$out"
 
+flutter build appbundle "${args[@]}"
+bundle="goodnight-${VERSION:-local}.aab"
+cp build/app/outputs/bundle/release/app-release.aab "$bundle"
+
 # Best effort: confirm the APK is signed with the release key, not the debug key.
 sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/AppData/Local/Android/sdk}}"
 apksigner=$(ls "$sdk"/build-tools/*/apksigner "$sdk"/build-tools/*/apksigner.bat 2>/dev/null | sort | tail -1 || true)
@@ -47,4 +53,4 @@ else
   echo "(apksigner not found, skipped signature check)"
 fi
 
-echo "Built $out"
+echo "Built $out and $bundle"

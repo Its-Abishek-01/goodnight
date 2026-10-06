@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../pairing/pair.dart';
+import '../settings/features.dart';
+import '../settings/features_providers.dart';
 import '../streak/streak_providers.dart';
 import 'night_log.dart';
 import 'night_providers.dart';
@@ -52,9 +54,12 @@ class CheckInCard extends ConsumerWidget {
       child = Text('✅ Checked in at ${_time(context, mine!.checkedInAt!)}');
     } else if (open) {
       child = FilledButton.icon(
-        onPressed: () => ref
-            .read(nightLogRepositoryProvider)
-            .checkIn(pair.id, uid, DateTime.now()),
+        onPressed: () => ref.read(nightLogRepositoryProvider).checkIn(
+              pair.id,
+              uid,
+              DateTime.now(),
+              alarm: (ref.read(myFeaturesProvider) ?? PersonalFeatures.all).alarm,
+            ),
         icon: const Icon(Icons.bedtime),
         label: const Text('Going to sleep'),
       );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../settings/delete_data.dart';
 import 'pair.dart';
 
 class WaitingScreen extends StatelessWidget {
@@ -37,6 +38,11 @@ class WaitingScreen extends StatelessWidget {
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
               const Text('Waiting for your partner to join...'),
+              const SizedBox(height: 32),
+              TextButton(
+                onPressed: () => confirmDeleteData(context, pair),
+                child: const Text('Cancel and delete my data'),
+              ),
             ],
           ),
         ),

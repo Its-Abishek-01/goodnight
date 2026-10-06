@@ -29,11 +29,15 @@ blocking, and Firebase for syncing the two phones.
   coupon to use on the other. They cannot say no, and it is deleted once they confirm.
   Once a week you can ask to forgive a bad night, if your partner agrees.
 - **Weekly report.** Last 7 nights for both of you.
+- **Pick what you use.** On the Setup tab, each of you can turn the smart alarm,
+  night mode and reminders on or off for yourself. Streak & coupons and Moments are
+  shared: one of you proposes the change and the other approves it.
 - **Moments.** Send each other a random selfie. The latest one from your partner shows on a home-screen widget, and you see "Seen" once they open it. Photos are private to the two of you and disappear after a week (5 per person per day).
 
 ## Install (Android)
 1. Open the [latest release](https://github.com/Its-Abishek-01/goodnight/releases/latest) on your phone and download the `.apk`.
 2. Open it and allow "Install unknown apps" for your browser when asked. If Play Protect warns about an unrecognised app, choose "Install anyway".
+   In some countries (India, for example) Play Protect blocks browser installs of any app that uses an Accessibility service, with no "Install anyway" option. Then install from a computer instead: turn on USB debugging on the phone and run `adb install goodnight-<version>.apk`. A Google Play release is planned.
 3. Open GoodNight and go to **Setup**. Allow notifications, exact alarms, running in the background and the camera.
 4. Turn on **Night mode blocking**. On Android 13 or later, if the Accessibility switch is greyed out, open Settings > Apps > GoodNight, tap the three-dot menu, choose **Allow restricted settings**, then enable "GoodNight night mode" under Accessibility.
 5. To use the selfie widget, long-press your home screen, choose Widgets, and add **GoodNight - Partner selfie**.

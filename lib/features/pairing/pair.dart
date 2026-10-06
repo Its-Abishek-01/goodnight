@@ -9,6 +9,7 @@ class Pair {
     required this.members,
     required this.names,
     required this.status,
+    this.closing = false,
   });
 
   final String id;
@@ -16,6 +17,10 @@ class Pair {
   final List<String> members;
   final Map<String, String> names;
   final PairStatus status;
+
+  /// Set when one of you chose to delete everything. The pair and all its
+  /// data are being removed.
+  final bool closing;
 
   factory Pair.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data()!;
@@ -25,6 +30,7 @@ class Pair {
       members: List<String>.from(d['members'] as List),
       names: Map<String, String>.from(d['names'] as Map),
       status: d['status'] == 'active' ? PairStatus.active : PairStatus.waiting,
+      closing: d['closing'] as bool? ?? false,
     );
   }
 

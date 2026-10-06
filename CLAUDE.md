@@ -36,10 +36,13 @@ Flutter UI with Riverpod, Firebase (anonymous auth, Firestore) as the only backe
 - `schedules/{ownerUid}`: `current` (approved, locked window) + `proposal` (pending, with `by`). Only the person who did NOT propose can approve. A change proposal leaves `current` active until approved.
 - `nights/{nightKey}`: `players.{uid}` = checkedInAt, wokeAt, snoozes, blocks, usageMinutes; plus `forgiveBy`/`forgiven`. Each person writes only their own player entry.
 - `grants/{startKey_milestone}` (tombstone so a coupon is earned once) and `coupons/{grantId_uid}` (holder, status ready/redeemed).
+- `features/{uid}`: that person's own choices (alarm, nightMode, reminders). `features/shared`: `current` + `proposal` for streak and moments, approved like schedules. A missing doc or field means on.
 
 **Night key**: a night is keyed by the date of `now - 12h` (`nightKey()` in `checkin/night_log.dart`), so 23:00 on D and 07:00 on D+1 are both night D. The Kotlin side has the identical `nightKeyOf` in `BlockEngine.kt`; keep the two in sync.
 
-**Streak and coupons** are computed client-side. `streak/streak.dart` is pure: a night is good only if both people checked in within 15 min after bedtime (up to 4h early) and woke with at most 3 snoozes; forgiven nights keep a streak alive without adding to it. `couponSyncProvider` grants coupons at milestones 7/14/30/60 using `startKey_milestone` ids.
+**Features** (`features/settings/`): sync providers read `myFeaturesProvider`, which is null until loaded so nothing acts on the defaults. `HomeScreen` hides the Moments/Coupons tabs and their sync providers when the shared feature is off.
+
+**Streak and coupons** are computed client-side. `streak/streak.dart` is pure: a night is good only if both people checked in within 15 min after bedtime (up to 4h early) and woke with at most 3 snoozes; forgiven nights keep a streak alive without adding to it. A person who checked in with the alarm off (`players.{uid}.alarm == false`, saved at check-in so later toggles cannot rewrite old nights) is judged on bedtime only. `couponSyncProvider` grants coupons at milestones 7/14/30/60 using `startKey_milestone` ids.
 
 **Alarm** (`features/alarm/`): wraps the `alarm` package. Ids 1001 wake, 1002 snooze, 1003 verify (`AlarmScheduler`). `RingNotifier` surfaces the ringing id to the gate. Challenge difficulty is `challengeFor(snoozeCount)` (tap, math, type, QR; QR falls back to type if no QR is set up). Snooze count and the night key persist in SharedPreferences (`AlarmPrefs`). `alarmSyncProvider` reschedules the wake alarm whenever the approved schedule changes.
 
@@ -54,4 +57,6 @@ Flutter UI with Riverpod, Firebase (anonymous auth, Firestore) as the only backe
 
 Grace/block durations are constants in `Blocker` (Dart); they are not yet configurable per couple.
 
-See also `docs/NEW_MACHINE.md` for setting up on a fresh computer.
+**Data deletion**: `PairRepository.deletePair` marks the pair `closing`, deletes every collection in `pairCollections` in small batches, then the pair, join code and user doc; the rules allow those deletes only while the pair is closing. Add any new pair subcollection to `pairCollections` and give it a `closingByMember` delete rule. The gate shows `_Closing` for a closing pair.
+
+See also `docs/NEW_MACHINE.md` for setting up on a fresh computer, `docs/PLAY_STORE.md` for Google Play, and `docs/privacy-policy.md` (published on GitHub Pages; keep it in step with what the app stores).

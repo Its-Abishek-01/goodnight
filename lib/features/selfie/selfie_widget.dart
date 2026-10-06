@@ -20,4 +20,14 @@ class SelfieHomeWidget {
     await HomeWidget.saveWidgetData<String>('selfie_caption', caption);
     await HomeWidget.updateWidget(androidName: _androidName);
   }
+
+  /// Empties the widget, for example after the data is deleted.
+  static Future<void> clear() async {
+    final dir = await getApplicationSupportDirectory();
+    final file = File('${dir.path}/partner_selfie.jpg');
+    if (await file.exists()) await file.delete();
+    await HomeWidget.saveWidgetData<String>('selfie_path', null);
+    await HomeWidget.saveWidgetData<String>('selfie_caption', null);
+    await HomeWidget.updateWidget(androidName: _androidName);
+  }
 }

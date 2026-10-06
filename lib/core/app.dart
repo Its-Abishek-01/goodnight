@@ -8,6 +8,7 @@ import '../features/pairing/pair.dart';
 import '../features/pairing/pair_providers.dart';
 import '../features/pairing/pairing_screen.dart';
 import '../features/pairing/waiting_screen.dart';
+import '../features/settings/delete_data.dart';
 import 'firebase_providers.dart';
 
 class GoodNightApp extends StatelessWidget {
@@ -24,6 +25,39 @@ class GoodNightApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const _Gate(),
+    );
+  }
+}
+
+/// Shown while a pair is being deleted. Either person can finish a deletion
+/// that was interrupted.
+class _Closing extends StatelessWidget {
+  const _Closing({required this.pair});
+
+  final Pair pair;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'This pact is being ended and its data deleted.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => confirmDeleteData(context, pair),
+                child: const Text('Finish deleting'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -70,6 +104,7 @@ class _Gate extends ConsumerWidget {
     }
     final p = pair.value;
     if (p == null) return const PairingScreen();
+    if (p.closing) return _Closing(pair: p);
     if (p.status == PairStatus.waiting) return WaitingScreen(pair: p);
     return HomeScreen(pair: p, uid: uid.value!);
   }

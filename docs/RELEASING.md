@@ -70,8 +70,8 @@ Same signed APK as the workflow, built on your own computer.
    (`../goodnight-release.jks` if the keystore sits in the repo root; it is git-ignored).
 3. Build:
    ```bash
-   bash scripts/build-release.sh              # goodnight-local.apk
-   bash scripts/build-release.sh 0.1.1 20     # goodnight-0.1.1.apk
+   bash scripts/build-release.sh              # goodnight-local.apk + .aab
+   bash scripts/build-release.sh 0.1.1 20     # goodnight-0.1.1.apk + .aab
    ```
    It runs analyze and tests, builds, and checks the APK is signed with the release key
    (not the debug key). Use a build number higher than the last release's
