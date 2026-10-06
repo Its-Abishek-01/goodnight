@@ -14,12 +14,11 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Streak coupons: single use, no questions asked, deleted when confirmed
 - ✅ Moments: selfies with read receipts and a home-screen widget 🔧
 - ✅ Release workflow (tag -> signed APK -> GitHub Release), README, privacy notes
+- ✅ Release keystore, GitHub secrets and Firebase API key restriction, Blaze plan, repo public, Firestore rules deployed
 
 ## Next (before the first public release)
 - ⏳ Test on two real Android phones (pairing, alarm, blocking, coupons)
 - ⏳ Verify Firestore rules against the live project and fix any denied writes
-- ⏳ Generate the release keystore and add the 5 GitHub secrets (`docs/RELEASING.md`)
-- ⏳ Restrict the Firebase API key to the package and release SHA-1
 - ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
 - ⏳ Push local commits and tag `v0.1.0`
 
