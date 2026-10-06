@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/alarm/alarm_providers.dart';
+import '../features/alarm/alarm_ring_screen.dart';
 import '../features/pairing/home_screen.dart';
 import '../features/pairing/pair.dart';
 import '../features/pairing/pair_providers.dart';
@@ -32,6 +34,9 @@ class _Gate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ringing = ref.watch(ringProvider);
+    if (ringing != null) return AlarmRingScreen(alarmId: ringing);
+
     final uid = ref.watch(uidProvider);
     final pair = ref.watch(pairProvider);
 

@@ -49,3 +49,6 @@ android/app/google-services.json
 *.jks
 *.keystore
 key.properties
+
+# Gradle build output
+/android/build/
