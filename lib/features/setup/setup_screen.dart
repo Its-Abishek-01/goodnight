@@ -70,13 +70,18 @@ class _SetupScreenState extends ConsumerState<SetupScreen> with WidgetsBindingOb
     final go = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Allow night mode blocking'),
+        title: const Text('Night mode uses Accessibility'),
         content: const Text(
-          'GoodNight uses Android\'s Accessibility service to see which app or '
-          'website is in front, only during the bedtime hours you and your partner '
-          'agreed on. It pauses Instagram and YouTube Shorts after a short grace '
-          'time. It never reads messages, passwords or what you type, and it '
-          'collects nothing else.\n\n'
+          'GoodNight uses Android\'s Accessibility service for night mode. Only '
+          'during the bedtime hours you and your partner agreed on, it checks which '
+          'app is open, the address in your browser\'s address bar and whether '
+          'YouTube is showing Shorts, so it can pause Instagram and Shorts after a '
+          '5-minute grace time.\n\n'
+          'It saves how many times it paused them and how many minutes you spent '
+          'on them at night, and shares those two numbers with your partner in your '
+          'weekly report. It never reads your messages, passwords or what you type, '
+          'and it does not keep your browsing history. You can turn night mode off '
+          'any time on the Us tab.\n\n'
           'If the switch is greyed out: tap "App info", open the three-dot menu, '
           'choose "Allow restricted settings", then come back and turn on '
           '"GoodNight night mode" under Accessibility.',

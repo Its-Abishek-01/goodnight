@@ -3,6 +3,8 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+### Changed
+- Clearer night-mode disclosure: it now says which two numbers are saved and shared with your partner.
 
 ## 0.2.1 - 2026-10-06
 ### Added
