@@ -33,6 +33,11 @@ flutter run            # needs an Android phone or emulator
 | GitHub Secrets: `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`, `GOOGLE_SERVICES_JSON` | repo Settings > Secrets | Re-add from the keystore and Firebase console |
 | Firebase login | CLI, per machine | `firebase login` |
 
+## Manual release build
+See "Manual (local) release build" in `docs/RELEASING.md` (`bash scripts/build-release.sh`).
+If you saved `goodnight-FULL-PRIVATE.zip`, unzipping it restores the keystore, `key.properties`
+and `google-services.json` in the right places.
+
 ## Releasing and deploying
 - Release: push a `v*` tag (see `docs/RELEASING.md`). The install link is
   `https://github.com/Its-Abishek-01/goodnight/releases/latest`.

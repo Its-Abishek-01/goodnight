@@ -61,13 +61,27 @@ the release with generated notes. The permanent install link is:
 Version name comes from the tag and the build number from the workflow run
 number, so every release is newer than the last.
 
-## Local release build
-Without `android/key.properties`, release builds are signed with the debug key.
-To sign locally, create `android/key.properties` (git-ignored):
+## Manual (local) release build
+Same signed APK as the workflow, built on your own computer.
 
-```
-storeFile=../goodnight-release.jks
-storePassword=...
-keyAlias=goodnight
-keyPassword=...
-```
+1. Put `google-services.json` in `android/app/` (Firebase console download).
+2. Copy `android/key.properties.example` to `android/key.properties` and fill it in.
+   `storeFile` is an absolute path, or relative to the `android/` folder
+   (`../goodnight-release.jks` if the keystore sits in the repo root; it is git-ignored).
+3. Build:
+   ```bash
+   bash scripts/build-release.sh              # goodnight-local.apk
+   bash scripts/build-release.sh 0.1.1 20     # goodnight-0.1.1.apk
+   ```
+   It runs analyze and tests, builds, and checks the APK is signed with the release key
+   (not the debug key). Use a build number higher than the last release's
+   (GitHub Actions uses its run number), or Android will refuse to install it as an update.
+
+Without `key.properties`, `flutter build apk --release` silently signs with the debug key.
+That APK installs fine but can never update a release install, so avoid it for sharing.
+
+## Backing up your secrets
+`bash scripts/make-private-zip.sh` bundles the source plus the keystore,
+`key.properties` and `google-services.json` into `../goodnight-FULL-PRIVATE.zip`.
+It is not encrypted: keep it in private storage only. To restore on a new machine,
+unzip it and `flutter pub get`; everything is already in place.
