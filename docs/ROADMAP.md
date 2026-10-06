@@ -29,7 +29,10 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Tested on two real vivo phones over adb
 
 ## Next
-- ⏳ Upload the v0.2.1 `.aab` to the closed test track
+- ⏳ Release v0.2.2 (clearer night-mode disclosure), record the disclosure video on it, replace the v0.2.1 `.aab` in the closed test
+- ⏳ Play declarations: full-screen intent (Alarm clock, pre-grant), exact alarms (Alarm clock), Accessibility (App functionality, sensitive data Yes, video), foreground service (Media playback, video)
+- ⏳ Decide: "Get it on Obtainium" badge and a lite APK without night mode (installs anywhere) in every GitHub release
+- ⏳ Next feature: update and announcement popups driven by Firebase Remote Config
 - ⏳ Closed test: 12 testers for 14 days, then apply for production and open testing (`store/play-console-answers.md` has every form answer)
 - ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
 - ⏳ Maybe: block/report, a "send a goodnight hug" button (needs push)
