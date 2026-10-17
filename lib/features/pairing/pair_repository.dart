@@ -80,6 +80,7 @@ class PairRepository {
     'grants',
     'coupons',
     'selfies',
+    'loveNotes',
     'profiles',
   ];
 

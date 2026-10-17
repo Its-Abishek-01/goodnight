@@ -13,6 +13,8 @@ import '../checkin/tonight_cards.dart';
 import '../coupons/coupon.dart';
 import '../coupons/coupon_providers.dart';
 import '../coupons/coupons_screen.dart';
+import '../lovenote/love_note_compose.dart';
+import '../lovenote/love_note_providers.dart';
 import '../push/push_providers.dart';
 import '../reminders/reminder_providers.dart';
 import '../report/report_screen.dart';
@@ -62,6 +64,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(blockerSyncProvider);
     ref.watch(reminderSyncProvider);
     ref.watch(pushSyncProvider);
+    ref.watch(loveNoteSyncProvider);
     final shared = ref.watch(sharedFeaturesProvider);
     if (shared.streak) ref.watch(couponSyncProvider);
     if (shared.moments) ref.watch(selfieSyncProvider);
@@ -155,6 +158,8 @@ class _Tonight extends ConsumerWidget {
         CheckInButton(pair: pair, uid: uid),
         const SizedBox(height: 16),
         PartnerTonight(pair: pair, uid: uid),
+        const SizedBox(height: 12),
+        LoveNoteButton(pair: pair, uid: uid),
         const SizedBox(height: 24),
         Text('Bedtimes', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 4),

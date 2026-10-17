@@ -29,13 +29,15 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Tested on two real vivo phones over adb
 
 ## Next
+- ⏳ Finish love notes on the dev laptop: paste the updated `firestore.rules` into the Firebase console (not auto-deployed, or sends are denied), then build/run on the two phones. Push for notes needs the Cloud Functions deployed (see below).
 - ⏳ Release v0.2.2 (clearer night-mode disclosure), record the disclosure video on it, replace the v0.2.1 `.aab` in the closed test
 - ⏳ Play declarations: full-screen intent (Alarm clock, pre-grant), exact alarms (Alarm clock), Accessibility (App functionality, sensitive data Yes, video), foreground service (Media playback, video)
 - ⏳ Decide: "Get it on Obtainium" badge and a lite APK without night mode (installs anywhere) in every GitHub release
 - ⏳ Next feature: update and announcement popups driven by Firebase Remote Config
 - ⏳ Closed test: 12 testers for 14 days, then apply for production and open testing (`store/play-console-answers.md` has every form answer)
 - ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
-- ⏳ Maybe: block/report, a "send a goodnight hug" button (needs push)
+- ✅ Love notes: a short message that fills the partner's screen, with a read receipt (the "goodnight hug" idea; shows in-app instantly, push when Functions are deployed)
+- ⏳ Maybe: block/report
 
 ## Later
 - ⏳ Make grace and block durations configurable per couple, locked at pairing

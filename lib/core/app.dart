@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/alarm/alarm_providers.dart';
 import '../features/alarm/alarm_ring_screen.dart';
+import '../features/lovenote/love_note_providers.dart';
+import '../features/lovenote/love_note_screen.dart';
 import '../features/pairing/home_screen.dart';
 import '../features/pairing/pair.dart';
 import '../features/pairing/pair_providers.dart';
@@ -109,6 +111,12 @@ class _Gate extends ConsumerWidget {
     if (p == null) return const PairingScreen();
     if (p.closing) return _Closing(pair: p);
     if (p.status == PairStatus.waiting) return WaitingScreen(pair: p);
+
+    // A sudden love note from your partner takes over the screen.
+    final note = ref.watch(loveNoteInboxProvider);
+    if (note != null && note.from != uid.value) {
+      return LoveNoteScreen(note: note, pair: p);
+    }
     return HomeScreen(pair: p, uid: uid.value!);
   }
 }

@@ -126,6 +126,32 @@ service cloud.firestore {
           && resource.data.from == request.auth.uid;
       }
 
+      // Sudden love notes between the two partners. Only the receiver can set
+      // the read receipt (seenAt), once. The sender can delete their own.
+      match /loveNotes/{id} {
+        allow delete: if closingByMember(pairId);
+
+        allow read: if request.auth != null
+          && request.auth.uid in pairMembers(pairId);
+
+        allow create: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && request.resource.data.from == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 200
+          && request.resource.data.seenAt == null;
+
+        allow update: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && resource.data.from != request.auth.uid
+          && resource.data.seenAt == null
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seenAt']);
+
+        allow delete: if request.auth != null
+          && resource.data.from == request.auth.uid;
+      }
+
       // Feature choices. Each person's own doc (keyed by uid) is theirs alone.
       // The `shared` doc works like a schedule: one person proposes, only the
       // OTHER person can approve, and either of them can clear a proposal.

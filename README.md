@@ -35,6 +35,7 @@ blocking, and Firebase for syncing the two phones.
   night mode and reminders on or off for yourself. Streak & coupons and Moments are
   shared: one of you proposes the change and the other approves it.
 - **Moments.** Send each other a random selfie. The latest one from your partner shows on a home-screen widget, and you see "Seen" once they open it. Photos are private to the two of you and disappear after a week (5 per person per day).
+- **Love notes.** Send a sudden short message that fills your partner's screen the moment it arrives. You get a read receipt once they have seen it. Private to the two of you.
 
 ## Install (Android)
 1. Open the [latest release](https://github.com/Its-Abishek-01/goodnight/releases/latest) on your phone and download the `.apk`.

@@ -97,3 +97,26 @@ exports.selfieSeenAlert = onDocumentUpdated('pairs/{pairId}/selfies/{id}', async
   const name = (await userDoc(viewer)).name || 'Your partner';
   await push((await userDoc(after.from)).fcmToken, '👀 Seen', `${name} saw your selfie.`);
 });
+
+// A sudden love note: show it to the partner right away.
+exports.loveNoteAlert = onDocumentCreated('pairs/{pairId}/loveNotes/{id}', async (event) => {
+  const note = event.data.data();
+  const name = (await userDoc(note.from)).name || 'Your partner';
+  await push(
+    await partnerToken(event.params.pairId, note.from),
+    `💌 ${name}`,
+    note.text,
+  );
+});
+
+// The partner saw the love note: tell the sender (the read receipt).
+exports.loveNoteSeenAlert = onDocumentUpdated('pairs/{pairId}/loveNotes/{id}', async (event) => {
+  const before = event.data.before.data();
+  const after = event.data.after.data();
+  if (before.seenAt || !after.seenAt) return;
+  const pair = (await db.doc(`pairs/${event.params.pairId}`).get()).data();
+  const viewer = (pair?.members || []).find((m) => m !== after.from);
+  if (!viewer) return;
+  const name = (await userDoc(viewer)).name || 'Your partner';
+  await push((await userDoc(after.from)).fcmToken, '👀 Seen', `${name} read your love note.`);
+});
