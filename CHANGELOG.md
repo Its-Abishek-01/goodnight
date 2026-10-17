@@ -3,8 +3,12 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+### Added
+- Tonight now shows a live "how your partner's night is going" card: whether they are winding down, asleep (and since when), snoozing, or up, plus tonight's Instagram/Shorts minutes and night-mode blocks. You both see the same card about each other.
+
 ### Changed
 - Clearer night-mode disclosure: it now says which two numbers are saved and shared with your partner.
+- The weekly report shows each person's average sleep length, and every finished night lists the actual check-in and wake times, how long they slept, and phone minutes.
 
 ## 0.2.1 - 2026-10-06
 ### Added

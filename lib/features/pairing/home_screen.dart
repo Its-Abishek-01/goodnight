@@ -153,6 +153,8 @@ class _Tonight extends ConsumerWidget {
         SnoozeNudge(pair: pair, uid: uid),
         const SizedBox(height: 8),
         CheckInButton(pair: pair, uid: uid),
+        const SizedBox(height: 16),
+        PartnerTonight(pair: pair, uid: uid),
         const SizedBox(height: 24),
         Text('Bedtimes', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 4),

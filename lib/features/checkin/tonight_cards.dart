@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme.dart';
+import '../bedtime/schedule.dart';
 import '../pairing/pair.dart';
+import '../profile/person_avatar.dart';
 import '../profile/profile.dart';
 import '../settings/features.dart';
 import '../settings/features_providers.dart';
@@ -98,6 +100,127 @@ class SnoozeNudge extends ConsumerWidget {
       ),
     );
   }
+}
+
+String _minutesLabel(BuildContext context, int minutes) =>
+    TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60).format(context);
+
+/// How your partner's night is going, right now. The two of you share these
+/// numbers by design: they see the very same card about you.
+class PartnerTonight extends ConsumerWidget {
+  const PartnerTonight({super.key, required this.pair, required this.uid});
+
+  final Pair pair;
+  final String uid;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final partnerUid = pair.partnerUid(uid) ?? '';
+    if (partnerUid.isEmpty) return const SizedBox.shrink();
+    final p = _tonight(ref, partnerUid);
+    final window = ref.watch(windowsProvider)[partnerUid];
+    final name = ref.watch(peopleProvider)[partnerUid]?.name ?? pair.nameOf(partnerUid);
+    final status = _partnerStatus(context, name, p, window);
+
+    final extras = <String>[
+      if (p.usageMinutes > 0) '${p.usageMinutes} min on Instagram/Shorts tonight',
+      if (p.blocks > 0) 'Night mode stepped in ${p.blocks}×',
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: context.sky.surface.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: context.sky.outline),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PersonAvatar(uid: partnerUid, size: 40),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(status.icon, size: 18, color: context.sky.accent),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(status.headline, style: Theme.of(context).textTheme.titleSmall),
+                    ),
+                  ],
+                ),
+                if (status.detail != null) ...[
+                  const SizedBox(height: 2),
+                  Text(status.detail!, style: Theme.of(context).textTheme.bodySmall),
+                ],
+                for (final e in extras) ...[
+                  const SizedBox(height: 2),
+                  Text(e, style: Theme.of(context).textTheme.bodySmall),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+({IconData icon, String headline, String? detail}) _partnerStatus(
+  BuildContext context,
+  String name,
+  PlayerNight p,
+  SleepWindow? w,
+) {
+  if (p.wokeAt != null) {
+    return (
+      icon: Icons.wb_sunny_outlined,
+      headline: '$name is up',
+      detail: 'Awake since ${_time(context, p.wokeAt!)}.',
+    );
+  }
+  if (p.checkedInAt != null) {
+    if (p.alarm && p.snoozes > 0) {
+      return (
+        icon: Icons.snooze,
+        headline: '$name is snoozing',
+        detail: '${p.snoozes} snooze${p.snoozes == 1 ? '' : 's'} so far this morning.',
+      );
+    }
+    return (
+      icon: Icons.bedtime,
+      headline: '$name is asleep',
+      detail: 'Checked in at ${_time(context, p.checkedInAt!)}.',
+    );
+  }
+  if (w == null) {
+    return (icon: Icons.schedule, headline: '$name hasn\'t set a bedtime yet', detail: null);
+  }
+  final now = DateTime.now();
+  final delta = (((now.hour * 60 + now.minute) - w.bedtime + 720) % 1440) - 720;
+  final bed = _minutesLabel(context, w.bedtime);
+  if (delta > checkInGraceMinutes) {
+    return (
+      icon: Icons.nightlight_outlined,
+      headline: '$name is still up',
+      detail: 'Bedtime was $bed — not checked in yet.',
+    );
+  }
+  if (delta >= -120) {
+    return (
+      icon: Icons.nights_stay_outlined,
+      headline: '$name is winding down',
+      detail: 'Bedtime $bed. Not checked in yet.',
+    );
+  }
+  return (
+    icon: Icons.schedule,
+    headline: '$name sleeps at $bed',
+    detail: 'Their night hasn\'t started.',
+  );
 }
 
 /// The big "Going to sleep" button, open from 2 hours before bedtime.

@@ -16,6 +16,25 @@ String _label(String key) {
   return '${_days[d.weekday - 1]} ${d.day} ${_months[d.month - 1]}';
 }
 
+String _hm(BuildContext context, DateTime t) =>
+    TimeOfDay.fromDateTime(t).format(context);
+
+String _dur(int minutes) => '${minutes ~/ 60}h ${(minutes % 60).toString().padLeft(2, '0')}m';
+
+/// A dim one-liner of the night's actual times, or null if nothing to show.
+String? _times(BuildContext context, PlayerNight p) {
+  final slept = (p.checkedInAt != null && p.wokeAt != null)
+      ? p.wokeAt!.difference(p.checkedInAt!).inMinutes
+      : 0;
+  final parts = <String>[
+    if (p.checkedInAt != null) 'in ${_hm(context, p.checkedInAt!)}',
+    if (p.wokeAt != null) 'up ${_hm(context, p.wokeAt!)}',
+    if (slept > 0) _dur(slept),
+    if (p.usageMinutes > 0) '${p.usageMinutes}m phone',
+  ];
+  return parts.isEmpty ? null : parts.join(' · ');
+}
+
 /// Last 7 nights for both of you.
 class ReportScreen extends ConsumerWidget {
   const ReportScreen({super.key, required this.pair, required this.uid});
@@ -46,6 +65,8 @@ class ReportScreen extends ConsumerWidget {
       var woke = 0;
       var blocks = 0;
       var usage = 0;
+      var sleptMin = 0;
+      var sleptNights = 0;
       for (final n in week) {
         final p = n.playerOf(who);
         if (goodBedtime(p, windows[who]) && goodMorning(p)) onTime++;
@@ -53,10 +74,18 @@ class ReportScreen extends ConsumerWidget {
           woke++;
           snoozes += p.snoozes;
         }
+        if (p.checkedInAt != null && p.wokeAt != null) {
+          final m = p.wokeAt!.difference(p.checkedInAt!).inMinutes;
+          if (m > 0) {
+            sleptMin += m;
+            sleptNights++;
+          }
+        }
         blocks += p.blocks;
         usage += p.usageMinutes;
       }
       final avg = woke == 0 ? '-' : (snoozes / woke).toStringAsFixed(1);
+      final sleep = sleptNights == 0 ? '-' : _dur(sleptMin ~/ sleptNights);
       return Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,6 +99,7 @@ class ReportScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 6),
             Text('On time: $onTime / ${week.length}'),
+            Text('Avg sleep: $sleep'),
             Text('Avg snoozes: $avg'),
             Text('Night blocks: $blocks'),
             Text('Insta/Shorts: $usage min'),
@@ -157,13 +187,19 @@ class ReportScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(_label(n.key), style: Theme.of(context).textTheme.titleSmall),
-                  for (final m in members)
+                  for (final m in members) ...[
                     Text(
                       '${m == uid ? 'You' : pair.nameOf(m)}: '
                       '${goodBedtime(n.playerOf(m), windows[m]) ? '✅' : '❌'} bedtime · '
                       '${!n.playerOf(m).alarm ? 'no alarm' : '${goodMorning(n.playerOf(m)) ? '✅' : '❌'} morning '
                           '(${n.playerOf(m).snoozes} snoozes)'}',
                     ),
+                    if (_times(context, n.playerOf(m)) case final line?)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12, bottom: 2),
+                        child: Text(line, style: Theme.of(context).textTheme.bodySmall),
+                      ),
+                  ],
                   if (!isGoodNight(n, windows, members))
                     _forgiveRow(context, n, nights, uid, pair, repo),
                 ],
