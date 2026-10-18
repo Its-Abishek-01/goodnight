@@ -36,15 +36,16 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Google Play dropped; releases ship the APK only
 - ✅ Firestore rules deployed (love notes)
 
-## Next
-- ⏳ Install v0.2.2 by hand once on both phones (phone 1 needs an uninstall and a new pairing, since it has a debug build); from then on updates arrive in-app
-- ⏳ Try love notes and the partner card on the two phones
-- ⏳ Check on a real phone that an in-app update is not blocked by Play Protect (it is an update of an installed app, which should be allowed)
-- ⏳ Maybe: a lite APK without night mode (no Accessibility service, so browser installs work anywhere) in every GitHub release
-- ⏳ Maybe: announcement popups (a message without a new build)
+## v0.2.3
+- ✅ v0.2.2 installed on both phones from GitHub, paired again; night-mode blocking confirmed working
 - ✅ Cloud Functions deployed (asia-south1), including love-note and night-mode alerts
 - ✅ Night-mode service reports minutes and blocks live to the night log (REST, works with the app closed) 🔧
-- ⏳ Release v0.2.3 with the live night-mode report; it is also the first real test of the in-app updater
+
+## Next
+- ⏳ Update both phones to v0.2.3 through the in-app "Update ready" sheet (first real test of the updater, including whether Play Protect allows it)
+- ⏳ Try love notes and the partner card on the two phones
+- ⏳ Maybe: a lite APK without night mode (no Accessibility service, so browser installs work anywhere) in every GitHub release
+- ⏳ Maybe: announcement popups (a message without a new build)
 - ⏳ Check push on two phones: love note with the app closed, scrolling after bedtime, a block
 - ⏳ Maybe: block/report
 
