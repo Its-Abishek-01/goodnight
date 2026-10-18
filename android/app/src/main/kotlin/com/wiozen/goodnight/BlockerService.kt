@@ -1,6 +1,7 @@
 package com.wiozen.goodnight
 
 import android.accessibilityservice.AccessibilityService
+import android.app.KeyguardManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.provider.Settings
 import android.view.Gravity
 import android.view.View
@@ -59,7 +61,11 @@ class BlockerService : AccessibilityService() {
         val pkg = e.packageName?.toString() ?: return
         when (e.eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                if (pkg == "com.android.systemui" || Targets.isKeyboard(pkg) || pkg == packageName) {
+                if (pkg == "com.android.systemui" || Targets.isKeyboard(pkg)) return
+                if (pkg == packageName) {
+                    // GoodNight itself (or its overlay): not a target, not phone use.
+                    fgPackage = pkg
+                    contentTarget = false
                     return
                 }
                 if (pkg != fgPackage) {
@@ -117,8 +123,13 @@ class BlockerService : AccessibilityService() {
         val config = store.loadConfig()
         val state = store.loadState()
         val now = LocalDateTime.now()
-        val onTarget = fgPackage == Targets.INSTAGRAM ||
-            (isContentApp(fgPackage) && contentTarget)
+        // The last app stays "in front" while the screen is off or locked; that is not use.
+        val inUse = screenInUse()
+        val onTarget = inUse && (
+            fgPackage == Targets.INSTAGRAM || (isContentApp(fgPackage) && contentTarget)
+            )
+        val onPhone = inUse && fgPackage.isNotEmpty() && fgPackage != packageName &&
+            fgPackage != homePackage() && !Targets.isNotPhoneUse(fgPackage)
         val decision = BlockEngine.tick(
             config,
             state,
@@ -126,15 +137,39 @@ class BlockerService : AccessibilityService() {
             now.hour * 60 + now.minute,
             nightKeyOf(now),
             onTarget,
+            onPhone,
         )
         store.saveState(state)
-        NightReporter.report(store, state.nightKey, (state.totalUsedMs / 60_000).toInt(), state.blocks)
+        NightReporter.report(
+            store,
+            state.nightKey,
+            (state.totalUsedMs / 60_000).toInt(),
+            state.blocks,
+            (state.phoneMs / 60_000).toInt(),
+        )
         if (decision is Decision.Block) {
             fgPackage = ""
             contentTarget = false
             performGlobalAction(GLOBAL_ACTION_HOME)
             showOverlay(decision.remainingMs)
         }
+    }
+
+    private fun screenInUse(): Boolean {
+        val power = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val keyguard = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        return power.isInteractive && !keyguard.isKeyguardLocked
+    }
+
+    private var home: String? = null
+
+    /** The launcher's package: being on the home screen is not phone use. */
+    private fun homePackage(): String {
+        home?.let { return it }
+        val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+        val pkg = packageManager.resolveActivity(intent, 0)?.activityInfo?.packageName ?: ""
+        home = pkg
+        return pkg
     }
 
     private fun showOverlay(remainingMs: Long) {

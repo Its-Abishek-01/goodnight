@@ -17,6 +17,8 @@ class FeaturesSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mine = ref.watch(myFeaturesProvider);
+    final partnerUid = pair.partnerUid(uid) ?? '';
+    final theirs = ref.watch(personalFeaturesProvider).value?[partnerUid] ?? PersonalFeatures.all;
     final settings = ref.watch(sharedSettingsProvider).value;
     final repo = ref.read(featuresRepositoryProvider);
     final partner = pair.nameOf(pair.partnerUid(uid) ?? '');
@@ -45,8 +47,10 @@ class FeaturesSection extends ConsumerWidget {
               ),
               SwitchListTile(
                 title: const Text('Night mode blocking'),
-                subtitle: const Text(
-                  'Pauses Instagram and YouTube Shorts at night.',
+                subtitle: Text(
+                  'Pauses Instagram and YouTube Shorts at night.'
+                  '${theirs.alertAfter > 0 ? ' $partner is told once you have been on your '
+                      'phone for ${theirs.alertAfter} min after your bedtime.' : ''}',
                 ),
                 value: mine?.nightMode ?? true,
                 onChanged: mine == null
@@ -64,6 +68,45 @@ class FeaturesSection extends ConsumerWidget {
                     : (v) => setMine(mine.copyWith(reminders: v)),
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text('Alerts about $partner', style: text.titleMedium),
+        const SizedBox(height: 4),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tell me when $partner is still on their phone after bedtime',
+                  style: text.titleSmall,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  theirs.nightMode
+                      ? 'Any app counts, once their bedtime starts. $partner can see what you picked.'
+                      : '$partner has night mode off, so their phone use is not counted.',
+                  style: text.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final m in PersonalFeatures.alertChoices)
+                      ChoiceChip(
+                        label: Text(m == 0 ? 'Off' : '$m min'),
+                        selected: (mine?.alertAfter ?? PersonalFeatures.defaultAlertAfter) == m,
+                        onSelected: mine == null
+                            ? null
+                            : (_) => setMine(mine.copyWith(alertAfter: m)),
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 12),

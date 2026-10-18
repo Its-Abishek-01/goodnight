@@ -55,6 +55,8 @@ class MainActivity : FlutterActivity() {
                                 "prevKey" to s.prevKey,
                                 "prevBlocks" to s.prevBlocks,
                                 "prevUsageMinutes" to (s.prevUsedMs / 60_000).toInt(),
+                                "phoneMinutes" to (s.phoneMs / 60_000).toInt(),
+                                "prevPhoneMinutes" to (s.prevPhoneMs / 60_000).toInt(),
                             )
                         )
                     }

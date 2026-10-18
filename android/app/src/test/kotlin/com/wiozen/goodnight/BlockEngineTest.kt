@@ -103,4 +103,42 @@ class BlockEngineTest {
         assertFalse(Targets.isBlockedUrl("youtube.com/watch?v=1"))
         assertFalse(Targets.isBlockedUrl(null))
     }
+    @Test
+    fun countsAnyPhoneUseAtNight() {
+        val s = BlockState()
+        var t = 1_000_000L
+        BlockEngine.tick(config, s, t, night, key, onTarget = false, onPhone = true)
+        repeat(12) {
+            t += 5_000
+            BlockEngine.tick(config, s, t, night, key, onTarget = false, onPhone = true)
+        }
+        assertEquals(60_000L, s.phoneMs)
+        assertEquals(0L, s.totalUsedMs)
+    }
+
+    @Test
+    fun phoneUseStopsCountingWhenPutDown() {
+        val s = BlockState()
+        var t = 1_000_000L
+        BlockEngine.tick(config, s, t, night, key, onTarget = false, onPhone = true)
+        t += 5_000
+        BlockEngine.tick(config, s, t, night, key, onTarget = false, onPhone = true)
+        t += 5_000
+        BlockEngine.tick(config, s, t, night, key, onTarget = false, onPhone = false)
+        t += 60_000
+        BlockEngine.tick(config, s, t, night, key, onTarget = false, onPhone = false)
+        assertEquals(5_000L, s.phoneMs)
+    }
+
+    @Test
+    fun phoneUseOnlyCountsAtNightAndResetsEachNight() {
+        val s = BlockState()
+        BlockEngine.tick(config, s, 1_000_000L, 12 * 60, key, onTarget = false, onPhone = true)
+        BlockEngine.tick(config, s, 1_005_000L, 12 * 60, key, onTarget = false, onPhone = true)
+        assertEquals(0L, s.phoneMs)
+        s.phoneMs = 90_000L
+        BlockEngine.tick(config, s, 2_000_000L, night, "2026-10-07", onTarget = false, onPhone = true)
+        assertEquals(0L, s.phoneMs)
+        assertEquals(90_000L, s.prevPhoneMs)
+    }
 }

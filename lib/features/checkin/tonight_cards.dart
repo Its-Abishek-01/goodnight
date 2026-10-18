@@ -124,6 +124,7 @@ class PartnerTonight extends ConsumerWidget {
     final status = _partnerStatus(context, name, p, window);
 
     final extras = <String>[
+      if (p.phoneMinutes > 0) '${p.phoneMinutes} min on the phone after bedtime',
       if (p.usageMinutes > 0) '${p.usageMinutes} min on Instagram/Shorts tonight',
       if (p.blocks > 0) 'Night mode stepped in ${p.blocks}×',
     ];

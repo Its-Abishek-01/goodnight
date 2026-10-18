@@ -223,6 +223,9 @@ void main() {
       const MethodChannel('flutter.baseflow.com/permissions/methods'),
       (call) async => 1, // granted
     );
+    // home_widget: no launch URI, no widget clicks, saves do nothing.
+    messenger.setMockMethodCallHandler(const MethodChannel('home_widget'), (call) async => null);
+    messenger.setMockMethodCallHandler(const MethodChannel('home_widget/updates'), (call) async => null);
     messenger.setMockMethodCallHandler(
       const MethodChannel('com.wiozen.goodnight/blocker'),
       (call) async => call.method == 'isServiceEnabled' ? true : null,
@@ -268,6 +271,18 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Us'));
     await _shoot(tester, '4-setup');
+  });
+
+  testWidgets('4b partner alerts', skip: !enabled, (tester) async {
+    await _show(tester, const HomeScreen(pair: _pair, uid: _me));
+    await tester.pump();
+    await tester.tap(find.text('Us'));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.scrollUntilVisible(find.text('Alerts about Alex'), 300, scrollable: find.byType(Scrollable).first);
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 250));
+    await _shoot(tester, '4b-alerts');
   });
 
   testWidgets('5 pairing', skip: !enabled, (tester) async {

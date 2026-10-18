@@ -4,7 +4,12 @@ class PersonalFeatures {
     this.alarm = true,
     this.nightMode = true,
     this.reminders = true,
+    this.alertAfter = defaultAlertAfter,
   });
+
+  /// The choices for [alertAfter], in minutes; 0 is off.
+  static const alertChoices = [0, 5, 10, 15, 30, 60];
+  static const defaultAlertAfter = 15;
 
   /// Everything on. Used until a person changes anything.
   static const all = PersonalFeatures();
@@ -13,23 +18,31 @@ class PersonalFeatures {
   final bool nightMode;
   final bool reminders;
 
+  /// Push me when my partner has been on their phone this many minutes after
+  /// their bedtime (0 = never). Chosen by the person who gets the alert;
+  /// the partner can see it.
+  final int alertAfter;
+
   factory PersonalFeatures.fromMap(Map<String, dynamic> m) => PersonalFeatures(
     alarm: m['alarm'] as bool? ?? true,
     nightMode: m['nightMode'] as bool? ?? true,
     reminders: m['reminders'] as bool? ?? true,
+    alertAfter: (m['alertAfter'] as num?)?.toInt() ?? defaultAlertAfter,
   );
 
-  Map<String, bool> toMap() => {
+  Map<String, Object> toMap() => {
     'alarm': alarm,
     'nightMode': nightMode,
     'reminders': reminders,
+    'alertAfter': alertAfter,
   };
 
-  PersonalFeatures copyWith({bool? alarm, bool? nightMode, bool? reminders}) =>
+  PersonalFeatures copyWith({bool? alarm, bool? nightMode, bool? reminders, int? alertAfter}) =>
       PersonalFeatures(
         alarm: alarm ?? this.alarm,
         nightMode: nightMode ?? this.nightMode,
         reminders: reminders ?? this.reminders,
+        alertAfter: alertAfter ?? this.alertAfter,
       );
 
   @override
@@ -37,10 +50,11 @@ class PersonalFeatures {
       other is PersonalFeatures &&
       other.alarm == alarm &&
       other.nightMode == nightMode &&
-      other.reminders == reminders;
+      other.reminders == reminders &&
+      other.alertAfter == alertAfter;
 
   @override
-  int get hashCode => Object.hash(alarm, nightMode, reminders);
+  int get hashCode => Object.hash(alarm, nightMode, reminders, alertAfter);
 }
 
 /// Features the couple shares. A change needs one person to propose it and

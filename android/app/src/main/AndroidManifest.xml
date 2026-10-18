@@ -24,6 +24,10 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/ic_launcher_background" />
+        <!-- Partner pushes pop up on screen (created in core/notifications.dart). -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="goodnight_general" />
         <!-- Shares a downloaded update (cache/updates) with the system installer. -->
         <provider
             android:name="androidx.core.content.FileProvider"

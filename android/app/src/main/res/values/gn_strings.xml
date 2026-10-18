@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="gn_accessibility_description">During your approved bedtime hours, GoodNight checks which app or website is in front so it can pause Instagram and YouTube Shorts after a short grace time. It never reads messages, passwords or what you type.</string>
+    <string name="gn_accessibility_description">During your approved bedtime hours, GoodNight checks which app or website is in front so it can pause Instagram and YouTube Shorts after a short grace time, and counts how many minutes the phone is in use after bedtime. It never reads messages, passwords or what you type.</string>
     <string name="gn_widget_description">The latest selfie from your partner.</string>
     <string name="gn_sleep_widget_description">You and your partner tonight, and a button to say you are going to sleep.</string>
 </resources>

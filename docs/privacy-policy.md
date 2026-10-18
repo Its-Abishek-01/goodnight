@@ -26,7 +26,7 @@ paired with.
 | Your bedtime and wake time, and any proposed changes | The pact: your partner approves them |
 | Which features you turned on | So both phones follow the same choices |
 | Check-in and wake-up times, snooze counts | The shared streak and weekly report |
-| Number of night-mode blocks and minutes spent on Instagram or YouTube Shorts at night | The weekly report |
+| Number of night-mode blocks, minutes spent on Instagram or YouTube Shorts at night, and minutes the phone was in use at all after bedtime (not which apps) | The weekly report, and an alert to your partner after the number of minutes they chose |
 | Coupons earned and used | Streak rewards |
 | Selfies you choose to send (Moments) | Shown to your partner only |
 | Love notes you send | Shown to your partner only, with a read receipt |
@@ -42,7 +42,7 @@ During your agreed bedtime hours only, it checks which app is in front, the addr
 your browser's address bar and whether YouTube is showing Shorts, so it can pause
 Instagram and YouTube Shorts after a short grace time. This happens on your phone. It
 never reads your messages, passwords or what you type, it does not record your browsing
-history, and nothing is uploaded except the two counts in the table above. They are sent as they change during the night, so your partner sees them live.
+history, and nothing is uploaded except the counts in the table above. They are sent as they change during the night, so your partner sees them live.
 You are asked to agree before it is turned on, and you can turn it off at any time.
 
 ## Updates

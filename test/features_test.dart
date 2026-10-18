@@ -10,6 +10,14 @@ void main() {
     expect(PersonalFeatures.fromMap(f.toMap()), f);
   });
 
+  test('the partner alert defaults to 15 minutes and round-trips', () {
+    expect(PersonalFeatures.fromMap({}).alertAfter, 15);
+    final off = PersonalFeatures.all.copyWith(alertAfter: 0);
+    expect(PersonalFeatures.fromMap(off.toMap()), off);
+    expect(PersonalFeatures.fromMap({'alertAfter': 30}).alertAfter, 30);
+    expect(PersonalFeatures.alertChoices, contains(PersonalFeatures.defaultAlertAfter));
+  });
+
   test('a couple without a shared doc has everything on', () {
     final s = SharedSettings.fromMap(null);
     expect(s.current, SharedFeatures.all);

@@ -33,8 +33,11 @@ pushes that arrive while it is open. The functions in `functions/index.js` send:
 | New love note | "💌 {name}" with the note |
 | Love note opened | "{name} read your love note" |
 | Check-in or wake-up | data-only push that updates the "Going to sleep" widget; on check-in the app shows "{name} is going to sleep" |
-| First minute of Instagram/Shorts after bedtime | "{name} is still scrolling" |
+| Phone use after bedtime reaches the minutes the partner picked (`features/{watcher}.alertAfter`, default 15, 0 = off) | "{name} is still on their phone" with the minutes |
 | Night mode blocks Instagram/Shorts | "Night mode paused {name}'s scrolling" with tonight's minutes |
+
+Every visible push uses the app's `goodnight_general` channel (high importance) so it pops
+up on screen; the app creates that channel at startup (`core/notifications.dart`).
 
 The two night-mode alerts fire only on live reports from the phone's night-mode
 service (`NightReporter.kt`, which also sets `usageAt`), so the catch-up upload when

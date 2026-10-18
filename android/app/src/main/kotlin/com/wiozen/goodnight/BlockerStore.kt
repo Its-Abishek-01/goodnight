@@ -45,6 +45,7 @@ class BlockerStore(context: Context) {
         nightKey = p.getString("r.nightKey", "") ?: "",
         usageMinutes = p.getInt("r.usageMinutes", 0),
         blocks = p.getInt("r.blocks", 0),
+        phoneMinutes = p.getInt("r.phoneMinutes", 0),
     )
 
     fun saveReported(r: Reported) {
@@ -52,6 +53,7 @@ class BlockerStore(context: Context) {
             .putString("r.nightKey", r.nightKey)
             .putInt("r.usageMinutes", r.usageMinutes)
             .putInt("r.blocks", r.blocks)
+            .putInt("r.phoneMinutes", r.phoneMinutes)
             .apply()
     }
 
@@ -66,6 +68,9 @@ class BlockerStore(context: Context) {
         prevKey = p.getString("s.prevKey", "") ?: "",
         prevBlocks = p.getInt("s.prevBlocks", 0),
         prevUsedMs = p.getLong("s.prevUsedMs", 0),
+        phoneMs = p.getLong("s.phoneMs", 0),
+        lastOnPhone = p.getBoolean("s.lastOnPhone", false),
+        prevPhoneMs = p.getLong("s.prevPhoneMs", 0),
     )
 
     fun saveState(s: BlockState) {
@@ -80,6 +85,9 @@ class BlockerStore(context: Context) {
             .putString("s.prevKey", s.prevKey)
             .putInt("s.prevBlocks", s.prevBlocks)
             .putLong("s.prevUsedMs", s.prevUsedMs)
+            .putLong("s.phoneMs", s.phoneMs)
+            .putBoolean("s.lastOnPhone", s.lastOnPhone)
+            .putLong("s.prevPhoneMs", s.prevPhoneMs)
             .apply()
     }
 }

@@ -23,7 +23,16 @@ async function partnerToken(pairId, actorUid) {
 
 async function push(token, title, body) {
   if (!token) return;
-  await admin.messaging().send({ token, notification: { title, body } });
+  await admin.messaging().send({
+    token,
+    notification: { title, body },
+    // The app's high-importance channel, so it pops up like a chat message
+    // instead of landing quietly in the tray.
+    android: {
+      priority: 'high',
+      notification: { channelId: 'goodnight_general', defaultSound: true },
+    },
+  });
 }
 
 // A partner has snoozed 2 or 3 times: tell the other person.
@@ -44,10 +53,13 @@ exports.snoozeAlert = onDocumentWritten('pairs/{pairId}/nights/{key}', async (ev
   }
 });
 
-// Night mode saw Instagram or Shorts after bedtime. The phone's night-mode
-// service reports this live (with usageAt) even while the app is closed; tell
-// the partner on the first minute of the night and each time night mode
-// steps in.
+// Minutes of phone use after the partner's bedtime before you are told, as
+// you chose on the Us tab (features/{you}.alertAfter; 0 = off).
+const DEFAULT_ALERT_AFTER = 15;
+
+// Phone use after bedtime crossed the minutes the partner chose (alertAfter),
+// or night mode stepped in on Instagram/Shorts. The phone's night-mode
+// service reports this live (with usageAt) even while the app is closed.
 exports.nightModeAlert = onDocumentWritten('pairs/{pairId}/nights/{key}', async (event) => {
   const before = event.data.before.data()?.players || {};
   const after = event.data.after.data()?.players || {};
@@ -55,21 +67,37 @@ exports.nightModeAlert = onDocumentWritten('pairs/{pairId}/nights/{key}', async 
     const was = before[uid] || {};
     // Only live reports carry usageAt; the app's catch-up upload on open does not.
     if (!p.usageAt || (was.usageAt && was.usageAt.isEqual(p.usageAt))) continue;
-    const minutes = p.usageMinutes || 0;
-    const blocks = p.blocks || 0;
+    const pair = (await db.doc(`pairs/${event.params.pairId}`).get()).data();
+    const watcher = (pair?.members || []).find((m) => m !== uid);
+    if (!watcher) continue;
+    const token = (await userDoc(watcher)).fcmToken;
+    if (!token) continue;
     const name = (await userDoc(uid)).name || 'Your partner';
-    let title;
-    let body;
-    if (blocks > (was.blocks || 0)) {
-      title = `🌙 Night mode paused ${name}'s scrolling`;
-      body = `${minutes} min on Instagram/Shorts after bedtime tonight.`;
-    } else if (!(was.usageMinutes > 0) && minutes > 0) {
-      title = `📱 ${name} is still scrolling`;
-      body = 'On Instagram/Shorts after bedtime. Maybe send a love note 💌';
-    } else {
+    const scrolled = p.usageMinutes || 0;
+
+    if ((p.blocks || 0) > (was.blocks || 0)) {
+      await push(
+        token,
+        `🌙 Night mode paused ${name}'s scrolling`,
+        `${scrolled} min on Instagram/Shorts after bedtime tonight.`,
+      );
       continue;
     }
-    await push(await partnerToken(event.params.pairId, uid), title, body);
+
+    const prefs = (await db.doc(`pairs/${event.params.pairId}/features/${watcher}`).get()).data() || {};
+    const limit = typeof prefs.alertAfter === 'number' ? prefs.alertAfter : DEFAULT_ALERT_AFTER;
+    if (limit <= 0) continue;
+    // Older app versions only report Instagram/Shorts minutes.
+    const now = Math.max(p.phoneMinutes || 0, scrolled);
+    const then = Math.max(was.phoneMinutes || 0, was.usageMinutes || 0);
+    if (then < limit && now >= limit) {
+      const detail = scrolled > 0 ? ` (${scrolled} on Instagram/Shorts)` : '';
+      await push(
+        token,
+        `📱 ${name} is still on their phone`,
+        `${now} min after bedtime${detail}. Maybe send a love note 💌`,
+      );
+    }
   }
 });
 

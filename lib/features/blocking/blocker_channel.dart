@@ -8,6 +8,8 @@ class BlockStats {
     required this.prevKey,
     required this.prevBlocks,
     required this.prevUsageMinutes,
+    required this.phoneMinutes,
+    required this.prevPhoneMinutes,
   });
 
   final String nightKey;
@@ -16,6 +18,8 @@ class BlockStats {
   final String prevKey;
   final int prevBlocks;
   final int prevUsageMinutes;
+  final int phoneMinutes;
+  final int prevPhoneMinutes;
 
   factory BlockStats.fromMap(Map<Object?, Object?> m) => BlockStats(
         nightKey: m['nightKey'] as String? ?? '',
@@ -24,6 +28,8 @@ class BlockStats {
         prevKey: m['prevKey'] as String? ?? '',
         prevBlocks: (m['prevBlocks'] as num?)?.toInt() ?? 0,
         prevUsageMinutes: (m['prevUsageMinutes'] as num?)?.toInt() ?? 0,
+        phoneMinutes: (m['phoneMinutes'] as num?)?.toInt() ?? 0,
+        prevPhoneMinutes: (m['prevPhoneMinutes'] as num?)?.toInt() ?? 0,
       );
 }
 

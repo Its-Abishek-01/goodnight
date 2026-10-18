@@ -31,6 +31,18 @@ object Targets {
         return url.contains("instagram.com") || url.contains("youtube.com/shorts")
     }
 
+    /** Calls and system screens do not count as being on the phone at night. */
+    private val NOT_PHONE_USE = setOf(
+        "android",
+        "com.android.incallui",
+        "com.google.android.dialer",
+        "com.android.dialer",
+        "com.samsung.android.incallui",
+        "com.android.server.telecom",
+    )
+
+    fun isNotPhoneUse(pkg: String): Boolean = pkg in NOT_PHONE_USE
+
     fun isKeyboard(pkg: String): Boolean =
         pkg.contains("inputmethod") || pkg.contains("keyboard") || pkg.contains("swiftkey")
 }

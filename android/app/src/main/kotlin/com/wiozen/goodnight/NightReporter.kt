@@ -29,15 +29,15 @@ object NightReporter {
     private val inFlight = AtomicBoolean(false)
     @Volatile private var lastFailureAt = 0L
 
-    fun report(store: BlockerStore, nightKey: String, usageMinutes: Int, blocks: Int) {
+    fun report(store: BlockerStore, nightKey: String, usageMinutes: Int, blocks: Int, phoneMinutes: Int) {
         val pair = store.loadPair() ?: return
-        if (!NightReport.shouldReport(store.loadReported(), nightKey, usageMinutes, blocks)) return
+        if (!NightReport.shouldReport(store.loadReported(), nightKey, usageMinutes, blocks, phoneMinutes)) return
         val now = System.currentTimeMillis()
         if (now - lastFailureAt < RETRY_MS || !inFlight.compareAndSet(false, true)) return
         executor.execute {
             try {
-                if (write(pair, nightKey, usageMinutes, blocks)) {
-                    store.saveReported(Reported(nightKey, usageMinutes, blocks))
+                if (write(pair, nightKey, usageMinutes, blocks, phoneMinutes)) {
+                    store.saveReported(Reported(nightKey, usageMinutes, blocks, phoneMinutes))
                 } else {
                     lastFailureAt = System.currentTimeMillis()
                 }
@@ -50,7 +50,7 @@ object NightReporter {
         }
     }
 
-    private fun write(pair: PairRef, nightKey: String, usageMinutes: Int, blocks: Int): Boolean {
+    private fun write(pair: PairRef, nightKey: String, usageMinutes: Int, blocks: Int, phoneMinutes: Int): Boolean {
         val user = FirebaseAuth.getInstance().currentUser ?: return false
         if (user.uid != pair.uid) return false
         val token = Tasks.await(user.getIdToken(false), 20, TimeUnit.SECONDS).token ?: return false
@@ -60,6 +60,7 @@ object NightReporter {
         val me = JSONObject()
             .put("blocks", JSONObject().put("integerValue", blocks.toString()))
             .put("usageMinutes", JSONObject().put("integerValue", usageMinutes.toString()))
+            .put("phoneMinutes", JSONObject().put("integerValue", phoneMinutes.toString()))
         val players = JSONObject().put(
             "mapValue",
             JSONObject().put(
@@ -76,7 +77,7 @@ object NightReporter {
                     .put("name", "$db/pairs/${pair.pairId}/nights/$nightKey")
                     .put("fields", JSONObject().put("players", players)),
             )
-            .put("updateMask", JSONObject().put("fieldPaths", JSONArray(listOf("$prefix.blocks", "$prefix.usageMinutes"))))
+            .put("updateMask", JSONObject().put("fieldPaths", JSONArray(listOf("$prefix.blocks", "$prefix.usageMinutes", "$prefix.phoneMinutes"))))
             .put(
                 "updateTransforms",
                 JSONArray().put(

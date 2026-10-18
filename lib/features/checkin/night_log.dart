@@ -20,6 +20,7 @@ class PlayerNight {
     this.snoozes = 0,
     this.blocks = 0,
     this.usageMinutes = 0,
+    this.phoneMinutes = 0,
     this.alarm = true,
   });
 
@@ -28,6 +29,9 @@ class PlayerNight {
   final int snoozes;
   final int blocks;
   final int usageMinutes;
+
+  /// Minutes on the phone at all after bedtime (any app), from night mode.
+  final int phoneMinutes;
 
   /// Whether this person used the wake alarm that night, saved at check-in.
   /// Without it there is no wake-up to judge, so only bedtime counts.
@@ -40,6 +44,7 @@ class PlayerNight {
         snoozes: (m['snoozes'] as num?)?.toInt() ?? 0,
         blocks: (m['blocks'] as num?)?.toInt() ?? 0,
         usageMinutes: (m['usageMinutes'] as num?)?.toInt() ?? 0,
+        phoneMinutes: (m['phoneMinutes'] as num?)?.toInt() ?? 0,
         alarm: m['alarm'] as bool? ?? true,
       );
 }
@@ -139,10 +144,11 @@ class NightLogRepository {
     String key, {
     required int blocks,
     required int usageMinutes,
+    required int phoneMinutes,
   }) {
     return _ref(pairId, key).set({
       'players': {
-        uid: {'blocks': blocks, 'usageMinutes': usageMinutes},
+        uid: {'blocks': blocks, 'usageMinutes': usageMinutes, 'phoneMinutes': phoneMinutes},
       },
     }, SetOptions(merge: true));
   }

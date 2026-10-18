@@ -44,13 +44,13 @@ Future<void> syncBlockStats(WidgetRef ref) async {
     final s = await Blocker.getStats();
     if (s == null) return;
     final repo = ref.read(nightLogRepositoryProvider);
-    if (s.nightKey.isNotEmpty && (s.blocks > 0 || s.usageMinutes > 0)) {
+    if (s.nightKey.isNotEmpty && (s.blocks > 0 || s.usageMinutes > 0 || s.phoneMinutes > 0)) {
       await repo.recordBlocks(pair.id, uid, s.nightKey,
-          blocks: s.blocks, usageMinutes: s.usageMinutes);
+          blocks: s.blocks, usageMinutes: s.usageMinutes, phoneMinutes: s.phoneMinutes);
     }
     if (s.prevKey.isNotEmpty) {
       await repo.recordBlocks(pair.id, uid, s.prevKey,
-          blocks: s.prevBlocks, usageMinutes: s.prevUsageMinutes);
+          blocks: s.prevBlocks, usageMinutes: s.prevUsageMinutes, phoneMinutes: s.prevPhoneMinutes);
     }
   } catch (_) {
     // Best effort; retried next time the app opens.

@@ -7,9 +7,13 @@ import 'package:timezone/timezone.dart' as tz;
 class Notifications {
   static final _plugin = FlutterLocalNotificationsPlugin();
 
+  /// Partner pushes from the Cloud Functions use this channel too
+  /// (functions/index.js), so they pop up on screen like a chat message.
+  static const channelId = 'goodnight_general';
+
   static const _details = NotificationDetails(
     android: AndroidNotificationDetails(
-      'goodnight_general',
+      channelId,
       'GoodNight',
       channelDescription: 'Bedtime reminders and alerts from your partner',
       importance: Importance.high,
@@ -30,6 +34,19 @@ class Notifications {
         android: AndroidInitializationSettings('@drawable/ic_notification'),
       ),
     );
+    // Create the channel up front: a push that arrives before any local
+    // notification was shown would otherwise land on Firebase's quiet
+    // fallback channel.
+    await _plugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(
+          const AndroidNotificationChannel(
+            channelId,
+            'GoodNight',
+            description: 'Bedtime reminders and alerts from your partner',
+            importance: Importance.high,
+          ),
+        );
   }
 
   static Future<void> showNow(int id, String title, String body) =>

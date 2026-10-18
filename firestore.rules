@@ -164,10 +164,15 @@ service cloud.firestore {
         allow create, update: if request.auth != null
           && request.auth.uid in pairMembers(pairId)
           && id == request.auth.uid
-          && request.resource.data.keys().hasOnly(['alarm', 'nightMode', 'reminders'])
+          && request.resource.data.keys().hasOnly(['alarm', 'nightMode', 'reminders', 'alertAfter'])
           && request.resource.data.alarm is bool
           && request.resource.data.nightMode is bool
-          && request.resource.data.reminders is bool;
+          && request.resource.data.reminders is bool
+          // Minutes of phone use after the partner's bedtime before you are told (0 = off).
+          && (!('alertAfter' in request.resource.data)
+              || (request.resource.data.alertAfter is int
+                  && request.resource.data.alertAfter >= 0
+                  && request.resource.data.alertAfter <= 240));
 
         allow create: if request.auth != null
           && request.auth.uid in pairMembers(pairId)

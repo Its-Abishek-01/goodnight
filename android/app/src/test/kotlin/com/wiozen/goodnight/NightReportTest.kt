@@ -25,4 +25,12 @@ class NightReportTest {
         assertTrue(NightReport.shouldReport(last, key, 5, 0))
         assertTrue(NightReport.shouldReport(last, key, 4, 1))
     }
+
+    @Test
+    fun phoneMinutesAloneAreSent() {
+        assertTrue(NightReport.shouldReport(Reported(), key, 0, 0, 1))
+        val last = Reported(key, 0, 0, 3)
+        assertFalse(NightReport.shouldReport(last, key, 0, 0, 3))
+        assertTrue(NightReport.shouldReport(last, key, 0, 0, 4))
+    }
 }

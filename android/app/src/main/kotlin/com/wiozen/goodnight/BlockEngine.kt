@@ -24,6 +24,11 @@ data class BlockState(
     var prevKey: String = "",
     var prevBlocks: Int = 0,
     var prevUsedMs: Long = 0,
+    // Any phone use at night (screen on and unlocked, not the home screen or
+    // GoodNight), for the partner's "still on their phone" alert.
+    var phoneMs: Long = 0,
+    var lastOnPhone: Boolean = false,
+    var prevPhoneMs: Long = 0,
 )
 
 sealed interface Decision {
@@ -35,17 +40,29 @@ sealed interface Decision {
 data class PairRef(val pairId: String, val uid: String)
 
 /** What was last sent to the shared night log. */
-data class Reported(val nightKey: String = "", val usageMinutes: Int = 0, val blocks: Int = 0)
+data class Reported(
+    val nightKey: String = "",
+    val usageMinutes: Int = 0,
+    val blocks: Int = 0,
+    val phoneMinutes: Int = 0,
+)
 
 object NightReport {
     /**
      * Send tonight's numbers when there is something to show and it has grown
      * since the last send (a new minute of use or a new block).
      */
-    fun shouldReport(last: Reported, nightKey: String, usageMinutes: Int, blocks: Int): Boolean {
-        if (usageMinutes <= 0 && blocks <= 0) return false
+    fun shouldReport(
+        last: Reported,
+        nightKey: String,
+        usageMinutes: Int,
+        blocks: Int,
+        phoneMinutes: Int = 0,
+    ): Boolean {
+        if (usageMinutes <= 0 && blocks <= 0 && phoneMinutes <= 0) return false
         if (last.nightKey != nightKey) return true
-        return usageMinutes > last.usageMinutes || blocks > last.blocks
+        return usageMinutes > last.usageMinutes || blocks > last.blocks ||
+            phoneMinutes > last.phoneMinutes
     }
 }
 
@@ -81,25 +98,36 @@ object BlockEngine {
         minuteOfDay: Int,
         nightKey: String,
         onTarget: Boolean,
+        onPhone: Boolean = onTarget,
     ): Decision {
         if (s.nightKey != nightKey) {
             if (s.nightKey.isNotEmpty()) {
                 s.prevKey = s.nightKey
                 s.prevBlocks = s.blocks
                 s.prevUsedMs = s.totalUsedMs
+                s.prevPhoneMs = s.phoneMs
             }
             s.nightKey = nightKey
             s.usedMs = 0
             s.blockUntil = 0
             s.blocks = 0
             s.totalUsedMs = 0
+            s.phoneMs = 0
+            s.lastOnPhone = false
         }
 
         if (!isNight(c, minuteOfDay)) {
             s.lastOnTarget = false
+            s.lastOnPhone = false
             s.lastTickAt = nowMs
             return Decision.Allow
         }
+
+        // Phone use counts whether or not the app in front is a target.
+        if (onPhone && s.lastOnPhone && s.lastTickAt > 0) {
+            s.phoneMs += (nowMs - s.lastTickAt).coerceIn(0, MAX_GAP_MS)
+        }
+        s.lastOnPhone = onPhone
 
         if (nowMs < s.blockUntil) {
             s.lastOnTarget = false
