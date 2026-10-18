@@ -3,6 +3,8 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+
+## 0.2.2 - 2026-10-19
 ### Added
 - Tonight now shows a live "how your partner's night is going" card: whether they are winding down, asleep (and since when), snoozing, or up, plus tonight's Instagram/Shorts minutes and night-mode blocks. You both see the same card about each other.
 - Updates from inside the app: GoodNight checks GitHub for a new version when you open it, downloads it and opens the installer. No more downloading APKs by hand.

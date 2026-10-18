@@ -28,15 +28,21 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Play app signing key uploaded (own key, so Play and GitHub builds match)
 - ✅ Tested on two real vivo phones over adb
 
-## Next
-- ⏳ Finish love notes on the dev laptop: paste the updated `firestore.rules` into the Firebase console (not auto-deployed, or sends are denied), then build/run on the two phones. Push for notes needs the Cloud Functions deployed (see below).
+## v0.2.2
+- ✅ Love notes: a short message that fills the partner's screen, with a read receipt (the "goodnight hug" idea; shows in-app instantly, push when Functions are deployed) 🔧
+- ✅ Live partner card on Tonight and a richer weekly report 🔧
 - ✅ In-app updates from GitHub Releases: checks on launch/resume, downloads the APK, opens the installer; `<!-- required -->` in the notes forces it 🔧
-- ⏳ Release v0.2.2 (disclosure fix, love notes, partner card, in-app updates). Install it by hand once on both phones; from then on updates arrive in-app
+- ✅ Clearer night-mode disclosure
+- ✅ Google Play dropped; releases ship the APK only
+- ✅ Firestore rules deployed (love notes)
+
+## Next
+- ⏳ Install v0.2.2 by hand once on both phones (phone 1 needs an uninstall and a new pairing, since it has a debug build); from then on updates arrive in-app
+- ⏳ Try love notes and the partner card on the two phones
 - ⏳ Check on a real phone that an in-app update is not blocked by Play Protect (it is an update of an installed app, which should be allowed)
 - ⏳ Maybe: a lite APK without night mode (no Accessibility service, so browser installs work anywhere) in every GitHub release
 - ⏳ Maybe: announcement popups (a message without a new build)
 - ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
-- ✅ Love notes: a short message that fills the partner's screen, with a read receipt (the "goodnight hug" idea; shows in-app instantly, push when Functions are deployed)
 - ⏳ Maybe: block/report
 
 ## Later
