@@ -45,12 +45,18 @@ class Blocker {
   static Future<void> openAppDetails() =>
       _channel.invokeMethod<void>('openAppDetails');
 
+  /// [pairId] and [uid] let the service report usage to the shared night log
+  /// while the app is closed.
   static Future<void> saveConfig({
     required bool enabled,
     required int bedtimeMin,
     required int wakeMin,
+    String? pairId,
+    String? uid,
   }) =>
       _channel.invokeMethod<void>('saveConfig', {
+        'pairId': pairId,
+        'uid': uid,
         'enabled': enabled,
         'bedtimeMin': bedtimeMin,
         'wakeMin': wakeMin,

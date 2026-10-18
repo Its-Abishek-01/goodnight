@@ -128,6 +128,7 @@ class BlockerService : AccessibilityService() {
             onTarget,
         )
         store.saveState(state)
+        NightReporter.report(store, state.nightKey, (state.totalUsedMs / 60_000).toInt(), state.blocks)
         if (decision is Decision.Block) {
             fgPackage = ""
             contentTarget = false

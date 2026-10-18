@@ -42,7 +42,10 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ⏳ Check on a real phone that an in-app update is not blocked by Play Protect (it is an update of an installed app, which should be allowed)
 - ⏳ Maybe: a lite APK without night mode (no Accessibility service, so browser installs work anywhere) in every GitHub release
 - ⏳ Maybe: announcement popups (a message without a new build)
-- ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
+- ✅ Cloud Functions deployed (asia-south1), including love-note and night-mode alerts
+- ✅ Night-mode service reports minutes and blocks live to the night log (REST, works with the app closed) 🔧
+- ⏳ Release v0.2.3 with the live night-mode report; it is also the first real test of the in-app updater
+- ⏳ Check push on two phones: love note with the app closed, scrolling after bedtime, a block
 - ⏳ Maybe: block/report
 
 ## Later

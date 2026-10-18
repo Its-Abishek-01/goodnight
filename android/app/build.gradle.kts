@@ -66,6 +66,8 @@ flutter {
 
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
+    // The night-mode service reports usage with the signed-in user (NightReporter).
+    implementation("com.google.firebase:firebase-auth")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     testImplementation("junit:junit:4.13.2")
 }

@@ -14,6 +14,7 @@ final blockerSyncProvider = Provider<void>((ref) {
   Future<void> sync() async {
     final map = ref.read(schedulesProvider).value;
     final features = ref.read(myFeaturesProvider);
+    final pair = ref.read(pairProvider).value;
     if (uid == null || map == null || features == null) return;
     final w = map[uid]?.current;
     try {
@@ -21,6 +22,8 @@ final blockerSyncProvider = Provider<void>((ref) {
         enabled: w != null && features.nightMode,
         bedtimeMin: w?.bedtime ?? 0,
         wakeMin: w?.wake ?? 0,
+        pairId: pair?.id,
+        uid: uid,
       );
     } catch (_) {
       // Not running on Android (tests); nothing to sync.
@@ -29,6 +32,7 @@ final blockerSyncProvider = Provider<void>((ref) {
 
   ref.listen(schedulesProvider, (_, _) => sync(), fireImmediately: true);
   ref.listen(myFeaturesProvider, (_, _) => sync());
+  ref.listen(pairProvider, (_, _) => sync());
 });
 
 /// Uploads the native block counts to the shared night log.

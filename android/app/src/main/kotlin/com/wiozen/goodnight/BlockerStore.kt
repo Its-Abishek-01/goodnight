@@ -6,8 +6,18 @@ import android.content.Context
 class BlockerStore(context: Context) {
     private val p = context.getSharedPreferences("goodnight_blocker", Context.MODE_PRIVATE)
 
-    fun saveConfig(enabled: Boolean, bedtimeMin: Int, wakeMin: Int, graceMin: Int, blockMin: Int) {
+    fun saveConfig(
+        enabled: Boolean,
+        bedtimeMin: Int,
+        wakeMin: Int,
+        graceMin: Int,
+        blockMin: Int,
+        pairId: String?,
+        uid: String?,
+    ) {
         p.edit()
+            .putString("pairId", pairId)
+            .putString("uid", uid)
             .putBoolean("enabled", enabled)
             .putInt("bedtimeMin", bedtimeMin)
             .putInt("wakeMin", wakeMin)
@@ -23,6 +33,27 @@ class BlockerStore(context: Context) {
         graceMs = p.getInt("graceMin", 5) * 60_000L,
         blockMs = p.getInt("blockMin", 10) * 60_000L,
     )
+
+    fun loadPair(): PairRef? {
+        val pairId = p.getString("pairId", null)
+        val uid = p.getString("uid", null)
+        if (pairId.isNullOrEmpty() || uid.isNullOrEmpty()) return null
+        return PairRef(pairId, uid)
+    }
+
+    fun loadReported() = Reported(
+        nightKey = p.getString("r.nightKey", "") ?: "",
+        usageMinutes = p.getInt("r.usageMinutes", 0),
+        blocks = p.getInt("r.blocks", 0),
+    )
+
+    fun saveReported(r: Reported) {
+        p.edit()
+            .putString("r.nightKey", r.nightKey)
+            .putInt("r.usageMinutes", r.usageMinutes)
+            .putInt("r.blocks", r.blocks)
+            .apply()
+    }
 
     fun loadState() = BlockState(
         nightKey = p.getString("s.nightKey", "") ?: "",

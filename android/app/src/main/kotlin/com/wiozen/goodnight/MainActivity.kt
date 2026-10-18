@@ -40,6 +40,8 @@ class MainActivity : FlutterActivity() {
                             wakeMin = call.argument<Int>("wakeMin") ?: 0,
                             graceMin = call.argument<Int>("graceMin") ?: 5,
                             blockMin = call.argument<Int>("blockMin") ?: 10,
+                            pairId = call.argument<String>("pairId"),
+                            uid = call.argument<String>("uid"),
                         )
                         result.success(null)
                     }

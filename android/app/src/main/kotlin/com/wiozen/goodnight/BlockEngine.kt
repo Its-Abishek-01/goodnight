@@ -31,6 +31,24 @@ sealed interface Decision {
     data class Block(val remainingMs: Long) : Decision
 }
 
+/** Which pair and person the night log belongs to (pushed by the Flutter app). */
+data class PairRef(val pairId: String, val uid: String)
+
+/** What was last sent to the shared night log. */
+data class Reported(val nightKey: String = "", val usageMinutes: Int = 0, val blocks: Int = 0)
+
+object NightReport {
+    /**
+     * Send tonight's numbers when there is something to show and it has grown
+     * since the last send (a new minute of use or a new block).
+     */
+    fun shouldReport(last: Reported, nightKey: String, usageMinutes: Int, blocks: Int): Boolean {
+        if (usageMinutes <= 0 && blocks <= 0) return false
+        if (last.nightKey != nightKey) return true
+        return usageMinutes > last.usageMinutes || blocks > last.blocks
+    }
+}
+
 /** Same night grouping as the Dart side: shift by 12 hours. */
 fun nightKeyOf(now: LocalDateTime): String {
     val d = now.minusHours(12)

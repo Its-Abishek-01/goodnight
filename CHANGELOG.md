@@ -3,6 +3,9 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+### Added
+- Your partner now finds out when you are on Instagram or Shorts after bedtime, even while GoodNight is closed: a push on the first minute and each time night mode steps in, and the minutes show live on their Tonight card.
+- Push alerts for love notes and their read receipts (the Cloud Functions are now deployed).
 
 ## 0.2.2 - 2026-10-19
 ### Added

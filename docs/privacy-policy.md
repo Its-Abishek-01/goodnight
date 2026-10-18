@@ -42,7 +42,7 @@ During your agreed bedtime hours only, it checks which app is in front, the addr
 your browser's address bar and whether YouTube is showing Shorts, so it can pause
 Instagram and YouTube Shorts after a short grace time. This happens on your phone. It
 never reads your messages, passwords or what you type, it does not record your browsing
-history, and nothing is uploaded except the two counts in the table above.
+history, and nothing is uploaded except the two counts in the table above. They are sent as they change during the night, so your partner sees them live.
 You are asked to agree before it is turned on, and you can turn it off at any time.
 
 ## Updates

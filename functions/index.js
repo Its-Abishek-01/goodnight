@@ -5,7 +5,11 @@ const {
   onDocumentCreated,
   onDocumentUpdated,
 } = require('firebase-functions/v2/firestore');
+const { setGlobalOptions } = require('firebase-functions/v2');
 const admin = require('firebase-admin');
+
+// Next to the Firestore database (Mumbai), where the functions already run.
+setGlobalOptions({ region: 'asia-south1' });
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -37,6 +41,35 @@ exports.snoozeAlert = onDocumentWritten('pairs/{pairId}/nights/{key}', async (ev
         `They have snoozed ${now} times. Maybe give them a call.`,
       );
     }
+  }
+});
+
+// Night mode saw Instagram or Shorts after bedtime. The phone's night-mode
+// service reports this live (with usageAt) even while the app is closed; tell
+// the partner on the first minute of the night and each time night mode
+// steps in.
+exports.nightModeAlert = onDocumentWritten('pairs/{pairId}/nights/{key}', async (event) => {
+  const before = event.data.before.data()?.players || {};
+  const after = event.data.after.data()?.players || {};
+  for (const [uid, p] of Object.entries(after)) {
+    const was = before[uid] || {};
+    // Only live reports carry usageAt; the app's catch-up upload on open does not.
+    if (!p.usageAt || (was.usageAt && was.usageAt.isEqual(p.usageAt))) continue;
+    const minutes = p.usageMinutes || 0;
+    const blocks = p.blocks || 0;
+    const name = (await userDoc(uid)).name || 'Your partner';
+    let title;
+    let body;
+    if (blocks > (was.blocks || 0)) {
+      title = `🌙 Night mode paused ${name}'s scrolling`;
+      body = `${minutes} min on Instagram/Shorts after bedtime tonight.`;
+    } else if (!(was.usageMinutes > 0) && minutes > 0) {
+      title = `📱 ${name} is still scrolling`;
+      body = 'On Instagram/Shorts after bedtime. Maybe send a love note 💌';
+    } else {
+      continue;
+    }
+    await push(await partnerToken(event.params.pairId, uid), title, body);
   }
 });
 

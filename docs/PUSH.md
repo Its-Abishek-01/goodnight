@@ -30,7 +30,19 @@ pushes that arrive while it is open. The functions in `functions/index.js` send:
 | Coupon redeemed | "{name} used a coupon" |
 | New selfie | data-only push that refreshes the home-screen widget and shows a notification |
 | Selfie opened | "{name} saw your selfie" (the read receipt) |
+| New love note | "💌 {name}" with the note |
+| Love note opened | "{name} read your love note" |
+| First minute of Instagram/Shorts after bedtime | "{name} is still scrolling" |
+| Night mode blocks Instagram/Shorts | "Night mode paused {name}'s scrolling" with tonight's minutes |
+
+The two night-mode alerts fire only on live reports from the phone's night-mode
+service (`NightReporter.kt`, which also sets `usageAt`), so the catch-up upload when
+the app opens never sends a late alert.
+
+All functions run in `asia-south1`, next to the Firestore database (set with
+`setGlobalOptions` in `functions/index.js`). Deploying without it tries to move them
+to `us-central1` and delete the old ones.
 
 First deploy of 2nd-gen functions can fail with an Eventarc permission error. Wait a few minutes and run the deploy again.
 
-These functions have not been tested end to end on real phones yet.
+Deployed on 2026-10-19. Push has not been checked end to end on real phones yet.
