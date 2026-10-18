@@ -5,9 +5,11 @@ All notable changes to GoodNight. The format follows Keep a Changelog.
 ## [Unreleased]
 ### Added
 - Tonight now shows a live "how your partner's night is going" card: whether they are winding down, asleep (and since when), snoozing, or up, plus tonight's Instagram/Shorts minutes and night-mode blocks. You both see the same card about each other.
+- Updates from inside the app: GoodNight checks GitHub for a new version when you open it, downloads it and opens the installer. No more downloading APKs by hand.
 - Love notes: send your partner a short message that fills their screen the moment it lands, with a read receipt back to you once they have seen it. Quick presets for one-tap sending, and a push alert when the Cloud Functions are deployed.
 
 ### Changed
+- GitHub releases no longer include an `.aab`: GoodNight is not going on Google Play.
 - Clearer night-mode disclosure: it now says which two numbers are saved and shared with your partner.
 - The weekly report shows each person's average sleep length, and every finished night lists the actual check-in and wake times, how long they slept, and phone minutes.
 

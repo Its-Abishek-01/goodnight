@@ -17,7 +17,7 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Release keystore, GitHub secrets and Firebase API key restriction, Blaze plan, repo public, Firestore rules deployed
 - ✅ Feature picker: personal (alarm, night mode, reminders) and shared with approval (streak & coupons, Moments) 🔧
 - ✅ v0.1.0 tagged and released on GitHub
-- ✅ Play Store groundwork: `.aab` builds, privacy policy, in-app data deletion, checklist in `docs/PLAY_STORE.md` 🔧
+- ✅ Play Store groundwork: privacy policy, in-app data deletion, checklist in `docs/PLAY_STORE.md` (Play dropped on 2026-10-18; GitHub only)
 
 ## v0.2.1
 - ✅ Golden crescent-heart icon everywhere, store graphics and rendered screenshots
@@ -30,11 +30,11 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 
 ## Next
 - ⏳ Finish love notes on the dev laptop: paste the updated `firestore.rules` into the Firebase console (not auto-deployed, or sends are denied), then build/run on the two phones. Push for notes needs the Cloud Functions deployed (see below).
-- ⏳ Release v0.2.2 (clearer night-mode disclosure), record the disclosure video on it, replace the v0.2.1 `.aab` in the closed test
-- ⏳ Play declarations: full-screen intent (Alarm clock, pre-grant), exact alarms (Alarm clock), Accessibility (App functionality, sensitive data Yes, video), foreground service (Media playback, video)
-- ⏳ Decide: "Get it on Obtainium" badge and a lite APK without night mode (installs anywhere) in every GitHub release
-- ⏳ Next feature: update and announcement popups driven by Firebase Remote Config
-- ⏳ Closed test: 12 testers for 14 days, then apply for production and open testing (`store/play-console-answers.md` has every form answer)
+- ✅ In-app updates from GitHub Releases: checks on launch/resume, downloads the APK, opens the installer; `<!-- required -->` in the notes forces it 🔧
+- ⏳ Release v0.2.2 (disclosure fix, love notes, partner card, in-app updates). Install it by hand once on both phones; from then on updates arrive in-app
+- ⏳ Check on a real phone that an in-app update is not blocked by Play Protect (it is an update of an installed app, which should be allowed)
+- ⏳ Maybe: a lite APK without night mode (no Accessibility service, so browser installs work anywhere) in every GitHub release
+- ⏳ Maybe: announcement popups (a message without a new build)
 - ⏳ Deploy the Cloud Functions (`docs/PUSH.md`) and check push on two phones
 - ✅ Love notes: a short message that fills the partner's screen, with a read receipt (the "goodnight hug" idea; shows in-app instantly, push when Functions are deployed)
 - ⏳ Maybe: block/report
@@ -45,7 +45,7 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ⏳ Rules tests with the Firebase emulator, and a CI job for analyze and tests
 
 ## Known risks
-- Play Protect blocks installing the GitHub APK from a browser in India (enhanced fraud protection, because of the Accessibility service). Play Store or `adb install` are the ways around it.
+- Play Protect blocks installing the GitHub APK from a browser in India (enhanced fraud protection, because of the Accessibility service). Ways around it: `adb install`, turning off Play Protect scanning for the install, or a future lite APK. Later updates come in-app.
 - Website and Shorts detection depends on third-party view ids that can change.
 - Some phone brands kill background services; the Setup tab asks for battery exemptions.
 - Streak and coupon integrity relies on honest partners (no server check).

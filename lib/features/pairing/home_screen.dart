@@ -22,6 +22,8 @@ import '../selfie/moments_screen.dart';
 import '../selfie/selfie_providers.dart';
 import '../settings/features_providers.dart';
 import '../setup/setup_screen.dart';
+import '../update/update_providers.dart';
+import '../update/update_widgets.dart';
 import 'pair.dart';
 
 /// App shell with the main tabs.
@@ -40,11 +42,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   CuteIconKind _tab = CuteIconKind.tonight;
   final _taps = <CuteIconKind, int>{};
 
+  String? _offeredTag;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     syncBlockStats(ref);
+    // The check may have finished before Home was first shown.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _offerUpdate(ref.read(updateProvider)));
+  }
+
+  /// Slides up the update sheet once per release (required updates have their own
+  /// screen in the gate).
+  void _offerUpdate(UpdateState s) {
+    final r = s.release;
+    if (!mounted || r == null || r.required || r.tag == _offeredTag) return;
+    _offeredTag = r.tag;
+    showUpdateSheet(context, ref);
   }
 
   @override
@@ -60,6 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(updateProvider, (_, next) => _offerUpdate(next));
     ref.watch(alarmSyncProvider);
     ref.watch(blockerSyncProvider);
     ref.watch(reminderSyncProvider);

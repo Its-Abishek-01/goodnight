@@ -11,6 +11,8 @@ import '../features/pairing/pair_providers.dart';
 import '../features/pairing/pairing_screen.dart';
 import '../features/pairing/waiting_screen.dart';
 import '../features/settings/delete_data.dart';
+import '../features/update/update_providers.dart';
+import '../features/update/update_widgets.dart';
 import 'firebase_providers.dart';
 import 'theme.dart';
 import 'sky_phase.dart';
@@ -75,6 +77,9 @@ class _Gate extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ringing = ref.watch(ringProvider);
     if (ringing != null) return AlarmRingScreen(alarmId: ringing);
+
+    // Watching it here also starts the update check on launch.
+    if (ref.watch(updateProvider).release?.required ?? false) return const UpdateRequiredScreen();
 
     final uid = ref.watch(uidProvider);
     final pair = ref.watch(pairProvider);

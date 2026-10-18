@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- In-app updates: the app downloads the new APK from GitHub Releases. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
@@ -22,6 +24,16 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/ic_launcher_background" />
+        <!-- Shares a downloaded update (cache/updates) with the system installer. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/update_paths" />
+        </provider>
         <receiver
             android:name=".SelfieWidgetProvider"
             android:exported="true"

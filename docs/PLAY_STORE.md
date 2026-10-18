@@ -1,5 +1,8 @@
 # Publishing on Google Play
 
+> **Dropped on 2026-10-18.** GoodNight ships only as an APK on GitHub Releases, with
+> in-app updates (see `RELEASING.md`). This page is kept in case Play is ever revived.
+
 The plan: closed test first (required), then production and open testing, so anyone can
 install from the Play Store without the Play Protect block that stops the GitHub APK.
 

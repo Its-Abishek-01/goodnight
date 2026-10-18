@@ -4,7 +4,7 @@ title: GoodNight privacy policy
 
 # GoodNight privacy policy
 
-_Last updated: 6 October 2026_
+_Last updated: 18 October 2026_
 
 GoodNight is a sleep pact app for two people. This policy explains what the app stores,
 why, and how to delete it. GoodNight is open source; you can read exactly what it does at
@@ -29,6 +29,7 @@ paired with.
 | Number of night-mode blocks and minutes spent on Instagram or YouTube Shorts at night | The weekly report |
 | Coupons earned and used | Streak rewards |
 | Selfies you choose to send (Moments) | Shown to your partner only |
+| Love notes you send | Shown to your partner only, with a read receipt |
 | A push notification token | To alert your partner's phone (only if push alerts are set up) |
 
 GoodNight does not use advertising, analytics or tracking, and does not sell or share
@@ -43,6 +44,11 @@ Instagram and YouTube Shorts after a short grace time. This happens on your phon
 never reads your messages, passwords or what you type, it does not record your browsing
 history, and nothing is uploaded except the two counts in the table above.
 You are asked to agree before it is turned on, and you can turn it off at any time.
+
+## Updates
+When you open the app, it asks GitHub (github.com, which hosts the app's releases)
+whether a newer version exists, and downloads it from there if you tap Update. GitHub sees
+your phone's IP address, as with any web request; nothing about you or your pair is sent.
 
 ## Camera, notifications and alarms
 - **Camera:** to scan the alarm QR code (processed on your phone) and to take selfies you

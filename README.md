@@ -40,13 +40,19 @@ blocking, and Firebase for syncing the two phones.
 ## Install (Android)
 1. Open the [latest release](https://github.com/Its-Abishek-01/goodnight/releases/latest) on your phone and download the `.apk`.
 2. Open it and allow "Install unknown apps" for your browser when asked. If Play Protect warns about an unrecognised app, choose "Install anyway".
-   In some countries (India, for example) Play Protect blocks browser installs of any app that uses an Accessibility service, with no "Install anyway" option. Then install from a computer instead: turn on USB debugging on the phone and run `adb install goodnight-<version>.apk`. A Google Play release is planned.
+   In some countries (India, for example) Play Protect blocks browser installs of any app that uses an Accessibility service, with no "Install anyway" option. Then either turn off Play Protect scanning while you install (Play Store > your profile > Play Protect > settings; turn it back on afterwards), or install from a computer: turn on USB debugging on the phone and run `adb install goodnight-<version>.apk`. GoodNight is not on Google Play.
 3. Open GoodNight and go to **Setup**. Allow notifications, exact alarms, running in the background and the camera.
 4. Turn on **Night mode blocking**. On Android 13 or later, if the Accessibility switch is greyed out, open Settings > Apps > GoodNight, tap the three-dot menu, choose **Allow restricted settings**, then enable "GoodNight night mode" under Accessibility.
 5. To use the selfie widget, long-press your home screen, choose Widgets, and add **GoodNight - Partner selfie**.
 6. On phones from Xiaomi, Oppo, Vivo, Samsung and similar makers, also set GoodNight to "No restrictions" for battery, or the system may kill the alarm and blocker.
 
 Both of you need the app. One creates a pair code and the other joins with it.
+
+### Updates
+GoodNight checks GitHub for a newer release when you open it and offers to update. Tap
+**Update**: it downloads the new version and opens the Android installer. The first time,
+Android asks you to allow GoodNight to install apps ("Allow from this source"). Your pact,
+streak and settings stay as they are.
 
 ## Privacy
 The released app syncs through a shared Firebase project. It stores only your name,

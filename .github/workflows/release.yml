@@ -57,20 +57,23 @@ jobs:
             --build-number="$GITHUB_RUN_NUMBER"
           cp build/app/outputs/flutter-apk/app-release.apk "goodnight-${GITHUB_REF_NAME}.apk"
 
-      # The bundle is for Google Play uploads; phones install the .apk.
-      - name: Build release app bundle
+      # The in-app updater shows the bullets of these notes, so they come from
+      # this version's CHANGELOG section ("## 0.2.2 - date").
+      - name: Release notes from CHANGELOG
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          flutter build appbundle --release \
-            --build-name="$VERSION" \
-            --build-number="$GITHUB_RUN_NUMBER"
-          cp build/app/outputs/bundle/release/app-release.aab "goodnight-${GITHUB_REF_NAME}.aab"
+          awk -v v="$VERSION" '
+            /^## / { if (found) exit; if (index($0, "## " v " ") == 1 || $0 == "## " v) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          [ -s release-notes.md ] || echo "See CHANGELOG.md for what changed." > release-notes.md
+          cat release-notes.md
 
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
-            "goodnight-${GITHUB_REF_NAME}.apk" "goodnight-${GITHUB_REF_NAME}.aab" \
+            "goodnight-${GITHUB_REF_NAME}.apk" \
             --title "GoodNight $GITHUB_REF_NAME" \
-            --generate-notes
+            --notes-file release-notes.md

@@ -54,12 +54,31 @@ git push origin v0.1.0
 ```
 
 The workflow runs analyze and tests, builds `goodnight-v0.1.0.apk`, and creates
-the release with generated notes. The permanent install link is:
+the release with this version's section of `CHANGELOG.md` as its notes, so move the
+Unreleased entries under a `## 0.1.0 - <date>` heading (and set `version:` in
+`pubspec.yaml` to match) before tagging. The permanent install link is:
 
 `https://github.com/Its-Abishek-01/goodnight/releases/latest`
 
 Version name comes from the tag and the build number from the workflow run
 number, so every release is newer than the last.
+
+## In-app updates
+The app asks `api.github.com/repos/Its-Abishek-01/goodnight/releases/latest` for the newest
+release (drafts and pre-releases are skipped) on launch and on resume, at most every 3 hours.
+If its tag is newer than the installed version name, it offers the update with the first
+bullets of the notes. Update downloads the `.apk` asset and opens the Android installer;
+"Later" hides that release for a day.
+
+- **Pushing a tag ships the update to everyone** within a few hours. To hold one back,
+  publish it as a draft or pre-release first and make it a full release when ready.
+- **Forced update:** edit the release on GitHub and add `<!-- required -->` anywhere in the
+  notes (it is invisible on the page). Older versions then show a full-screen "update now"
+  screen with no way past it. Use it only for breaking changes, such as Firestore rules the
+  old app cannot work with.
+- Updates only install over a build signed with the same key. Debug builds never check.
+- Local builds take their version from `pubspec.yaml`; keep it at the latest released
+  version so a locally built release APK is offered the next update.
 
 ## Manual (local) release build
 Same signed APK as the workflow, built on your own computer.
@@ -70,8 +89,8 @@ Same signed APK as the workflow, built on your own computer.
    (`../goodnight-release.jks` if the keystore sits in the repo root; it is git-ignored).
 3. Build:
    ```bash
-   bash scripts/build-release.sh              # goodnight-local.apk + .aab
-   bash scripts/build-release.sh 0.1.1 20     # goodnight-0.1.1.apk + .aab
+   bash scripts/build-release.sh              # goodnight-local.apk
+   bash scripts/build-release.sh 0.1.1 20     # goodnight-0.1.1.apk
    ```
    It runs analyze and tests, builds, and checks the APK is signed with the release key
    (not the debug key). Use a build number higher than the last release's
@@ -80,11 +99,10 @@ Same signed APK as the workflow, built on your own computer.
 You can also run Flutter directly. With `android/key.properties` in place, release builds
 are signed with your release key:
 ```bash
-flutter build appbundle --release --build-name=0.1.1 --build-number=20   # Play Store bundle
 flutter build apk --release --build-name=0.1.1 --build-number=20         # installable APK
 flutter build apk --debug                                                # debug, uses the debug key
 ```
-Without the flags, the version comes from `pubspec.yaml` (`version: 1.0.0+1`). A higher
+Without the flags, the version comes from `pubspec.yaml`. A higher
 build number is required for every update.
 
 ### Firebase API key and SHA-1
@@ -95,9 +113,8 @@ are blocked":
 
 | Build | SHA-1 to add (Google Cloud Console > APIs & Services > Credentials > the Android key) |
 |---|---|
-| Release APK / bundle you sign yourself | `keytool -list -v -keystore goodnight-release.jks -alias goodnight` |
+| Release APK you sign yourself | `keytool -list -v -keystore goodnight-release.jks -alias goodnight` |
 | Debug builds (differs on every computer) | `keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android` |
-| Play Store (if you publish there) | Play Console > Setup > App signing > "App signing key certificate" |
 
 Add the same SHA-1 values to the Android app in Firebase project settings too.
 
