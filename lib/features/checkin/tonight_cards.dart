@@ -9,6 +9,7 @@ import '../profile/person_avatar.dart';
 import '../profile/profile.dart';
 import '../settings/features.dart';
 import '../settings/features_providers.dart';
+import '../sleep_widget/sleep_widget_content.dart';
 import '../streak/streak.dart';
 import '../streak/streak_providers.dart';
 import 'moon_journey.dart';
@@ -252,9 +253,7 @@ class CheckInButton extends ConsumerWidget {
         text: 'Checked in at ${_time(context, mine.checkedInAt!)}. Phone down, sleep well.',
       );
     }
-    final now = DateTime.now();
-    final delta = (((now.hour * 60 + now.minute) - window.bedtime + 720) % 1440) - 720;
-    if (delta < -120 || delta > 240) {
+    if (!checkInOpenAt(window, DateTime.now())) {
       return const _Hint(
         icon: Icons.nights_stay_outlined,
         text: 'Check-in opens 2 hours before your bedtime.',

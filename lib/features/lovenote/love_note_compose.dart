@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme.dart';
 import '../pairing/pair.dart';
+import '../../core/widgets/cute_loader.dart';
 import 'love_note.dart';
 import 'love_note_providers.dart';
 import 'love_note_repository.dart';
@@ -170,11 +171,7 @@ class _ComposerState extends ConsumerState<_Composer> {
             child: FilledButton.icon(
               onPressed: _sending ? null : () => _send(_controller.text),
               icon: _sending
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
+                  ? const CuteLoader(size: 30)
                   : const Icon(Icons.send),
               label: const Text('Send'),
             ),

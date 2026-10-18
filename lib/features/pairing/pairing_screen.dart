@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/firebase_providers.dart';
 import '../../core/theme.dart';
+import '../../core/widgets/cute_loader.dart';
 import 'pair_providers.dart';
 import 'pair_repository.dart';
 import 'partner_color.dart';
+import 'scan_code_screen.dart';
 
 class PairingScreen extends ConsumerStatefulWidget {
   const PairingScreen({super.key});
@@ -52,6 +54,26 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _join() => _run(
+        (uid, name) => ref.read(pairRepositoryProvider).joinPair(
+              uid: uid,
+              name: name,
+              rawCode: _code.text,
+              color: _color,
+            ),
+      );
+
+  /// Scan the partner's QR code, then join straight away.
+  Future<void> _scan() async {
+    final code = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const ScanCodeScreen()),
+    );
+    if (code == null || !mounted) return;
+    _code.text = code;
+    await _join();
   }
 
   @override
@@ -115,26 +137,23 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
               ],
             ),
             const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: _busy ? null : _scan,
+              icon: const Icon(Icons.qr_code_scanner_rounded),
+              label: const Text("Scan your partner's code"),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: _code,
               textCapitalization: TextCapitalization.characters,
               decoration: const InputDecoration(
-                labelText: "Partner's code",
+                labelText: 'or type the code',
                 prefixIcon: Icon(Icons.vpn_key_outlined),
               ),
             ),
             const SizedBox(height: 12),
             OutlinedButton(
-              onPressed: _busy
-                  ? null
-                  : () => _run(
-                        (uid, name) => repo.joinPair(
-                          uid: uid,
-                          name: name,
-                          rawCode: _code.text,
-                          color: _color,
-                        ),
-                      ),
+              onPressed: _busy ? null : _join,
               child: const Text('Join with code'),
             ),
             if (_error != null) ...[
@@ -148,7 +167,7 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
             if (_busy)
               const Padding(
                 padding: EdgeInsets.only(top: 24),
-                child: LinearProgressIndicator(),
+                child: Center(child: CuteLoader(size: 72)),
               ),
           ],
         ),

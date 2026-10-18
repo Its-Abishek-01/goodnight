@@ -6,6 +6,7 @@ import '../../core/firebase_providers.dart';
 import '../../core/notifications.dart';
 import '../alarm/alarm_scheduler.dart';
 import '../blocking/blocker_channel.dart';
+import '../../core/widgets/cute_loader.dart';
 import '../pairing/pair.dart';
 import '../pairing/pair_providers.dart';
 import '../selfie/selfie_widget.dart';
@@ -96,7 +97,7 @@ class _DeletingDialogState extends ConsumerState<_DeletingDialog> {
       content: error == null
           ? const Row(
               children: [
-                CircularProgressIndicator(),
+                CuteLoader(size: 56),
                 SizedBox(width: 16),
                 Expanded(child: Text('Removing your data. Keep the app open.')),
               ],

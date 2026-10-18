@@ -9,6 +9,7 @@ import '../bedtime/schedule_providers.dart';
 import '../checkin/night_log.dart';
 import '../checkin/night_providers.dart';
 import '../pairing/pair_providers.dart';
+import '../../core/widgets/cute_loader.dart';
 import 'alarm_providers.dart';
 import 'alarm_scheduler.dart';
 import 'challenges.dart';
@@ -121,7 +122,7 @@ class _AlarmRingScreenState extends ConsumerState<AlarmRingScreen> {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: !_loaded
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: CuteLoader(size: 96))
                 : switch (_stage) {
                     _Stage.stayUp => _message(
                         '☕ Stay up!',

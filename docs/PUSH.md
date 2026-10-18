@@ -32,6 +32,7 @@ pushes that arrive while it is open. The functions in `functions/index.js` send:
 | Selfie opened | "{name} saw your selfie" (the read receipt) |
 | New love note | "💌 {name}" with the note |
 | Love note opened | "{name} read your love note" |
+| Check-in or wake-up | data-only push that updates the "Going to sleep" widget; on check-in the app shows "{name} is going to sleep" |
 | First minute of Instagram/Shorts after bedtime | "{name} is still scrolling" |
 | Night mode blocks Instagram/Shorts | "Night mode paused {name}'s scrolling" with tonight's minutes |
 

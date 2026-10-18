@@ -25,6 +25,7 @@ import 'package:goodnight/features/pairing/home_screen.dart';
 import 'package:goodnight/features/pairing/pair.dart';
 import 'package:goodnight/features/pairing/pair_providers.dart';
 import 'package:goodnight/features/pairing/pairing_screen.dart';
+import 'package:goodnight/features/pairing/waiting_screen.dart';
 import 'package:goodnight/features/profile/profile.dart';
 import 'package:goodnight/features/push/push_providers.dart';
 import 'package:goodnight/features/reminders/reminder_providers.dart';
@@ -32,6 +33,7 @@ import 'package:goodnight/features/selfie/selfie.dart';
 import 'package:goodnight/features/selfie/selfie_providers.dart';
 import 'package:goodnight/features/settings/features.dart';
 import 'package:goodnight/features/settings/features_providers.dart';
+import 'package:goodnight/features/sleep_widget/sleep_widget.dart';
 
 /// Repositories are constructed with a db but never called in these scenes.
 class _NoDb implements FirebaseFirestore {
@@ -162,6 +164,7 @@ Widget _app(Widget home, {bool together = false, SkyPhase phase = SkyPhase.night
       pushSyncProvider.overrideWith((ref) {}),
       couponSyncProvider.overrideWith((ref) {}),
       selfieSyncProvider.overrideWith((ref) {}),
+      sleepWidgetSyncProvider.overrideWith((ref) {}),
     ],
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -270,5 +273,22 @@ void main() {
   testWidgets('5 pairing', skip: !enabled, (tester) async {
     await _show(tester, const PairingScreen());
     await _shoot(tester, '5-pairing');
+  });
+
+  testWidgets('8 waiting', skip: !enabled, (tester) async {
+    await _show(
+      tester,
+      const WaitingScreen(
+        pair: Pair(
+          id: 'pair',
+          code: '7WED6T',
+          members: [_me],
+          names: {_me: 'Sam'},
+          status: PairStatus.waiting,
+          colors: {_me: 'sky'},
+        ),
+      ),
+    );
+    await _shoot(tester, '8-waiting');
   });
 }

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:home_widget/home_widget.dart';
 
 import '../../core/sky_phase.dart';
 import '../../core/widgets/cute_icons.dart';
@@ -22,6 +25,7 @@ import '../selfie/moments_screen.dart';
 import '../selfie/selfie_providers.dart';
 import '../settings/features_providers.dart';
 import '../setup/setup_screen.dart';
+import '../sleep_widget/sleep_widget.dart';
 import '../update/update_providers.dart';
 import '../update/update_widgets.dart';
 import 'pair.dart';
@@ -43,6 +47,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   final _taps = <CuteIconKind, int>{};
 
   String? _offeredTag;
+  StreamSubscription<Uri?>? _widgetClicks;
+
+  /// The launch that opened the app is handled once, not on every rebuild of Home.
+  static bool _handledLaunch = false;
 
   @override
   void initState() {
@@ -51,6 +59,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     syncBlockStats(ref);
     // The check may have finished before Home was first shown.
     WidgetsBinding.instance.addPostFrameCallback((_) => _offerUpdate(ref.read(updateProvider)));
+    _widgetClicks = HomeWidget.widgetClicked.listen(_onWidgetUri, onError: (_) {});
+    if (!_handledLaunch) {
+      _handledLaunch = true;
+      HomeWidget.initiallyLaunchedFromHomeWidget().then(_onWidgetUri).catchError((_) {});
+    }
+  }
+
+  /// The "Going to sleep" widget's button opens the app with [SleepHomeWidget.checkInUri].
+  Future<void> _onWidgetUri(Uri? uri) async {
+    if (uri?.toString() != SleepHomeWidget.checkInUri) return;
+    final message = await checkInFromWidget(ref);
+    if (message == null || !mounted) return;
+    setState(() => _tab = CuteIconKind.tonight);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   /// Slides up the update sheet once per release (required updates have their own
@@ -65,6 +87,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _widgetClicks?.cancel();
     super.dispose();
   }
 
@@ -81,6 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(reminderSyncProvider);
     ref.watch(pushSyncProvider);
     ref.watch(loveNoteSyncProvider);
+    ref.watch(sleepWidgetSyncProvider);
     final shared = ref.watch(sharedFeaturesProvider);
     if (shared.streak) ref.watch(couponSyncProvider);
     if (shared.moments) ref.watch(selfieSyncProvider);

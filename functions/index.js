@@ -73,6 +73,40 @@ exports.nightModeAlert = onDocumentWritten('pairs/{pairId}/nights/{key}', async 
   }
 });
 
+// Someone checked in ("going to sleep") or woke up: a data-only push so the
+// partner's "Going to sleep" widget updates while the app is closed. The app
+// shows "{name} is going to sleep" itself.
+exports.statusAlert = onDocumentWritten('pairs/{pairId}/nights/{key}', async (event) => {
+  const before = event.data.before.data()?.players || {};
+  const after = event.data.after.data()?.players || {};
+  for (const [uid, p] of Object.entries(after)) {
+    const was = before[uid] || {};
+    let state;
+    let at;
+    if (p.wokeAt && !was.wokeAt) {
+      state = 'up';
+      at = p.wokeAt;
+    } else if (p.checkedInAt && !(was.checkedInAt && was.checkedInAt.isEqual(p.checkedInAt))) {
+      state = 'asleep';
+      at = p.checkedInAt;
+    } else {
+      continue;
+    }
+    const token = await partnerToken(event.params.pairId, uid);
+    if (!token) continue;
+    await admin.messaging().send({
+      token,
+      data: {
+        type: 'status',
+        state,
+        at: at.toDate().toISOString(),
+        name: (await userDoc(uid)).name || 'Your partner',
+      },
+      android: { priority: 'high' },
+    });
+  }
+});
+
 // A new bedtime proposal needs the partner's approval.
 exports.proposalAlert = onDocumentWritten('pairs/{pairId}/schedules/{owner}', async (event) => {
   const after = event.data.after.data();

@@ -3,6 +3,13 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+### Added
+- "Going to sleep" home-screen widget: you and your partner tonight (bedtime, asleep since, up since) and a button that checks you in. It updates when your partner checks in or wakes up, even while the app is closed, and you get a "{name} is going to sleep" notification.
+- Pair by QR code: the waiting screen shows a QR code, and joining has a "Scan your partner's code" button. Typing the code still works.
+
+### Changed
+- A new loading animation everywhere: two little love letters fly together and a heart floats up. No more spinners.
+- The waiting-for-your-partner screen is centred and tidier.
 
 ## 0.2.3 - 2026-10-19
 ### Added

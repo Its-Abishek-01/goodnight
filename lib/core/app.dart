@@ -16,6 +16,7 @@ import '../features/update/update_widgets.dart';
 import 'firebase_providers.dart';
 import 'theme.dart';
 import 'sky_phase.dart';
+import 'widgets/cute_loader.dart';
 import 'widgets/living_sky.dart';
 
 class GoodNightApp extends ConsumerWidget {
@@ -110,7 +111,7 @@ class _Gate extends ConsumerWidget {
       );
     }
     if (!uid.hasValue || !pair.hasValue) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CuteLoader(size: 110)));
     }
     final p = pair.value;
     if (p == null) return const PairingScreen();

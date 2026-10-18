@@ -41,8 +41,13 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Cloud Functions deployed (asia-south1), including love-note and night-mode alerts
 - ✅ Night-mode service reports minutes and blocks live to the night log (REST, works with the app closed) 🔧
 
+## v0.2.4
+- ✅ Love-letter loading animation everywhere (no spinners)
+- ✅ Waiting screen centred, with a QR code; "Scan your partner's code" to join 🔧
+- ✅ "Going to sleep" home-screen widget with both of you and a check-in button; `statusAlert` (deployed) keeps it fresh while the app is closed 🔧
+
 ## Next
-- ⏳ Update both phones to v0.2.3 through the in-app "Update ready" sheet (first real test of the updater, including whether Play Protect allows it)
+- ⏳ Update both phones through the in-app "Update ready" sheet (first real test of the updater, including whether Play Protect allows it)
 - ⏳ Try love notes and the partner card on the two phones
 - ⏳ Maybe: a lite APK without night mode (no Accessibility service, so browser installs work anywhere) in every GitHub release
 - ⏳ Maybe: announcement popups (a message without a new build)

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/cute_loader.dart';
 import '../pairing/pair.dart';
 import 'features.dart';
 import 'features_providers.dart';
@@ -72,7 +73,7 @@ class FeaturesSection extends ConsumerWidget {
           child: settings == null
               ? const Padding(
                   padding: EdgeInsets.all(16),
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: CuteLoader(size: 64)),
                 )
               : _SharedFeatures(pair: pair, uid: uid, settings: settings),
         ),

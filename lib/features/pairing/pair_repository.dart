@@ -32,6 +32,22 @@ class PairRepository {
   static String normalizeCode(String input) =>
       input.trim().toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
 
+  static const _qrPrefix = 'goodnight:pair:';
+
+  /// What the waiting screen's QR code holds.
+  static String pairQrData(String code) => '$_qrPrefix$code';
+
+  /// The pair code in a scanned QR code, or null when it is not one of ours.
+  /// A bare code (someone's own QR of it) also works.
+  static String? codeFromQr(String raw) {
+    var s = raw.trim();
+    if (s.toLowerCase().startsWith(_qrPrefix)) s = s.substring(_qrPrefix.length);
+    final code = normalizeCode(s);
+    if (code.length != codeLength) return null;
+    if (code.split('').any((c) => !_alphabet.contains(c))) return null;
+    return code;
+  }
+
   Stream<String?> watchPairId(String uid) => _db
       .doc('users/$uid')
       .snapshots()

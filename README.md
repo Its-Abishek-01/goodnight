@@ -35,6 +35,7 @@ blocking, and Firebase for syncing the two phones.
   night mode and reminders on or off for yourself. Streak & coupons and Moments are
   shared: one of you proposes the change and the other approves it.
 - **Moments.** Send each other a random selfie. The latest one from your partner shows on a home-screen widget, and you see "Seen" once they open it. Photos are private to the two of you and disappear after a week (5 per person per day).
+- **Going to sleep widget.** A home-screen widget with both of you tonight and a button to check in; it updates when your partner goes to sleep or wakes up.
 - **Love notes.** Send a sudden short message that fills your partner's screen the moment it arrives. You get a read receipt once they have seen it. Private to the two of you.
 
 ## Install (Android)
@@ -43,10 +44,10 @@ blocking, and Firebase for syncing the two phones.
    In some countries (India, for example) Play Protect blocks browser installs of any app that uses an Accessibility service, with no "Install anyway" option. Then either turn off Play Protect scanning while you install (Play Store > your profile > Play Protect > settings; turn it back on afterwards), or install from a computer: turn on USB debugging on the phone and run `adb install goodnight-<version>.apk`. GoodNight is not on Google Play.
 3. Open GoodNight and go to **Setup**. Allow notifications, exact alarms, running in the background and the camera.
 4. Turn on **Night mode blocking**. On Android 13 or later, if the Accessibility switch is greyed out, open Settings > Apps > GoodNight, tap the three-dot menu, choose **Allow restricted settings**, then enable "GoodNight night mode" under Accessibility.
-5. To use the selfie widget, long-press your home screen, choose Widgets, and add **GoodNight - Partner selfie**.
+5. To use the widgets, long-press your home screen, choose Widgets, and add **GoodNight - Going to sleep** or **GoodNight - Partner selfie**.
 6. On phones from Xiaomi, Oppo, Vivo, Samsung and similar makers, also set GoodNight to "No restrictions" for battery, or the system may kill the alarm and blocker.
 
-Both of you need the app. One creates a pair code and the other joins with it.
+Both of you need the app. One creates a pair code; the other scans its QR code (or types the code) to join.
 
 ### Updates
 GoodNight checks GitHub for a newer release when you open it and offers to update. Tap
