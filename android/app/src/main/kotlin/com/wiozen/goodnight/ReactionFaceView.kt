@@ -30,6 +30,18 @@ class ReactionFaceView(context: Context) : View(context) {
     var mood: Mood = Mood.HAPPY
         private set
 
+    /**
+     * Idle motion runs only while the bubble is out; tucked away the face
+     * holds still so it costs no battery (vivo stops apps that draw a lot in
+     * the background, and that also turns night mode off).
+     */
+    var animating = true
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value) invalidate()
+        }
+
     fun setMood(m: Mood) {
         if (m == mood) return
         from = Look(current().skin, cur.copyOf())
@@ -106,7 +118,11 @@ class ReactionFaceView(context: Context) : View(context) {
         // The z's float outside the face, so they are not scaled or shaken.
         if (v[ZZZ] > 0.01f) drawZzz(canvas, v[ZZZ], t, u)
 
-        if (isAttachedToWindow && visibility == VISIBLE) postInvalidateOnAnimation()
+        // Keep drawing while moving, and until a mood change has finished morphing.
+        val morphing = now - changedAt < max(MORPH_MS, POP_MS)
+        if (isAttachedToWindow && visibility == VISIBLE && (animating || morphing)) {
+            postInvalidateOnAnimation()
+        }
     }
 
     private fun drawEyes(canvas: Canvas, v: FloatArray, t: Float, u: Float) {

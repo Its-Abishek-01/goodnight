@@ -160,6 +160,20 @@ class _SetupScreenState extends ConsumerState<SetupScreen> with WidgetsBindingOb
                     ),
             ),
           ),
+        if (mine.nightMode)
+          Card(
+            child: ListTile(
+              title: const Text('Keep night mode running'),
+              subtitle: const Text(
+                'Some phones (vivo especially) stop apps in the background, which also '
+                'turns night mode off. Allow GoodNight to use power in the background.',
+              ),
+              trailing: TextButton(
+                onPressed: Blocker.openBackgroundPower,
+                child: const Text('Open'),
+              ),
+            ),
+          ),
         if (mine.alarm)
           Card(
             child: ListTile(

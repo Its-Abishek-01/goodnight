@@ -198,6 +198,7 @@ class WatchBubbleOverlay(
             return
         }
         out = show
+        face.animating = show
         val peek = ((6 + FACE_DP / 2 + 2) * dp).toInt()
         val target = if (show) 0 else -(v.width - peek)
         val fromX = params.x

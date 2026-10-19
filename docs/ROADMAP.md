@@ -67,6 +67,9 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Watch bubble any time Instagram/Shorts is open (day: this sitting; night: countdown to the pause), see-through when tucked, "Preview the bubble" on the Us tab 🔧
 - ✅ Fix: own overlays no longer count as the app in front
 
+## Next (on main, not released)
+- ✅ vivo force-stop turns night mode off: warning card on Tonight, "Keep night mode running" on the Us tab, face idle while tucked 🔧
+
 ## Next
 - ⏳ Update both phones through the in-app "Update ready" sheet (first real test of the updater, including whether Play Protect allows it)
 - ⏳ Try love notes and the partner card on the two phones

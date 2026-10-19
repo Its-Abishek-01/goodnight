@@ -13,6 +13,7 @@ import '../alarm/wake_sound_providers.dart';
 import '../bedtime/bedtime_card.dart';
 import '../bedtime/schedule_providers.dart';
 import '../blocking/blocker_providers.dart';
+import '../blocking/night_mode_off_card.dart';
 import '../blocking/time_request_card.dart';
 import '../checkin/tonight_cards.dart';
 import '../coupons/coupon.dart';
@@ -195,6 +196,7 @@ class _Tonight extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
+        const NightModeOffCard(),
         TimeRequestCard(pair: pair, uid: uid),
         TonightJourney(pair: pair, uid: uid),
         const SizedBox(height: 12),

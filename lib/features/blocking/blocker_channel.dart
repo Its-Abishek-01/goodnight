@@ -77,6 +77,10 @@ class Blocker {
         'bubble': bubble,
       });
 
+  /// Opens the phone's "allow background power use" screen (vivo), or App info.
+  static Future<void> openBackgroundPower() =>
+      _channel.invokeMethod<void>('openBackgroundPower');
+
   /// Shows the watch bubble over the screen for a few seconds. False when
   /// the night-mode service is not running.
   static Future<bool> previewBubble() async =>

@@ -1,5 +1,6 @@
 package com.wiozen.goodnight
 
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -50,6 +51,7 @@ class MainActivity : FlutterActivity() {
                         )
                         result.success(null)
                     }
+                    "openBackgroundPower" -> result.success(openBackgroundPower())
                     "previewBubble" -> result.success(BlockerService.instance?.previewBubble() ?: false)
                     "getStats" -> {
                         val s = BlockerStore(this).loadState()
@@ -122,6 +124,35 @@ class MainActivity : FlutterActivity() {
                 .setDataAndType(uri, "application/vnd.android.package-archive")
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
         )
+    }
+
+    /**
+     * Opens the phone's own "let this app run in the background" screen, where
+     * one exists. vivo's power manager otherwise force-stops GoodNight, which
+     * also switches its Accessibility service (night mode) off.
+     */
+    private fun openBackgroundPower(): Boolean {
+        val tries = listOf(
+            Intent("com.vivo.abe.highpower.search.powermanageractivity"),
+            Intent().setComponent(
+                ComponentName(
+                    "com.vivo.abe",
+                    "com.vivo.applicationbehaviorengine.ui.ExcessivePowerManagerActivity",
+                )
+            ),
+            Intent().setComponent(
+                ComponentName("com.iqoo.secure", "com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity")
+            ),
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")),
+        )
+        for (intent in tries) {
+            try {
+                startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                return true
+            } catch (_: Exception) {
+            }
+        }
+        return false
     }
 
     companion object {

@@ -3,6 +3,8 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+### Fixed
+- vivo phones could stop GoodNight in the background, and Android then switched night mode (and the watch bubble) off without telling you. Tonight now shows "Night mode got switched off" with a button to turn it back on, and the Us tab has "Keep night mode running", which opens the phone's background power setting. The bubble's face also holds still while tucked away, to save battery.
 
 ## 0.2.8 - 2026-10-20
 ### Changed
