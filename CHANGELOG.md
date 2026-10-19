@@ -3,6 +3,8 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+
+## 0.2.7 - 2026-10-20
 ### Added
 - Account backup: on the Us tab, create a backup code (shown once as text and a QR code). On a new phone or after a reinstall, tap "Restore with a backup code" on the first screen, type it or scan it from the old phone, and your pair, streak and history come back.
 - Scan your partner's code also works for backup codes; the scanner is shared.
