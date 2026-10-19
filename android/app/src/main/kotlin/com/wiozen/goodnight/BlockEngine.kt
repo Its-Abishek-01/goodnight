@@ -9,6 +9,8 @@ data class BlockConfig(
     val wakeMin: Int = 0,
     val graceMs: Long = 5 * 60_000L,
     val blockMs: Long = 10 * 60_000L,
+    /** Show the watch bubble (time and reels) over Instagram and Shorts. */
+    val bubble: Boolean = true,
 )
 
 /** Running state of the grace and block timers for the current night. */
@@ -29,6 +31,8 @@ data class BlockState(
     var phoneMs: Long = 0,
     var lastOnPhone: Boolean = false,
     var prevPhoneMs: Long = 0,
+    // Reels and Shorts swiped through tonight, for the watch bubble.
+    var reels: Int = 0,
 )
 
 sealed interface Decision {
@@ -147,6 +151,7 @@ object BlockEngine {
             s.totalUsedMs = 0
             s.phoneMs = 0
             s.lastOnPhone = false
+            s.reels = 0
         }
 
         if (!isNight(c, minuteOfDay)) {

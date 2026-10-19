@@ -19,6 +19,8 @@ import 'package:goodnight/features/alarm/alarm_scheduler.dart';
 import 'package:goodnight/features/alarm/wake_sound.dart';
 import 'package:goodnight/features/alarm/wake_sound_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:goodnight/features/backup/backup_card.dart';
+import 'package:goodnight/features/backup/restore_screen.dart';
 import 'package:goodnight/features/bedtime/schedule.dart';
 import 'package:goodnight/features/bedtime/schedule_providers.dart';
 import 'package:goodnight/features/blocking/blocker_providers.dart';
@@ -334,6 +336,16 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
     }
     await _shoot(tester, '9-alarm');
+  });
+
+  testWidgets('10 backup code', skip: !enabled, (tester) async {
+    await _show(tester, const BackupCodeScreen(code: 'K7WDM3QX9PRTH2FNB6YC'));
+    await _shoot(tester, '10-backup-code');
+  });
+
+  testWidgets('11 restore', skip: !enabled, (tester) async {
+    await _show(tester, const RestoreScreen());
+    await _shoot(tester, '11-restore');
   });
 
   testWidgets('5 pairing', skip: !enabled, (tester) async {

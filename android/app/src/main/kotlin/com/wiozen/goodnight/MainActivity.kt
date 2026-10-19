@@ -46,6 +46,7 @@ class MainActivity : FlutterActivity() {
                             pairId = call.argument<String>("pairId"),
                             uid = call.argument<String>("uid"),
                             partnerName = call.argument<String>("partnerName"),
+                            bubble = call.argument<Boolean>("bubble") ?: true,
                         )
                         result.success(null)
                     }

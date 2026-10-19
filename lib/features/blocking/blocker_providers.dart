@@ -26,6 +26,7 @@ final blockerSyncProvider = Provider<void>((ref) {
         wakeMin: w?.wake ?? 0,
         graceMin: w?.grace ?? SleepWindow.defaultGrace,
         blockMin: w?.pause ?? SleepWindow.defaultPause,
+        bubble: features.watchBubble,
         pairId: pair?.id,
         uid: uid,
         // For "Ask {partner} for more time" on the block screen.

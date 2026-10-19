@@ -15,6 +15,7 @@ class BlockerStore(context: Context) {
         pairId: String?,
         uid: String?,
         partnerName: String?,
+        bubble: Boolean = true,
     ) {
         p.edit()
             .putString("pairId", pairId)
@@ -25,6 +26,7 @@ class BlockerStore(context: Context) {
             .putInt("wakeMin", wakeMin)
             .putInt("graceMin", graceMin)
             .putInt("blockMin", blockMin)
+            .putBoolean("bubble", bubble)
             .apply()
     }
 
@@ -34,7 +36,15 @@ class BlockerStore(context: Context) {
         wakeMin = p.getInt("wakeMin", 0),
         graceMs = p.getInt("graceMin", 5) * 60_000L,
         blockMs = p.getInt("blockMin", 10) * 60_000L,
+        bubble = p.getBoolean("bubble", true),
     )
+
+    /** Where the watch bubble sits, as a fraction of the screen height. */
+    fun bubbleY(): Float = p.getFloat("bubbleY", 0.32f)
+
+    fun saveBubbleY(y: Float) {
+        p.edit().putFloat("bubbleY", y).apply()
+    }
 
     fun loadPair(): PairRef? {
         val pairId = p.getString("pairId", null)
@@ -95,6 +105,7 @@ class BlockerStore(context: Context) {
         phoneMs = p.getLong("s.phoneMs", 0),
         lastOnPhone = p.getBoolean("s.lastOnPhone", false),
         prevPhoneMs = p.getLong("s.prevPhoneMs", 0),
+        reels = p.getInt("s.reels", 0),
     )
 
     fun saveState(s: BlockState) {
@@ -112,6 +123,7 @@ class BlockerStore(context: Context) {
             .putLong("s.phoneMs", s.phoneMs)
             .putBoolean("s.lastOnPhone", s.lastOnPhone)
             .putLong("s.prevPhoneMs", s.prevPhoneMs)
+            .putInt("s.reels", s.reels)
             .apply()
     }
 }

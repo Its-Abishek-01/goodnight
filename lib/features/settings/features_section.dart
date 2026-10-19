@@ -59,6 +59,19 @@ class FeaturesSection extends ConsumerWidget {
                     ? null
                     : (v) => setMine(mine.copyWith(nightMode: v)),
               ),
+              if (mine?.nightMode ?? true)
+                SwitchListTile(
+                  title: const Text('Watch bubble'),
+                  subtitle: const Text(
+                    'A little face peeks from the screen edge on Instagram and Shorts '
+                    'at night, with how long you have watched and how many reels. '
+                    'It gets sleepier as your pause gets closer.',
+                  ),
+                  value: mine?.watchBubble ?? true,
+                  onChanged: mine == null
+                      ? null
+                      : (v) => setMine(mine.copyWith(watchBubble: v)),
+                ),
               SwitchListTile(
                 title: const Text('Bedtime reminders'),
                 subtitle: const Text(

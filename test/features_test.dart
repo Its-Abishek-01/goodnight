@@ -18,6 +18,12 @@ void main() {
     expect(PersonalFeatures.alertChoices, contains(PersonalFeatures.defaultAlertAfter));
   });
 
+  test('the watch bubble is on by default and round-trips', () {
+    expect(PersonalFeatures.fromMap({}).watchBubble, isTrue);
+    final off = PersonalFeatures.all.copyWith(watchBubble: false);
+    expect(PersonalFeatures.fromMap(off.toMap()), off);
+  });
+
   test('a couple without a shared doc has everything on', () {
     final s = SharedSettings.fromMap(null);
     expect(s.current, SharedFeatures.all);

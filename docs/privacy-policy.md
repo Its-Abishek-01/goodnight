@@ -22,6 +22,7 @@ paired with.
 | Data | Why |
 |---|---|
 | Random user ID | To link your phone to your pair |
+| A sign-in made from your backup code (if you create one) | To bring your account back on a new phone; it is not a real email address |
 | The name you type in | So your partner sees who you are |
 | Your bedtime and wake time, and any proposed changes | The pact: your partner approves them |
 | Which features you turned on | So both phones follow the same choices |
@@ -42,7 +43,9 @@ your data with anyone. Google provides the hosting (Firebase), the push notifica
 If you turn on night-mode blocking, GoodNight uses Android's Accessibility service.
 During your agreed bedtime hours only, it checks which app is in front, the address in
 your browser's address bar and whether YouTube is showing Shorts, so it can pause
-Instagram and YouTube Shorts after a short grace time. This happens on your phone. It
+Instagram and YouTube Shorts after a short grace time. It also notices when you swipe
+to the next reel in Instagram Reels or YouTube Shorts, to show a reel count on the watch
+bubble; that count stays on your phone. This happens on your phone. It
 never reads your messages, passwords or what you type, it does not record your browsing
 history, and nothing is uploaded except the counts in the table above. They are sent as they change during the night, so your partner sees them live.
 You are asked to agree before it is turned on, and you can turn it off at any time.

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../alarm/alarm_qr_screen.dart';
+import '../backup/backup_card.dart';
 import '../blocking/blocker_channel.dart';
 import '../pairing/pair.dart';
 import '../profile/profile_section.dart';
@@ -127,6 +128,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> with WidgetsBindingOb
         ),
         const SizedBox(height: 8),
         ProfileSection(pair: widget.pair, uid: widget.uid),
+        const SizedBox(height: 6),
+        const BackupCard(),
         const SizedBox(height: 12),
         FeaturesSection(pair: widget.pair, uid: widget.uid),
         const SizedBox(height: 12),

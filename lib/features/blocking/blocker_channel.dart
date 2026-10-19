@@ -53,6 +53,7 @@ class Blocker {
   /// [pairId] and [uid] let the service report usage to the shared night log
   /// while the app is closed.
   /// [graceMin] and [blockMin] are the night-mode times agreed in the pact.
+  /// [bubble] shows the watch bubble over Instagram and Shorts at night.
   static Future<void> saveConfig({
     required bool enabled,
     required int bedtimeMin,
@@ -62,6 +63,7 @@ class Blocker {
     String? pairId,
     String? uid,
     String? partnerName,
+    bool bubble = true,
   }) =>
       _channel.invokeMethod<void>('saveConfig', {
         'pairId': pairId,
@@ -72,6 +74,7 @@ class Blocker {
         'wakeMin': wakeMin,
         'graceMin': graceMin,
         'blockMin': blockMin,
+        'bubble': bubble,
       });
 
   static Future<BlockStats?> getStats() async {

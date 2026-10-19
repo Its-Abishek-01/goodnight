@@ -35,6 +35,8 @@ class BlockerService : AccessibilityService() {
     private var contentTarget = false
     private var lastContentCheck = 0L
     private var overlay: View? = null
+    private lateinit var bubble: WatchBubbleOverlay
+    private val reelTrack = ReelTrack()
 
     private val ticker = object : Runnable {
         override fun run() {
@@ -46,12 +48,14 @@ class BlockerService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         store = BlockerStore(this)
+        bubble = WatchBubbleOverlay(this, store)
         handler.post(ticker)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
         handler.removeCallbacks(ticker)
         removeOverlay()
+        if (::bubble.isInitialized) bubble.remove()
         return super.onUnbind(intent)
     }
 
@@ -63,6 +67,8 @@ class BlockerService : AccessibilityService() {
         when (e.eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 if (pkg == "com.android.systemui" || Targets.isKeyboard(pkg)) return
+                // Our own overlays (the watch bubble, the pause screen) are not an app in front.
+                if (pkg == packageName && e.className?.toString()?.startsWith("android.widget.") == true) return
                 if (pkg == packageName) {
                     // GoodNight itself (or its overlay): not a target, not phone use.
                     fgPackage = pkg
@@ -81,7 +87,36 @@ class BlockerService : AccessibilityService() {
                     evaluate()
                 }
             }
+            AccessibilityEvent.TYPE_VIEW_SCROLLED -> onScrolled(e, pkg)
         }
+    }
+
+    /** A swipe in the Reels or Shorts pager at night is one more reel. */
+    private fun onScrolled(e: AccessibilityEvent, pkg: String) {
+        if (!::store.isInitialized || pkg != fgPackage) return
+        val ids = Targets.REEL_PAGER_IDS[pkg] ?: return
+        val id = try {
+            e.source?.viewIdResourceName
+        } catch (_: Exception) {
+            null
+        }
+        val isPager = if (id != null) {
+            ids.any { id.endsWith(":id/$it") }
+        } else {
+            // No id on the scrolled view: check the screen for the pager.
+            val root = rootInActiveWindow
+            root != null && ids.any { root.findAccessibilityNodeInfosByViewId("$pkg:id/$it").isNotEmpty() }
+        }
+        if (!isPager) return
+        val now = LocalDateTime.now()
+        val config = store.loadConfig()
+        if (!BlockEngine.isNight(config, now.hour * 60 + now.minute)) return
+        val state = store.loadState()
+        if (state.nightKey != nightKeyOf(now) || System.currentTimeMillis() < state.blockUntil) return
+        if (!ReelCounter.onScroll(reelTrack, id ?: pkg, e.fromIndex, System.currentTimeMillis())) return
+        state.reels++
+        store.saveState(state)
+        if (config.bubble) bubble.update(state.totalUsedMs, state.reels, Mood.of(state.usedMs, config.graceMs))
     }
 
     private fun isContentApp(pkg: String) =
@@ -152,10 +187,20 @@ class BlockerService : AccessibilityService() {
             handler.post { onAnswer(approved, minutes) }
         }
         if (decision is Decision.Block) {
+            bubble.remove()
             fgPackage = ""
             contentTarget = false
             performGlobalAction(GLOBAL_ACTION_HOME)
             showOverlay(decision.remainingMs)
+            return
+        }
+        val watching = config.bubble && onTarget &&
+            BlockEngine.isNight(config, now.hour * 60 + now.minute) &&
+            System.currentTimeMillis() >= state.blockUntil
+        if (watching) {
+            bubble.update(state.totalUsedMs, state.reels, Mood.of(state.usedMs, config.graceMs))
+        } else {
+            bubble.remove()
         }
     }
 

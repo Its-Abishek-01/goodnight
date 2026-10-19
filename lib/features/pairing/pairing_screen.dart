@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/firebase_providers.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/cute_loader.dart';
+import '../backup/restore_screen.dart';
 import 'pair_providers.dart';
 import 'pair_repository.dart';
 import 'partner_color.dart';
@@ -169,6 +170,17 @@ class _PairingScreenState extends ConsumerState<PairingScreen> {
                 padding: EdgeInsets.only(top: 24),
                 child: Center(child: CuteLoader(size: 72)),
               ),
+            const SizedBox(height: 28),
+            TextButton.icon(
+              onPressed: _busy
+                  ? null
+                  : () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RestoreScreen()),
+                      ),
+              icon: const Icon(Icons.key_rounded),
+              label: const Text('Restore with a backup code'),
+            ),
           ],
         ),
       ),

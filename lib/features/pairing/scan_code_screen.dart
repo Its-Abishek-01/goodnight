@@ -4,10 +4,21 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../core/theme.dart';
 import 'pair_repository.dart';
 
-/// Scans the QR code on your partner's waiting screen. Pops with the pair
-/// code, or null when closed.
+/// Scans the QR code on your partner's waiting screen (or, with [parse], any
+/// other GoodNight code such as a backup). Pops with the code, or null.
 class ScanCodeScreen extends StatefulWidget {
-  const ScanCodeScreen({super.key});
+  const ScanCodeScreen({
+    super.key,
+    this.title = "Scan your partner's code",
+    this.hint = 'Point the camera at the QR code on their screen.',
+    this.wrong = "That isn't a GoodNight code. Scan the one on your partner's waiting screen.",
+    this.parse = PairRepository.codeFromQr,
+  });
+
+  final String title;
+  final String hint;
+  final String wrong;
+  final String? Function(String raw) parse;
 
   @override
   State<ScanCodeScreen> createState() => _ScanCodeScreenState();
@@ -22,7 +33,7 @@ class _ScanCodeScreenState extends State<ScanCodeScreen> {
     for (final b in capture.barcodes) {
       final raw = b.rawValue;
       if (raw == null) continue;
-      final code = PairRepository.codeFromQr(raw);
+      final code = widget.parse(raw);
       if (code != null) {
         _done = true;
         Navigator.pop(context, code);
@@ -36,14 +47,14 @@ class _ScanCodeScreenState extends State<ScanCodeScreen> {
   Widget build(BuildContext context) {
     final sky = context.sky;
     return Scaffold(
-      appBar: AppBar(title: const Text("Scan your partner's code")),
+      appBar: AppBar(title: Text(widget.title)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
               Text(
-                'Point the camera at the QR code on their screen.',
+                widget.hint,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: sky.muted),
               ),
@@ -75,7 +86,7 @@ class _ScanCodeScreenState extends State<ScanCodeScreen> {
                 opacity: _wrong ? 1 : 0,
                 duration: const Duration(milliseconds: 250),
                 child: Text(
-                  "That isn't a GoodNight code. Scan the one on your partner's waiting screen.",
+                  widget.wrong,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),

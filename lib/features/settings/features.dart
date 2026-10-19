@@ -5,6 +5,7 @@ class PersonalFeatures {
     this.nightMode = true,
     this.reminders = true,
     this.alertAfter = defaultAlertAfter,
+    this.watchBubble = true,
   });
 
   /// The choices for [alertAfter], in minutes; 0 is off.
@@ -23,11 +24,16 @@ class PersonalFeatures {
   /// the partner can see it.
   final int alertAfter;
 
+  /// The little face on the screen edge over Instagram and Shorts at night,
+  /// with how long I have watched and how many reels.
+  final bool watchBubble;
+
   factory PersonalFeatures.fromMap(Map<String, dynamic> m) => PersonalFeatures(
     alarm: m['alarm'] as bool? ?? true,
     nightMode: m['nightMode'] as bool? ?? true,
     reminders: m['reminders'] as bool? ?? true,
     alertAfter: (m['alertAfter'] as num?)?.toInt() ?? defaultAlertAfter,
+    watchBubble: m['watchBubble'] as bool? ?? true,
   );
 
   Map<String, Object> toMap() => {
@@ -35,14 +41,22 @@ class PersonalFeatures {
     'nightMode': nightMode,
     'reminders': reminders,
     'alertAfter': alertAfter,
+    'watchBubble': watchBubble,
   };
 
-  PersonalFeatures copyWith({bool? alarm, bool? nightMode, bool? reminders, int? alertAfter}) =>
+  PersonalFeatures copyWith({
+    bool? alarm,
+    bool? nightMode,
+    bool? reminders,
+    int? alertAfter,
+    bool? watchBubble,
+  }) =>
       PersonalFeatures(
         alarm: alarm ?? this.alarm,
         nightMode: nightMode ?? this.nightMode,
         reminders: reminders ?? this.reminders,
         alertAfter: alertAfter ?? this.alertAfter,
+        watchBubble: watchBubble ?? this.watchBubble,
       );
 
   @override
@@ -51,10 +65,11 @@ class PersonalFeatures {
       other.alarm == alarm &&
       other.nightMode == nightMode &&
       other.reminders == reminders &&
-      other.alertAfter == alertAfter;
+      other.alertAfter == alertAfter &&
+      other.watchBubble == watchBubble;
 
   @override
-  int get hashCode => Object.hash(alarm, nightMode, reminders, alertAfter);
+  int get hashCode => Object.hash(alarm, nightMode, reminders, alertAfter, watchBubble);
 }
 
 /// Features the couple shares. A change needs one person to propose it and

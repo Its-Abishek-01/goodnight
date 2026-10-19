@@ -59,6 +59,10 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Wake-up sounds: 4 original tones (`scripts/make-sounds.py`) + Classic + phone sounds; "I pick" / "partner picks"; partner voice messages up to 15 s 🔧
 - ✅ Rules (alarmSounds) and alarmSoundAlert deployed
 
+## Next (on main, not released)
+- ✅ Account backup code (hidden email/password login linked to the anonymous account) and restore from the pairing screen 🔧 (needs Email/Password enabled in Firebase Auth; done 2026-10-19)
+- ✅ Watch bubble over Instagram/Shorts at night: auto-hiding edge pill with time, reel count and an animated reaction face (5 moods); toggle on the Us tab 🔧 (rules change: `watchBubble` in features; done 2026-10-20)
+
 ## Next
 - ⏳ Update both phones through the in-app "Update ready" sheet (first real test of the updater, including whether Play Protect allows it)
 - ⏳ Try love notes and the partner card on the two phones

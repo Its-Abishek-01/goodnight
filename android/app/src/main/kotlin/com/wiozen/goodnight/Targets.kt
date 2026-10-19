@@ -26,6 +26,15 @@ object Targets {
         "shorts_player_container",
     )
 
+    /**
+     * The full-screen reel pagers whose scrolls count as one more reel:
+     * Instagram Reels and YouTube Shorts.
+     */
+    val REEL_PAGER_IDS: Map<String, List<String>> = mapOf(
+        INSTAGRAM to listOf("clips_viewer_view_pager", "clips_viewer_pager"),
+        YOUTUBE to listOf("reel_recycler"),
+    )
+
     fun isBlockedUrl(raw: String?): Boolean {
         val url = raw?.lowercase() ?: return false
         return url.contains("instagram.com") || url.contains("youtube.com/shorts")

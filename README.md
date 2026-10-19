@@ -36,7 +36,7 @@ blocking, and Firebase for syncing the two phones.
   shared: one of you proposes the change and the other approves it.
 - **Moments.** Send each other a random selfie. The latest one from your partner shows on a home-screen widget, and you see "Seen" once they open it. Photos are private to the two of you and disappear after a week (5 per person per day).
 - **Wake-up sounds.** Pick your alarm sound (gentle tones made for GoodNight or your phone's own), let your partner pick it for you, or wake up to a voice message they recorded.
-- **Night mode on your terms.** Agree on how long you get on Instagram/Shorts before a pause and how long the pause lasts, and ask your partner for 5, 10 or 15 more minutes from the pause screen. Each of you also picks after how many minutes of phone use past the other's bedtime you get told.
+- **Night mode on your terms.** Agree on how long you get on Instagram/Shorts before a pause and how long the pause lasts, and ask your partner for 5, 10 or 15 more minutes from the pause screen. A little face peeks from the screen edge while you scroll, shows your time and reels tonight, and gets sleepier as the pause gets closer. Each of you also picks after how many minutes of phone use past the other's bedtime you get told.
 - **Going to sleep widget.** A home-screen widget with both of you tonight and a button to check in; it updates when your partner goes to sleep or wakes up.
 - **Love notes.** Send a sudden short message that fills your partner's screen the moment it arrives. You get a read receipt once they have seen it. Private to the two of you.
 
@@ -48,6 +48,8 @@ blocking, and Firebase for syncing the two phones.
 4. Turn on **Night mode blocking**. On Android 13 or later, if the Accessibility switch is greyed out, open Settings > Apps > GoodNight, tap the three-dot menu, choose **Allow restricted settings**, then enable "GoodNight night mode" under Accessibility.
 5. To use the widgets, long-press your home screen, choose Widgets, and add **GoodNight - Going to sleep** or **GoodNight - Partner selfie**.
 6. On phones from Xiaomi, Oppo, Vivo, Samsung and similar makers, also set GoodNight to "No restrictions" for battery, or the system may kill the alarm and blocker.
+
+Make an account backup code on the Us tab and keep it safe: it brings your pair back on a new phone or after a reinstall ("Restore with a backup code" on the first screen).
 
 Both of you need the app. One creates a pair code; the other scans its QR code (or types the code) to join.
 

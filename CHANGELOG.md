@@ -3,6 +3,10 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+### Added
+- Account backup: on the Us tab, create a backup code (shown once as text and a QR code). On a new phone or after a reinstall, tap "Restore with a backup code" on the first screen, type it or scan it from the old phone, and your pair, streak and history come back.
+- Scan your partner's code also works for backup codes; the scanner is shared.
+- Watch bubble: at night, a little face peeks from the right edge of the screen on Instagram and YouTube Shorts. Every so often (and when you tap it) it slides out to show how long you have watched tonight and how many reels, then tucks itself away again. It starts happy, then glances at you, sweats, yawns and finally gets grumpy as your pause gets closer. Drag it up or down to move it. Turn it off on the Us tab under Night mode.
 
 ## 0.2.6 - 2026-10-19
 ### Added
