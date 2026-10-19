@@ -79,6 +79,7 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ⏳ Maybe: block/report
 
 ## Later
+- ⏸️ Watch together (screen sharing with sound, voice and reactions): half built on local branch `feature/watch-together`, paused 2026-10-20; plan in `docs/WATCH_TOGETHER.md`
 - ⏳ Photo-of-object alarm challenge
 - ⏳ Rules tests with the Firebase emulator, and a CI job for analyze and tests
 
