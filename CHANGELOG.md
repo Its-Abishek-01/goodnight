@@ -3,6 +3,8 @@
 All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
+
+## 0.2.6 - 2026-10-19
 ### Added
 - Choose your wake-up sound on the Us tab: Soft chimes, Music box, Morning birds, Sunrise piano, Classic beep, or one of your phone's own alarm sounds. Tap play to hear each one.
 - Let your partner pick it: switch "Wake-up sound" to "{partner} picks", and they choose for you from their Us tab.
