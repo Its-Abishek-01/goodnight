@@ -97,6 +97,7 @@ class PairRepository {
     'coupons',
     'selfies',
     'loveNotes',
+    'timeRequests',
     'profiles',
   ];
 

@@ -41,7 +41,12 @@ class ScheduleRepository {
       final proposal = (await tx.get(ref)).data()?['proposal'] as Map<String, dynamic>?;
       if (proposal == null) return;
       tx.set(ref, {
-        'current': {'bedtime': proposal['bedtime'], 'wake': proposal['wake']},
+        'current': {
+          'bedtime': proposal['bedtime'],
+          'wake': proposal['wake'],
+          'grace': proposal['grace'] ?? SleepWindow.defaultGrace,
+          'pause': proposal['pause'] ?? SleepWindow.defaultPause,
+        },
         'proposal': null,
         'approvedAt': FieldValue.serverTimestamp(),
       });

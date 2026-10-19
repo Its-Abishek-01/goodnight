@@ -13,7 +13,8 @@ String _describe(BuildContext context, SleepWindow w) {
   final h = w.sleepMinutes ~/ 60;
   final m = w.sleepMinutes % 60;
   final sleep = m == 0 ? '${h}h' : '${h}h ${m}m';
-  return '${_tod(w.bedtime).format(context)} to ${_tod(w.wake).format(context)} ($sleep sleep)';
+  return '${_tod(w.bedtime).format(context)} to ${_tod(w.wake).format(context)} ($sleep sleep)'
+      ' · night mode ${w.grace} min, then ${w.pause} min pause';
 }
 
 /// Shows one person's bedtime and the actions available to the viewer.
@@ -136,9 +137,12 @@ class _WindowDialogState extends State<_WindowDialog> {
     setState(() => bed ? _bed = t : _wake = t);
   }
 
+  // The night-mode times are changed on the Us tab; keep them as they are.
   SleepWindow get _window => SleepWindow(
         bedtime: _bed.hour * 60 + _bed.minute,
         wake: _wake.hour * 60 + _wake.minute,
+        grace: widget.initial?.grace ?? SleepWindow.defaultGrace,
+        pause: widget.initial?.pause ?? SleepWindow.defaultPause,
       );
 
   @override

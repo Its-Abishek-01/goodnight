@@ -6,6 +6,8 @@ All notable changes to GoodNight. The format follows Keep a Changelog.
 ### Added
 - Choose when you hear about your partner: on the Us tab, "Alerts about {partner}" lets you pick Off, 5, 10, 15, 30 or 60 minutes. Once they have been on their phone that long after their bedtime (any app, not only Instagram), you get a push. Your partner sees what you picked. The default is 15 minutes, which replaces the old alert on the first minute of Instagram.
 - Your partner's Tonight card shows their minutes on the phone after bedtime.
+- Night mode times you agree on: on the Us tab, pick how many minutes of Instagram/Shorts you get before a pause (3, 5, 10 or 15) and how long the pause lasts (10, 15, 20 or 30). Like your bedtime, a change waits for your partner's OK.
+- Ask for more time: the pause screen has +5, +10 and +15 min buttons that ask your partner (up to 3 times a night). They get a push and answer on their Tonight tab; a yes unlocks Instagram/Shorts for exactly that long, even while GoodNight is closed.
 
 ### Fixed
 - Partner pushes now pop up on screen with sound, like a chat message, instead of arriving silently in the notification tray.

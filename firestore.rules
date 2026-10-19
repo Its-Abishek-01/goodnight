@@ -8,6 +8,12 @@ service cloud.firestore {
 
     // "Delete my data": a member marks the pair closing, then may delete
     // everything under it. Normal deletes stay limited by the rules below.
+    // Night-mode minutes in a bedtime proposal: absent (defaults) or 1..60.
+    function validNightTimes(p) {
+      return (!('grace' in p) || (p.grace is int && p.grace >= 1 && p.grace <= 60))
+        && (!('pause' in p) || (p.pause is int && p.pause >= 1 && p.pause <= 60));
+    }
+
     function closingByMember(pairId) {
       let pair = get(/databases/$(database)/documents/pairs/$(pairId)).data;
       return request.auth != null
@@ -152,6 +158,32 @@ service cloud.firestore {
           && resource.data.from == request.auth.uid;
       }
 
+      // Asking the partner for extra night-mode minutes from the block screen.
+      // Only the partner answers, once; the asker can delete their own.
+      match /timeRequests/{id} {
+        allow delete: if closingByMember(pairId);
+
+        allow read: if request.auth != null
+          && request.auth.uid in pairMembers(pairId);
+
+        allow create: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && request.resource.data.from == request.auth.uid
+          && request.resource.data.minutes in [5, 10, 15]
+          && request.resource.data.status == 'pending'
+          && request.resource.data.keys().hasOnly(['from', 'minutes', 'nightKey', 'status', 'createdAt']);
+
+        allow update: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && resource.data.from != request.auth.uid
+          && resource.data.status == 'pending'
+          && request.resource.data.status in ['approved', 'declined']
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decidedAt']);
+
+        allow delete: if request.auth != null
+          && resource.data.from == request.auth.uid;
+      }
+
       // Feature choices. Each person's own doc (keyed by uid) is theirs alone.
       // The `shared` doc works like a schedule: one person proposes, only the
       // OTHER person can approve, and either of them can clear a proposal.
@@ -249,7 +281,8 @@ service cloud.firestore {
           && request.auth.uid in pairMembers(pairId)
           && owner in pairMembers(pairId)
           && request.resource.data.current == null
-          && request.resource.data.proposal.by == request.auth.uid;
+          && request.resource.data.proposal.by == request.auth.uid
+          && validNightTimes(request.resource.data.proposal);
 
         allow update: if request.auth != null
           && request.auth.uid in pairMembers(pairId)
@@ -257,13 +290,17 @@ service cloud.firestore {
             // propose or counter-propose: approved window must not change
             (request.resource.data.proposal != null
               && request.resource.data.proposal.by == request.auth.uid
-              && request.resource.data.current == resource.data.current)
-            // approve: only by someone who did not make the proposal
+              && request.resource.data.current == resource.data.current
+              && validNightTimes(request.resource.data.proposal))
+            // approve: only by someone who did not make the proposal; the
+            // night-mode times (grace, pause) are approved with the bedtime
             || (resource.data.proposal != null
               && resource.data.proposal.by != request.auth.uid
               && request.resource.data.proposal == null
               && request.resource.data.current.bedtime == resource.data.proposal.bedtime
-              && request.resource.data.current.wake == resource.data.proposal.wake)
+              && request.resource.data.current.wake == resource.data.proposal.wake
+              && request.resource.data.current.get('grace', 5) == resource.data.proposal.get('grace', 5)
+              && request.resource.data.current.get('pause', 10) == resource.data.proposal.get('pause', 10))
           );
       }
     }

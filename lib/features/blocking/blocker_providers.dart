@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/firebase_providers.dart';
+import '../bedtime/schedule.dart';
 import '../bedtime/schedule_providers.dart';
 import '../checkin/night_providers.dart';
 import '../pairing/pair_providers.dart';
+import '../profile/profile.dart';
 import '../settings/features_providers.dart';
 import 'blocker_channel.dart';
 
@@ -22,8 +24,12 @@ final blockerSyncProvider = Provider<void>((ref) {
         enabled: w != null && features.nightMode,
         bedtimeMin: w?.bedtime ?? 0,
         wakeMin: w?.wake ?? 0,
+        graceMin: w?.grace ?? SleepWindow.defaultGrace,
+        blockMin: w?.pause ?? SleepWindow.defaultPause,
         pairId: pair?.id,
         uid: uid,
+        // For "Ask {partner} for more time" on the block screen.
+        partnerName: ref.read(peopleProvider)[pair?.partnerUid(uid) ?? '']?.name,
       );
     } catch (_) {
       // Not running on Android (tests); nothing to sync.
@@ -33,6 +39,7 @@ final blockerSyncProvider = Provider<void>((ref) {
   ref.listen(schedulesProvider, (_, _) => sync(), fireImmediately: true);
   ref.listen(myFeaturesProvider, (_, _) => sync());
   ref.listen(pairProvider, (_, _) => sync());
+  ref.listen(peopleProvider, (_, _) => sync());
 });
 
 /// Uploads the native block counts to the shared night log.

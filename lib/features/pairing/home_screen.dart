@@ -12,6 +12,7 @@ import '../alarm/alarm_providers.dart';
 import '../bedtime/bedtime_card.dart';
 import '../bedtime/schedule_providers.dart';
 import '../blocking/blocker_providers.dart';
+import '../blocking/time_request_card.dart';
 import '../checkin/tonight_cards.dart';
 import '../coupons/coupon.dart';
 import '../coupons/coupon_providers.dart';
@@ -105,6 +106,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(pushSyncProvider);
     ref.watch(loveNoteSyncProvider);
     ref.watch(sleepWidgetSyncProvider);
+    ref.watch(timeRequestSyncProvider);
     final shared = ref.watch(sharedFeaturesProvider);
     if (shared.streak) ref.watch(couponSyncProvider);
     if (shared.moments) ref.watch(selfieSyncProvider);
@@ -191,6 +193,7 @@ class _Tonight extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 8),
+        TimeRequestCard(pair: pair, uid: uid),
         TonightJourney(pair: pair, uid: uid),
         const SizedBox(height: 12),
         SnoozeNudge(pair: pair, uid: uid),

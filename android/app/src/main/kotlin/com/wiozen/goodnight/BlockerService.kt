@@ -19,6 +19,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import java.time.LocalDateTime
 
 /**
@@ -147,6 +148,9 @@ class BlockerService : AccessibilityService() {
             state.blocks,
             (state.phoneMs / 60_000).toInt(),
         )
+        TimeRequests.poll(store) { approved, minutes ->
+            handler.post { onAnswer(approved, minutes) }
+        }
         if (decision is Decision.Block) {
             fgPackage = ""
             contentTarget = false
@@ -154,6 +158,22 @@ class BlockerService : AccessibilityService() {
             showOverlay(decision.remainingMs)
         }
     }
+
+    /** The partner answered a request for extra minutes. */
+    private fun onAnswer(approved: Boolean, minutes: Int) {
+        val name = store.partnerName()
+        if (approved) {
+            val state = store.loadState()
+            BlockEngine.grantExtra(store.loadConfig(), state, minutes)
+            store.saveState(state)
+            removeOverlay()
+            toast("${name.replaceFirstChar { it.uppercase() }} gave you $minutes more minutes 💛")
+        } else {
+            toast("${name.replaceFirstChar { it.uppercase() }} says it's time to sleep 🌙")
+        }
+    }
+
+    private fun toast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
     private fun screenInUse(): Boolean {
         val power = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -199,6 +219,7 @@ class BlockerService : AccessibilityService() {
             text = "Okay, going to sleep"
             setOnClickListener { removeOverlay() }
         })
+        addAskForTime(root)
         root.addView(Button(this).apply {
             text = "Open GoodNight"
             setOnClickListener {
@@ -225,6 +246,54 @@ class BlockerService : AccessibilityService() {
         }
     }
 
+    /** "Need a bit longer? Ask {partner}" with +5/+10/+15, or the pending request. */
+    private fun addAskForTime(root: LinearLayout) {
+        val name = store.partnerName()
+        val state = store.loadState()
+        val req = store.loadRequest()
+        val now = System.currentTimeMillis()
+        val hint = TextView(this).apply {
+            textSize = 14f
+            setTextColor(0xFFCCCCFF.toInt())
+            gravity = Gravity.CENTER
+            setPadding(0, 40, 0, 8)
+        }
+        root.addView(hint)
+        if (TimeRequest.pending(req, now)) {
+            hint.text = "Asked $name for ${req.minutes} more min. It unlocks as soon as they say yes."
+            return
+        }
+        if (!TimeRequest.canAsk(req, state.nightKey, now)) {
+            hint.text = "No more asking for time tonight."
+            return
+        }
+        hint.text = "Need a bit longer? Ask $name"
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+        }
+        for (m in TimeRequest.CHOICES) {
+            row.addView(Button(this).apply {
+                text = "+$m min"
+                setOnClickListener {
+                    hint.text = "Asking $name…"
+                    row.visibility = View.GONE
+                    TimeRequests.ask(store, state.nightKey, m) { sent ->
+                        handler.post {
+                            hint.text = if (sent) {
+                                "Asked $name for $m more min. It unlocks as soon as they say yes."
+                            } else {
+                                "Couldn't send that. Check your connection."
+                            }
+                            if (!sent) row.visibility = View.VISIBLE
+                        }
+                    }
+                }
+            })
+        }
+        root.addView(row)
+    }
+
     private fun removeOverlay() {
         val v = overlay ?: return
         overlay = null
@@ -237,7 +306,7 @@ class BlockerService : AccessibilityService() {
     companion object {
         private const val TICK_MS = 5_000L
         private const val CONTENT_THROTTLE_MS = 600L
-        private const val OVERLAY_MS = 8_000L
+        private const val OVERLAY_MS = 20_000L
 
         /** True when the user has switched the accessibility service on. */
         fun isEnabled(context: Context): Boolean {

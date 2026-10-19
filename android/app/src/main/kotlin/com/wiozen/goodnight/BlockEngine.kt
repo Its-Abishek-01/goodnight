@@ -66,6 +66,39 @@ object NightReport {
     }
 }
 
+/**
+ * The last request for extra minutes sent from the block screen. [id] is
+ * empty when none is waiting for an answer; [count] is how many were sent on
+ * the night [countKey].
+ */
+data class TimeRequest(
+    val id: String = "",
+    val minutes: Int = 0,
+    val nightKey: String = "",
+    val askedAt: Long = 0,
+    val countKey: String = "",
+    val count: Int = 0,
+) {
+    companion object {
+        val CHOICES = listOf(5, 10, 15)
+        const val MAX_PER_NIGHT = 3
+        const val EXPIRE_MS = 20 * 60_000L
+
+        fun expired(r: TimeRequest, nowMs: Long) = r.id.isNotEmpty() && nowMs - r.askedAt > EXPIRE_MS
+
+        fun pending(r: TimeRequest, nowMs: Long) = r.id.isNotEmpty() && !expired(r, nowMs)
+
+        fun sentTonight(r: TimeRequest, nightKey: String) = if (r.countKey == nightKey) r.count else 0
+
+        /** One request at a time, and at most [MAX_PER_NIGHT] a night. */
+        fun canAsk(r: TimeRequest, nightKey: String, nowMs: Long) =
+            !pending(r, nowMs) && sentTonight(r, nightKey) < MAX_PER_NIGHT
+
+        fun asked(r: TimeRequest, id: String, minutes: Int, nightKey: String, nowMs: Long) =
+            TimeRequest(id, minutes, nightKey, nowMs, nightKey, sentTonight(r, nightKey) + 1)
+    }
+}
+
 /** Same night grouping as the Dart side: shift by 12 hours. */
 fun nightKeyOf(now: LocalDateTime): String {
     val d = now.minusHours(12)
@@ -153,5 +186,15 @@ object BlockEngine {
         s.lastOnTarget = onTarget
         s.lastTickAt = nowMs
         return Decision.Allow
+    }
+
+    /**
+     * The partner gave [minutes] more: lift any pause, and the next pause
+     * comes after exactly [minutes] more of Instagram/Shorts.
+     */
+    fun grantExtra(c: BlockConfig, s: BlockState, minutes: Int) {
+        s.blockUntil = 0
+        s.usedMs = c.graceMs - minutes * 60_000L
+        s.lastOnTarget = false
     }
 }

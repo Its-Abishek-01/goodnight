@@ -14,7 +14,18 @@ void main() {
 
   test('round-trips through the stored map', () {
     const w = SleepWindow(bedtime: 22 * 60 + 5, wake: 5 * 60 + 45);
-    expect(w.toMap(), {'bedtime': '22:05', 'wake': '05:45'});
+    expect(w.toMap(), {'bedtime': '22:05', 'wake': '05:45', 'grace': 5, 'pause': 10});
     expect(SleepWindow.fromMap(w.toMap()), w);
+  });
+
+  test('night-mode times default to 5 and 10 minutes and round-trip', () {
+    final old = SleepWindow.fromMap({'bedtime': '23:00', 'wake': '07:00'});
+    expect(old.grace, 5);
+    expect(old.pause, 10);
+    final agreed = old.copyWith(grace: 10, pause: 15);
+    expect(SleepWindow.fromMap(agreed.toMap()), agreed);
+    expect(agreed == old, isFalse);
+    expect(SleepWindow.graceChoices, contains(SleepWindow.defaultGrace));
+    expect(SleepWindow.pauseChoices, contains(SleepWindow.defaultPause));
   });
 }

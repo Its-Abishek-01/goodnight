@@ -50,7 +50,9 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ "Alerts about {partner}": each person picks after how many minutes of phone use past the partner's bedtime they get a push (Off/5/10/15/30/60, default 15) 🔧
 - ✅ Night mode counts any phone use after bedtime (screen on and unlocked, not the home screen, GoodNight or calls)
 - ✅ Partner pushes pop up on screen (high-importance channel)
-- ⏳ Deploy the new `firestore.rules` (alertAfter) and the functions, then release
+- ✅ Night mode times agreed with the partner (grace 3/5/10/15, pause 10/15/20/30), approved with the bedtime 🔧
+- ✅ Ask for +5/+10/+15 min from the pause screen (max 3 a night); partner answers on Tonight; the service polls and unlocks 🔧
+- ⏳ Deploy the new `firestore.rules` (alertAfter, night times, timeRequests) and the functions, then release
 
 ## Next
 - ⏳ Update both phones through the in-app "Update ready" sheet (first real test of the updater, including whether Play Protect allows it)
@@ -61,7 +63,6 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ⏳ Maybe: block/report
 
 ## Later
-- ⏳ Make grace and block durations configurable per couple, locked at pairing
 - ⏳ Photo-of-object alarm challenge
 - ⏳ Rules tests with the Firebase emulator, and a CI job for analyze and tests
 

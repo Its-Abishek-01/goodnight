@@ -17,6 +17,8 @@ import 'package:goodnight/features/alarm/alarm_providers.dart';
 import 'package:goodnight/features/bedtime/schedule.dart';
 import 'package:goodnight/features/bedtime/schedule_providers.dart';
 import 'package:goodnight/features/blocking/blocker_providers.dart';
+import 'package:goodnight/features/blocking/time_request.dart';
+import 'package:goodnight/features/blocking/time_request_card.dart';
 import 'package:goodnight/features/checkin/night_log.dart';
 import 'package:goodnight/features/checkin/night_providers.dart';
 import 'package:goodnight/features/coupons/coupon.dart';
@@ -132,7 +134,7 @@ String _prev(String key) {
   return formatNightKey(DateTime(d.year, d.month, d.day - 1));
 }
 
-Widget _app(Widget home, {bool together = false, SkyPhase phase = SkyPhase.night}) {
+Widget _app(Widget home, {bool together = false, SkyPhase phase = SkyPhase.night, List<TimeRequest> requests = const []}) {
   final windows = {_me: _window(0), _partner: _window(-30)};
   return ProviderScope(
     overrides: [
@@ -165,6 +167,8 @@ Widget _app(Widget home, {bool together = false, SkyPhase phase = SkyPhase.night
       couponSyncProvider.overrideWith((ref) {}),
       selfieSyncProvider.overrideWith((ref) {}),
       sleepWidgetSyncProvider.overrideWith((ref) {}),
+      timeRequestSyncProvider.overrideWith((ref) {}),
+      timeRequestsProvider.overrideWith((ref) => Stream.value(requests)),
     ],
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -204,11 +208,17 @@ Future<void> _shoot(WidgetTester tester, String name) async {
   });
 }
 
-Future<void> _show(WidgetTester tester, Widget home, {bool together = false, SkyPhase phase = SkyPhase.night}) async {
+Future<void> _show(
+  WidgetTester tester,
+  Widget home, {
+  bool together = false,
+  SkyPhase phase = SkyPhase.night,
+  List<TimeRequest> requests = const [],
+}) async {
   tester.view.physicalSize = _size * _dpr;
   tester.view.devicePixelRatio = _dpr;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(RepaintBoundary(key: _boundary, child: _app(home, together: together, phase: phase)));
+  await tester.pumpWidget(RepaintBoundary(key: _boundary, child: _app(home, together: together, phase: phase, requests: requests)));
 }
 
 void main() {
@@ -235,6 +245,17 @@ void main() {
   testWidgets('1 tonight', skip: !enabled, (tester) async {
     await _show(tester, const HomeScreen(pair: _pair, uid: _me));
     await _shoot(tester, '1-tonight');
+  });
+
+  testWidgets('1c time request', skip: !enabled, (tester) async {
+    await _show(
+      tester,
+      const HomeScreen(pair: _pair, uid: _me),
+      requests: [
+        TimeRequest(id: 'r', from: _partner, minutes: 10, status: 'pending', createdAt: DateTime.now()),
+      ],
+    );
+    await _shoot(tester, '1c-time-request');
   });
 
   testWidgets('1b together', skip: !enabled, (tester) async {

@@ -30,6 +30,7 @@ paired with.
 | Coupons earned and used | Streak rewards |
 | Selfies you choose to send (Moments) | Shown to your partner only |
 | Love notes you send | Shown to your partner only, with a read receipt |
+| Requests for extra night-mode minutes and your partner's answer | So your partner can say yes or no; deleted after two days |
 | A push notification token | To alert your partner's phone (only if push alerts are set up) |
 
 GoodNight does not use advertising, analytics or tracking, and does not sell or share

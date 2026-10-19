@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 
+import '../bedtime/schedule.dart';
+
 class BlockStats {
   const BlockStats({
     required this.nightKey,
@@ -37,9 +39,6 @@ class BlockStats {
 class Blocker {
   static const _channel = MethodChannel('com.wiozen.goodnight/blocker');
 
-  /// Agreed in the pact: 5 minutes of grace, then a 10 minute block.
-  static const graceMinutes = 5;
-  static const blockMinutes = 10;
 
   static Future<bool> isServiceEnabled() async =>
       await _channel.invokeMethod<bool>('isServiceEnabled') ?? false;
@@ -53,21 +52,26 @@ class Blocker {
 
   /// [pairId] and [uid] let the service report usage to the shared night log
   /// while the app is closed.
+  /// [graceMin] and [blockMin] are the night-mode times agreed in the pact.
   static Future<void> saveConfig({
     required bool enabled,
     required int bedtimeMin,
     required int wakeMin,
+    int graceMin = SleepWindow.defaultGrace,
+    int blockMin = SleepWindow.defaultPause,
     String? pairId,
     String? uid,
+    String? partnerName,
   }) =>
       _channel.invokeMethod<void>('saveConfig', {
         'pairId': pairId,
         'uid': uid,
+        'partnerName': partnerName,
         'enabled': enabled,
         'bedtimeMin': bedtimeMin,
         'wakeMin': wakeMin,
-        'graceMin': graceMinutes,
-        'blockMin': blockMinutes,
+        'graceMin': graceMin,
+        'blockMin': blockMin,
       });
 
   static Future<BlockStats?> getStats() async {

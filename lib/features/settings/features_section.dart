@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/cute_loader.dart';
+import '../bedtime/night_times_card.dart';
 import '../pairing/pair.dart';
 import 'features.dart';
 import 'features_providers.dart';
@@ -70,6 +71,10 @@ class FeaturesSection extends ConsumerWidget {
             ],
           ),
         ),
+        if (mine?.nightMode ?? true) ...[
+          const SizedBox(height: 6),
+          NightTimesCard(pair: pair, uid: uid),
+        ],
         const SizedBox(height: 12),
         Text('Alerts about $partner', style: text.titleMedium),
         const SizedBox(height: 4),

@@ -14,10 +14,12 @@ class BlockerStore(context: Context) {
         blockMin: Int,
         pairId: String?,
         uid: String?,
+        partnerName: String?,
     ) {
         p.edit()
             .putString("pairId", pairId)
             .putString("uid", uid)
+            .putString("partnerName", partnerName)
             .putBoolean("enabled", enabled)
             .putInt("bedtimeMin", bedtimeMin)
             .putInt("wakeMin", wakeMin)
@@ -39,6 +41,28 @@ class BlockerStore(context: Context) {
         val uid = p.getString("uid", null)
         if (pairId.isNullOrEmpty() || uid.isNullOrEmpty()) return null
         return PairRef(pairId, uid)
+    }
+
+    fun partnerName(): String = p.getString("partnerName", null)?.takeIf { it.isNotBlank() } ?: "your partner"
+
+    fun loadRequest() = TimeRequest(
+        id = p.getString("q.id", "") ?: "",
+        minutes = p.getInt("q.minutes", 0),
+        nightKey = p.getString("q.nightKey", "") ?: "",
+        askedAt = p.getLong("q.askedAt", 0),
+        countKey = p.getString("q.countKey", "") ?: "",
+        count = p.getInt("q.count", 0),
+    )
+
+    fun saveRequest(r: TimeRequest) {
+        p.edit()
+            .putString("q.id", r.id)
+            .putInt("q.minutes", r.minutes)
+            .putString("q.nightKey", r.nightKey)
+            .putLong("q.askedAt", r.askedAt)
+            .putString("q.countKey", r.countKey)
+            .putInt("q.count", r.count)
+            .apply()
     }
 
     fun loadReported() = Reported(

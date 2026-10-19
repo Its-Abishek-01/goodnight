@@ -42,6 +42,7 @@ class MainActivity : FlutterActivity() {
                             blockMin = call.argument<Int>("blockMin") ?: 10,
                             pairId = call.argument<String>("pairId"),
                             uid = call.argument<String>("uid"),
+                            partnerName = call.argument<String>("partnerName"),
                         )
                         result.success(null)
                     }

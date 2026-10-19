@@ -135,6 +135,35 @@ exports.statusAlert = onDocumentWritten('pairs/{pairId}/nights/{key}', async (ev
   }
 });
 
+// Asked for extra minutes from the night-mode block screen: tell the partner,
+// who answers on their Tonight tab.
+exports.timeRequestAlert = onDocumentCreated('pairs/{pairId}/timeRequests/{id}', async (event) => {
+  const r = event.data.data();
+  const name = (await userDoc(r.from)).name || 'Your partner';
+  await push(
+    await partnerToken(event.params.pairId, r.from),
+    `⏳ ${name} asks for ${r.minutes} more minutes`,
+    'Night mode paused their scrolling. Open GoodNight to say yes or no.',
+  );
+});
+
+// The partner answered: tell the person who asked. (Their phone also picks
+// the answer up by itself and unlocks if it is a yes.)
+exports.timeAnswerAlert = onDocumentUpdated('pairs/{pairId}/timeRequests/{id}', async (event) => {
+  const before = event.data.before.data();
+  const after = event.data.after.data();
+  if (before.status !== 'pending' || after.status === 'pending') return;
+  const pair = (await db.doc(`pairs/${event.params.pairId}`).get()).data();
+  const partner = (pair?.members || []).find((m) => m !== after.from);
+  const name = (partner && (await userDoc(partner)).name) || 'Your partner';
+  const yes = after.status === 'approved';
+  await push(
+    (await userDoc(after.from)).fcmToken,
+    yes ? `💛 ${name} gave you ${after.minutes} more minutes` : `🌙 ${name} says it's time to sleep`,
+    yes ? 'Enjoy them, then phone down.' : 'Phone down, sleep well.',
+  );
+});
+
 // A new bedtime proposal needs the partner's approval.
 exports.proposalAlert = onDocumentWritten('pairs/{pairId}/schedules/{owner}', async (event) => {
   const after = event.data.after.data();

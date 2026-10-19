@@ -32,6 +32,8 @@ pushes that arrive while it is open. The functions in `functions/index.js` send:
 | Selfie opened | "{name} saw your selfie" (the read receipt) |
 | New love note | "💌 {name}" with the note |
 | Love note opened | "{name} read your love note" |
+| Asked for more time from the pause screen | "{name} asks for N more minutes" |
+| The partner answered | "{name} gave you N more minutes" or "{name} says it's time to sleep" |
 | Check-in or wake-up | data-only push that updates the "Going to sleep" widget; on check-in the app shows "{name} is going to sleep" |
 | Phone use after bedtime reaches the minutes the partner picked (`features/{watcher}.alertAfter`, default 15, 0 = off) | "{name} is still on their phone" with the minutes |
 | Night mode blocks Instagram/Shorts | "Night mode paused {name}'s scrolling" with tonight's minutes |
