@@ -50,6 +50,8 @@ dependencies:
   image_picker: ^1.2.4
   home_widget: ^0.10.0
   path_provider: ^2.1.6
+  flutter_webrtc: ^1.6.2+hotfix.4
+  cloud_functions: ^6.5.0
 
 dev_dependencies:
   flutter_test:

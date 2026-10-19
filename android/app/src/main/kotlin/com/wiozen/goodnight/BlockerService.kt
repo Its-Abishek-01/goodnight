@@ -96,6 +96,58 @@ class BlockerService : AccessibilityService() {
         }
     }
 
+    /**
+     * A reaction from the partner watching your screen floats up over
+     * whatever app you are in (Watch together).
+     */
+    fun showReaction(emoji: String) {
+        if (emoji.isEmpty()) return
+        val dp = resources.displayMetrics.density
+        val h = (resources.displayMetrics.heightPixels * 0.6f).toInt()
+        val root = android.widget.FrameLayout(this)
+        val face = TextView(this).apply {
+            text = emoji
+            textSize = 44f
+        }
+        root.addView(face, android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+        ))
+        val lp = WindowManager.LayoutParams(
+            (96 * dp).toInt(),
+            h,
+            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT,
+        ).apply {
+            gravity = Gravity.BOTTOM or Gravity.END
+            x = ((8 + (0..56).random()) * dp).toInt()
+            y = (120 * dp).toInt()
+        }
+        val wm = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        try {
+            wm.addView(root, lp)
+        } catch (_: Exception) {
+            return
+        }
+        face.animate()
+            .translationY(-(h - 60 * dp))
+            .alpha(0f)
+            .scaleX(1.3f)
+            .scaleY(1.3f)
+            .setDuration(2_400)
+            .withEndAction {
+                try {
+                    wm.removeView(root)
+                } catch (_: Exception) {
+                }
+            }
+            .start()
+    }
+
     /** "Preview" on the Us tab. */
     fun previewBubble(): Boolean = ::bubble.isInitialized && bubble.preview()
 

@@ -68,6 +68,9 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
     // The night-mode service reports usage with the signed-in user (NightReporter).
     implementation("com.google.firebase:firebase-auth")
+    // ShareSound mixes the phone's sound into flutter_webrtc's audio; it needs
+    // WebRTC's classes to compile. Same version as the plugin (it ships them).
+    compileOnly("io.github.webrtc-sdk:android:150.7871.01")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     testImplementation("junit:junit:4.13.2")
 }

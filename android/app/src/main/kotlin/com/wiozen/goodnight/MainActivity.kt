@@ -13,10 +13,12 @@ import java.io.File
 
 class MainActivity : FlutterActivity() {
     private var sounds: SoundChannel? = null
+    private var share: ShareChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         sounds = SoundChannel(this, flutterEngine.dartExecutor.binaryMessenger)
+        share = ShareChannel(this, flutterEngine.dartExecutor.binaryMessenger)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
