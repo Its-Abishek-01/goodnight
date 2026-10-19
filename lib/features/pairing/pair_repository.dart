@@ -98,6 +98,7 @@ class PairRepository {
     'selfies',
     'loveNotes',
     'timeRequests',
+    'alarmSounds',
     'profiles',
   ];
 

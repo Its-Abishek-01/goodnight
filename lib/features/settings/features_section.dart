@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/cute_loader.dart';
+import '../alarm/wake_sound_cards.dart';
 import '../bedtime/night_times_card.dart';
 import '../pairing/pair.dart';
 import 'features.dart';
@@ -71,6 +72,10 @@ class FeaturesSection extends ConsumerWidget {
             ],
           ),
         ),
+        if (mine?.alarm ?? true) ...[
+          const SizedBox(height: 6),
+          WakeSoundCard(pair: pair, uid: uid),
+        ],
         if (mine?.nightMode ?? true) ...[
           const SizedBox(height: 6),
           NightTimesCard(pair: pair, uid: uid),
@@ -114,6 +119,10 @@ class FeaturesSection extends ConsumerWidget {
             ),
           ),
         ),
+        if (theirs.alarm) ...[
+          const SizedBox(height: 6),
+          PartnerWakeSoundCard(pair: pair, uid: uid),
+        ],
         const SizedBox(height: 12),
         Text('Shared with $partner', style: text.titleMedium),
         const SizedBox(height: 4),

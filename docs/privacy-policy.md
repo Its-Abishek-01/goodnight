@@ -30,6 +30,7 @@ paired with.
 | Coupons earned and used | Streak rewards |
 | Selfies you choose to send (Moments) | Shown to your partner only |
 | Love notes you send | Shown to your partner only, with a read receipt |
+| Your wake-up sound choice, and voice messages your partner records for your alarm | So the right sound plays; only the two of you can read them |
 | Requests for extra night-mode minutes and your partner's answer | So your partner can say yes or no; deleted after two days |
 | A push notification token | To alert your partner's phone (only if push alerts are set up) |
 
@@ -52,6 +53,7 @@ whether a newer version exists, and downloads it from there if you tap Update. G
 your phone's IP address, as with any web request; nothing about you or your pair is sent.
 
 ## Camera, notifications and alarms
+- **Microphone:** only while you record a wake-up message for your partner.
 - **Camera:** to scan the alarm QR code (processed on your phone) and to take selfies you
   decide to send.
 - **Notifications and alarms:** for the wake-up alarm and bedtime reminders. These are

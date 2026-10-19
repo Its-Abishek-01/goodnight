@@ -35,6 +35,7 @@ blocking, and Firebase for syncing the two phones.
   night mode and reminders on or off for yourself. Streak & coupons and Moments are
   shared: one of you proposes the change and the other approves it.
 - **Moments.** Send each other a random selfie. The latest one from your partner shows on a home-screen widget, and you see "Seen" once they open it. Photos are private to the two of you and disappear after a week (5 per person per day).
+- **Wake-up sounds.** Pick your alarm sound (gentle tones made for GoodNight or your phone's own), let your partner pick it for you, or wake up to a voice message they recorded.
 - **Night mode on your terms.** Agree on how long you get on Instagram/Shorts before a pause and how long the pause lasts, and ask your partner for 5, 10 or 15 more minutes from the pause screen. Each of you also picks after how many minutes of phone use past the other's bedtime you get told.
 - **Going to sleep widget.** A home-screen widget with both of you tonight and a button to check in; it updates when your partner goes to sleep or wakes up.
 - **Love notes.** Send a sudden short message that fills your partner's screen the moment it arrives. You get a read receipt once they have seen it. Private to the two of you.

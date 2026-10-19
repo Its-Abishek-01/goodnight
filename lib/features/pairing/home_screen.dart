@@ -9,6 +9,7 @@ import '../../core/widgets/cute_icons.dart';
 import '../../core/widgets/moon_nav_bar.dart';
 
 import '../alarm/alarm_providers.dart';
+import '../alarm/wake_sound_providers.dart';
 import '../bedtime/bedtime_card.dart';
 import '../bedtime/schedule_providers.dart';
 import '../blocking/blocker_providers.dart';
@@ -107,6 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(loveNoteSyncProvider);
     ref.watch(sleepWidgetSyncProvider);
     ref.watch(timeRequestSyncProvider);
+    ref.watch(wakeSoundSyncProvider);
     final shared = ref.watch(sharedFeaturesProvider);
     if (shared.streak) ref.watch(couponSyncProvider);
     if (shared.moments) ref.watch(selfieSyncProvider);

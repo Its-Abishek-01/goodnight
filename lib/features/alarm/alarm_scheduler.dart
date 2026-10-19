@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:alarm/alarm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'wake_sound.dart';
+
 /// Schedules the wake alarm and its escalation. Each snooze makes the next
 /// ring louder and the dismiss challenge harder.
 class AlarmScheduler {
@@ -37,7 +39,7 @@ class AlarmScheduler {
       alarmSettings: AlarmSettings(
         id: id,
         dateTime: when,
-        assetAudioPath: 'assets/alarm.wav',
+        assetAudioPath: await AlarmPrefs.audioPath(),
         loopAudio: true,
         vibrate: true,
         volume: volumeFor(level),
@@ -69,6 +71,17 @@ class AlarmScheduler {
 
   static Future<void> cancelWake() => Alarm.stop(wakeId);
 
+  /// The wake-up sound changed: re-set pending alarms with the new sound.
+  /// A ringing alarm is left alone.
+  static Future<void> refreshAudio() async {
+    if (await Alarm.isRinging()) return;
+    final audio = await AlarmPrefs.audioPath();
+    for (final a in await Alarm.getAlarms()) {
+      if (a.assetAudioPath == audio || !a.dateTime.isAfter(DateTime.now())) continue;
+      await Alarm.set(alarmSettings: a.copyWith(assetAudioPath: audio));
+    }
+  }
+
   static Future<void> scheduleSnooze(int level) => _set(
         id: snoozeId,
         when: DateTime.now().add(const Duration(minutes: snoozeMinutes)),
@@ -94,6 +107,31 @@ class AlarmPrefs {
   static const _qrSecretKey = 'alarm.qrSecret';
   static const _qrReadyKey = 'alarm.qrReady';
   static const _nightKeyKey = 'alarm.nightKey';
+  static const _audioKey = 'alarm.audio';
+  static const _phoneSoundKey = 'alarm.phoneSound';
+  static const _voiceAtKey = 'alarm.voiceAt';
+
+  /// What the alarm plays: a bundled asset or a file in the app's storage
+  /// (see wake_sound.dart). Soft chimes until something else is picked.
+  static Future<String> audioPath() async =>
+      (await SharedPreferences.getInstance()).getString(_audioKey) ?? WakeTone.chimes.asset;
+
+  static Future<void> setAudioPath(String v) async =>
+      (await SharedPreferences.getInstance()).setString(_audioKey, v);
+
+  /// The copy of the phone alarm sound picked on this phone.
+  static Future<String?> phoneSoundPath() async =>
+      (await SharedPreferences.getInstance()).getString(_phoneSoundKey);
+
+  static Future<void> setPhoneSoundPath(String v) async =>
+      (await SharedPreferences.getInstance()).setString(_phoneSoundKey, v);
+
+  /// When the voice note saved on this phone was recorded, to skip rewriting it.
+  static Future<int?> voiceAt() async =>
+      (await SharedPreferences.getInstance()).getInt(_voiceAtKey);
+
+  static Future<void> setVoiceAt(int v) async =>
+      (await SharedPreferences.getInstance()).setInt(_voiceAtKey, v);
 
   static Future<int> snoozeCount() async =>
       (await SharedPreferences.getInstance()).getInt(_snoozeKey) ?? 0;

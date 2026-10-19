@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/firebase_providers.dart';
+import '../../core/theme.dart';
 import '../bedtime/schedule_providers.dart';
 import '../checkin/night_log.dart';
 import '../checkin/night_providers.dart';
 import '../pairing/pair_providers.dart';
+import '../profile/profile.dart';
 import '../../core/widgets/cute_loader.dart';
 import 'alarm_providers.dart';
 import 'alarm_scheduler.dart';
 import 'challenges.dart';
+import 'sunrise_sky.dart';
 
 enum _Stage { challenge, stayUp, done }
 
@@ -114,67 +117,116 @@ class _AlarmRingScreenState extends ConsumerState<AlarmRingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The ring screen always wears the warm dusk palette over its sunrise.
+    return Theme(
+      data: buildTheme(SkyPhase.dusk),
+      child: Builder(builder: _body),
+    );
+  }
+
+  Widget _body(BuildContext context) {
     final theme = Theme.of(context);
+    final uid = ref.watch(uidProvider).value ?? '';
+    final pair = ref.watch(pairProvider).value;
+    final people = ref.watch(peopleProvider);
+    final me = people[uid]?.name ?? pair?.nameOf(uid) ?? '';
+    final partnerUid = pair?.partnerUid(uid) ?? '';
+    final partner = people[partnerUid]?.name ?? pair?.nameOf(partnerUid) ?? '';
+    final nights = ref.watch(nightsProvider).value ?? const <Night>[];
+    final partnerUp = nights
+            .where((n) => n.key == nightKey(_now))
+            .firstOrNull
+            ?.playerOf(partnerUid)
+            .wokeAt !=
+        null;
+    final shadow = [Shadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 12)];
+
+    final Widget panel = !_loaded
+        ? const Center(child: CuteLoader(size: 96))
+        : switch (_stage) {
+            _Stage.stayUp => _message(
+                '☕ Stay up!',
+                "We'll check that you're really awake in ${AlarmScheduler.verifyMinutes} minutes.",
+                'Okay',
+                () => ref.read(ringProvider.notifier).clear(),
+              ),
+            _Stage.done => _message(
+                'Have a great day ☀️',
+                partnerUp ? 'Your wake-up is logged. $partner is up too.' : 'Your wake-up is logged.',
+                'Close',
+                () => ref.read(ringProvider.notifier).clear(),
+              ),
+            _Stage.challenge => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Challenge(
+                    key: ValueKey('$_kind-$_snoozes-${widget.alarmId}'),
+                    kind: _kind,
+                    qrPayload: _qrPayload,
+                    onSolved: _solved,
+                  ),
+                  if (!_isVerify && _snoozes < AlarmScheduler.maxSnoozes) ...[
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: _snooze,
+                      style: TextButton.styleFrom(foregroundColor: context.sky.muted),
+                      child: Text('Snooze ${AlarmScheduler.snoozeMinutes} min · louder, harder'),
+                    ),
+                  ],
+                ],
+              ),
+          };
+
     return PopScope(
       canPop: false,
       child: Scaffold(
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: !_loaded
-                ? const Center(child: CuteLoader(size: 96))
-                : switch (_stage) {
-                    _Stage.stayUp => _message(
-                        '☕ Stay up!',
-                        "We'll check that you're really awake in ${AlarmScheduler.verifyMinutes} minutes.",
-                        'Okay',
-                        () => ref.read(ringProvider.notifier).clear(),
-                      ),
-                    _Stage.done => _message(
-                        'Have a great day ☀️',
-                        'Your wake-up is logged.',
-                        'Close',
-                        () => ref.read(ringProvider.notifier).clear(),
-                      ),
-                    _Stage.challenge => ListView(
-                        children: [
-                          const SizedBox(height: 24),
-                          Center(
-                            child: Text(
-                              '${_two(_now.hour)}:${_two(_now.minute)}',
-                              style: theme.textTheme.displayLarge,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Center(
-                            child: Text(
-                              _isVerify
-                                  ? 'Are you really up? Prove it.'
-                                  : _snoozes == 0
-                                      ? 'Good morning ☀️'
-                                      : 'Snooze #$_snoozes. It gets harder each time.',
-                              style: theme.textTheme.titleMedium,
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          Challenge(
-                            key: ValueKey('$_kind-$_snoozes-${widget.alarmId}'),
-                            kind: _kind,
-                            qrPayload: _qrPayload,
-                            onSolved: _solved,
-                          ),
-                          if (!_isVerify && _snoozes < AlarmScheduler.maxSnoozes) ...[
-                            const SizedBox(height: 32),
-                            TextButton(
-                              onPressed: _snooze,
-                              child: Text(
-                                'Snooze ${AlarmScheduler.snoozeMinutes} min (louder and harder)',
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                  },
+        body: SunriseSky(
+          child: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 36),
+                Text(
+                  '${_two(_now.hour)}:${_two(_now.minute)}',
+                  style: theme.textTheme.displayLarge?.copyWith(
+                    fontSize: 76,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    shadows: shadow,
+                  ),
+                ),
+                Text(
+                  _isVerify
+                      ? 'Are you really up? Prove it.'
+                      : _snoozes == 0
+                          ? 'Good morning${me.isEmpty ? '' : ', $me'} ☀️'
+                          : 'Snooze #$_snoozes. It gets harder each time.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(color: Colors.white, shadows: shadow),
+                ),
+                if (partnerUp && _stage == _Stage.challenge) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '$partner is already up 💛',
+                    style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white, shadows: shadow),
+                  ),
+                ],
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Container(
+                    width: double.infinity,
+                    constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.55),
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                    decoration: BoxDecoration(
+                      color: context.sky.surface.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: context.sky.outline),
+                    ),
+                    child: SingleChildScrollView(child: panel),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -183,13 +235,14 @@ class _AlarmRingScreenState extends ConsumerState<AlarmRingScreen> {
 
   Widget _message(String title, String body, String button, VoidCallback onTap) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(title, style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 12),
+        Text(title, style: Theme.of(context).textTheme.headlineSmall),
+        const SizedBox(height: 10),
         Text(body, textAlign: TextAlign.center),
-        const SizedBox(height: 32),
-        FilledButton(onPressed: onTap, child: Text(button)),
+        const SizedBox(height: 20),
+        SizedBox(width: double.infinity, child: FilledButton(onPressed: onTap, child: Text(button))),
+        const SizedBox(height: 8),
       ],
     );
   }

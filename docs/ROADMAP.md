@@ -54,6 +54,11 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Ask for +5/+10/+15 min from the pause screen (max 3 a night); partner answers on Tonight; the service polls and unlocks 🔧
 - ✅ Rules and functions deployed (alertAfter, night times, timeRequests)
 
+## Next (on main, not released)
+- ✅ Sunrise alarm screen (rising sun, greeting, partner already up, challenge card) 🔧
+- ✅ Wake-up sounds: 4 original tones (`scripts/make-sounds.py`) + Classic + phone sounds; "I pick" / "partner picks"; partner voice messages up to 15 s 🔧
+- ⏳ Deploy rules (alarmSounds) and functions (alarmSoundAlert), then release
+
 ## Next
 - ⏳ Update both phones through the in-app "Update ready" sheet (first real test of the updater, including whether Play Protect allows it)
 - ⏳ Try love notes and the partner card on the two phones

@@ -164,6 +164,44 @@ exports.timeAnswerAlert = onDocumentUpdated('pairs/{pairId}/timeRequests/{id}', 
   );
 });
 
+const TONE_NAMES = {
+  chimes: 'Soft chimes',
+  music_box: 'Music box',
+  birds: 'Morning birds',
+  sunrise_piano: 'Sunrise piano',
+  classic: 'Classic beep',
+  voice: 'your voice note',
+};
+
+// Wake-up sounds: tell the owner when the partner recorded a voice note or
+// picked their sound, and tell the partner when the owner hands them the pick.
+exports.alarmSoundAlert = onDocumentWritten('pairs/{pairId}/alarmSounds/{owner}', async (event) => {
+  const before = event.data.before.data() || {};
+  const after = event.data.after.data();
+  if (!after) return;
+  const owner = event.params.owner;
+  const pair = (await db.doc(`pairs/${event.params.pairId}`).get()).data();
+  const partner = (pair?.members || []).find((m) => m !== owner);
+  if (!partner) return;
+  const ownerDoc = await userDoc(owner);
+  const partnerDoc = await userDoc(partner);
+  const partnerName = partnerDoc.name || 'Your partner';
+
+  const newVoice = after.voiceAt && !(before.voiceAt && before.voiceAt.isEqual(after.voiceAt));
+  if (newVoice && after.voiceBy === partner) {
+    await push(ownerDoc.fcmToken, `💌 ${partnerName} recorded your wake-up message`,
+      'Open GoodNight to hear it, and pick it as your alarm.');
+  }
+  if (after.sound !== before.sound && after.pickedBy === partner) {
+    await push(ownerDoc.fcmToken, `🎵 ${partnerName} picked your wake-up sound`,
+      `Tomorrow you wake up to ${TONE_NAMES[after.sound] || 'a new sound'}.`);
+  }
+  if (after.picker === 'partner' && before.picker !== 'partner') {
+    await push(partnerDoc.fcmToken, `🎵 ${ownerDoc.name || 'Your partner'} wants you to pick their alarm`,
+      'Choose a sound or record a wake-up message on the Us tab.');
+  }
+});
+
 // A new bedtime proposal needs the partner's approval.
 exports.proposalAlert = onDocumentWritten('pairs/{pairId}/schedules/{owner}', async (event) => {
   const after = event.data.after.data();

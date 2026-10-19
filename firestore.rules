@@ -14,6 +14,15 @@ service cloud.firestore {
         && (!('pause' in p) || (p.pause is int && p.pause >= 1 && p.pause <= 60));
     }
 
+    function wakeSounds() {
+      return ['chimes', 'music_box', 'birds', 'sunrise_piano', 'classic', 'phone', 'voice'];
+    }
+
+    // A recorded wake-up message, stored in the doc (like selfies).
+    function validVoice(d) {
+      return !('voice' in d) || d.voice == null || d.voice.size() < 400000;
+    }
+
     function closingByMember(pairId) {
       let pair = get(/databases/$(database)/documents/pairs/$(pairId)).data;
       return request.auth != null
@@ -130,6 +139,46 @@ service cloud.firestore {
 
         allow delete: if request.auth != null
           && resource.data.from == request.auth.uid;
+      }
+
+      // What each person's alarm plays. The owner decides who picks; the
+      // partner can always record a voice note, and choose the sound only
+      // when the owner let them (picker == 'partner').
+      match /alarmSounds/{owner} {
+        allow delete: if closingByMember(pairId);
+
+        allow read: if request.auth != null
+          && request.auth.uid in pairMembers(pairId);
+
+        allow create, update: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && owner == request.auth.uid
+          && request.resource.data.keys().hasOnly(
+               ['picker', 'sound', 'pickedBy', 'voice', 'voiceAt', 'voiceBy', 'phoneTitle'])
+          && request.resource.data.get('picker', 'me') in ['me', 'partner']
+          && request.resource.data.get('sound', 'chimes') in wakeSounds()
+          && validVoice(request.resource.data);
+
+        allow create: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && owner in pairMembers(pairId)
+          && owner != request.auth.uid
+          && request.resource.data.keys().hasOnly(['voice', 'voiceAt', 'voiceBy'])
+          && request.resource.data.voiceBy == request.auth.uid
+          && validVoice(request.resource.data);
+
+        allow update: if request.auth != null
+          && request.auth.uid in pairMembers(pairId)
+          && owner in pairMembers(pairId)
+          && owner != request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['voice', 'voiceAt', 'voiceBy', 'sound', 'pickedBy'])
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['sound', 'pickedBy'])
+              || (resource.data.get('picker', 'me') == 'partner'
+                  && request.resource.data.sound in wakeSounds()
+                  && request.resource.data.sound != 'phone'
+                  && request.resource.data.pickedBy == request.auth.uid))
+          && validVoice(request.resource.data);
       }
 
       // Sudden love notes between the two partners. Only the receiver can set

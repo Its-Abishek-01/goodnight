@@ -14,6 +14,11 @@ import 'package:goodnight/core/firebase_providers.dart';
 import 'package:goodnight/core/theme.dart';
 import 'package:goodnight/core/widgets/living_sky.dart';
 import 'package:goodnight/features/alarm/alarm_providers.dart';
+import 'package:goodnight/features/alarm/alarm_ring_screen.dart';
+import 'package:goodnight/features/alarm/alarm_scheduler.dart';
+import 'package:goodnight/features/alarm/wake_sound.dart';
+import 'package:goodnight/features/alarm/wake_sound_providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:goodnight/features/bedtime/schedule.dart';
 import 'package:goodnight/features/bedtime/schedule_providers.dart';
 import 'package:goodnight/features/blocking/blocker_providers.dart';
@@ -167,6 +172,8 @@ Widget _app(Widget home, {bool together = false, SkyPhase phase = SkyPhase.night
       couponSyncProvider.overrideWith((ref) {}),
       selfieSyncProvider.overrideWith((ref) {}),
       sleepWidgetSyncProvider.overrideWith((ref) {}),
+      wakeSoundSyncProvider.overrideWith((ref) {}),
+      wakeSoundProvider.overrideWith((ref, owner) => Stream.value(WakeSoundChoice.initial)),
       timeRequestSyncProvider.overrideWith((ref) {}),
       timeRequestsProvider.overrideWith((ref) => Stream.value(requests)),
     ],
@@ -304,6 +311,29 @@ void main() {
     await tester.scrollUntilVisible(find.text('Alerts about Alex'), 300, scrollable: find.byType(Scrollable).first);
     await tester.drag(find.byType(Scrollable).first, const Offset(0, 250));
     await _shoot(tester, '4b-alerts');
+  });
+
+  testWidgets('4c wake sound', skip: !enabled, (tester) async {
+    await _show(tester, const HomeScreen(pair: _pair, uid: _me));
+    await tester.pump();
+    await tester.tap(find.text('Us'));
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.scrollUntilVisible(find.text('Wake-up sound'), 300, scrollable: find.byType(Scrollable).first);
+    Scrollable.ensureVisible(tester.element(find.text('Wake-up sound')), alignment: 0.02);
+    await _shoot(tester, '4c-wake-sound');
+  });
+
+  testWidgets('9 alarm', skip: !enabled, (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await _show(tester, const AlarmRingScreen(alarmId: AlarmScheduler.wakeId), together: true);
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
+    // Let the sun climb most of the way.
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(seconds: 1));
+    }
+    await _shoot(tester, '9-alarm');
   });
 
   testWidgets('5 pairing', skip: !enabled, (tester) async {
