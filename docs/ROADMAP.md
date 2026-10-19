@@ -46,13 +46,13 @@ Legend: ✅ done · 🔧 needs real-device testing · ⏳ to do
 - ✅ Waiting screen centred, with a QR code; "Scan your partner's code" to join 🔧
 - ✅ "Going to sleep" home-screen widget with both of you and a check-in button; `statusAlert` (deployed) keeps it fresh while the app is closed 🔧
 
-## Next (on main, not released)
+## v0.2.5
 - ✅ "Alerts about {partner}": each person picks after how many minutes of phone use past the partner's bedtime they get a push (Off/5/10/15/30/60, default 15) 🔧
 - ✅ Night mode counts any phone use after bedtime (screen on and unlocked, not the home screen, GoodNight or calls)
 - ✅ Partner pushes pop up on screen (high-importance channel)
 - ✅ Night mode times agreed with the partner (grace 3/5/10/15, pause 10/15/20/30), approved with the bedtime 🔧
 - ✅ Ask for +5/+10/+15 min from the pause screen (max 3 a night); partner answers on Tonight; the service polls and unlocks 🔧
-- ⏳ Deploy the new `firestore.rules` (alertAfter, night times, timeRequests) and the functions, then release
+- ✅ Rules and functions deployed (alertAfter, night times, timeRequests)
 
 ## Next
 - ⏳ Update both phones through the in-app "Update ready" sheet (first real test of the updater, including whether Play Protect allows it)
