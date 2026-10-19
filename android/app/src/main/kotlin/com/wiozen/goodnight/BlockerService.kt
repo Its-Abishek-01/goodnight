@@ -37,6 +37,7 @@ class BlockerService : AccessibilityService() {
     private var overlay: View? = null
     private lateinit var bubble: WatchBubbleOverlay
     private val reelTrack = ReelTrack()
+    private var session = WatchSession()
 
     private val ticker = object : Runnable {
         override fun run() {
@@ -49,10 +50,13 @@ class BlockerService : AccessibilityService() {
         super.onServiceConnected()
         store = BlockerStore(this)
         bubble = WatchBubbleOverlay(this, store)
+        session = store.loadSession()
+        instance = this
         handler.post(ticker)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        if (instance === this) instance = null
         handler.removeCallbacks(ticker)
         removeOverlay()
         if (::bubble.isInitialized) bubble.remove()
@@ -67,10 +71,11 @@ class BlockerService : AccessibilityService() {
         when (e.eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
                 if (pkg == "com.android.systemui" || Targets.isKeyboard(pkg)) return
-                // Our own overlays (the watch bubble, the pause screen) are not an app in front.
-                if (pkg == packageName && e.className?.toString()?.startsWith("android.widget.") == true) return
                 if (pkg == packageName) {
-                    // GoodNight itself (or its overlay): not a target, not phone use.
+                    // Our own overlays (the watch bubble, the pause screen) are not an app
+                    // in front; only GoodNight's own screen is.
+                    if (!isOwnActivity(e.className?.toString())) return
+                    // GoodNight itself: not a target, not phone use.
                     fgPackage = pkg
                     contentTarget = false
                     return
@@ -91,7 +96,10 @@ class BlockerService : AccessibilityService() {
         }
     }
 
-    /** A swipe in the Reels or Shorts pager at night is one more reel. */
+    /** "Preview" on the Us tab. */
+    fun previewBubble(): Boolean = ::bubble.isInitialized && bubble.preview()
+
+    /** A swipe in the Reels or Shorts pager is one more reel (and one more tonight, at night). */
     private fun onScrolled(e: AccessibilityEvent, pkg: String) {
         if (!::store.isInitialized || pkg != fgPackage) return
         val ids = Targets.REEL_PAGER_IDS[pkg] ?: return
@@ -108,15 +116,44 @@ class BlockerService : AccessibilityService() {
             root != null && ids.any { root.findAccessibilityNodeInfosByViewId("$pkg:id/$it").isNotEmpty() }
         }
         if (!isPager) return
+        val nowMs = System.currentTimeMillis()
+        if (!ReelCounter.onScroll(reelTrack, id ?: pkg, e.fromIndex, nowMs)) return
+        WatchSessions.addReel(session, nowMs)
+        store.saveSession(session)
         val now = LocalDateTime.now()
         val config = store.loadConfig()
-        if (!BlockEngine.isNight(config, now.hour * 60 + now.minute)) return
         val state = store.loadState()
-        if (state.nightKey != nightKeyOf(now) || System.currentTimeMillis() < state.blockUntil) return
-        if (!ReelCounter.onScroll(reelTrack, id ?: pkg, e.fromIndex, System.currentTimeMillis())) return
-        state.reels++
-        store.saveState(state)
-        if (config.bubble) bubble.update(state.totalUsedMs, state.reels, Mood.of(state.usedMs, config.graceMs))
+        val night = BlockEngine.isNight(config, now.hour * 60 + now.minute) &&
+            state.nightKey == nightKeyOf(now)
+        if (night) {
+            if (nowMs < state.blockUntil) return
+            state.reels++
+            store.saveState(state)
+        }
+        if (config.bubble && !bubble.previewing) showBubble(config, state, night)
+    }
+
+    /** Tonight's numbers and the countdown to the pause at night; this sitting's otherwise. */
+    private fun showBubble(config: BlockConfig, state: BlockState, night: Boolean) {
+        if (night) {
+            bubble.update(state.totalUsedMs, state.reels, Mood.of(state.usedMs, config.graceMs))
+        } else {
+            bubble.update(session.watchedMs, session.reels, Mood.ofSession(session.watchedMs))
+        }
+    }
+
+    private val ownActivities = mutableMapOf<String, Boolean>()
+
+    private fun isOwnActivity(className: String?): Boolean {
+        if (className.isNullOrEmpty()) return false
+        return ownActivities.getOrPut(className) {
+            try {
+                packageManager.getActivityInfo(ComponentName(packageName, className), 0)
+                true
+            } catch (_: Exception) {
+                false
+            }
+        }
     }
 
     private fun isContentApp(pkg: String) =
@@ -166,6 +203,8 @@ class BlockerService : AccessibilityService() {
             )
         val onPhone = inUse && fgPackage.isNotEmpty() && fgPackage != packageName &&
             fgPackage != homePackage() && !Targets.isNotPhoneUse(fgPackage)
+        WatchSessions.tick(session, System.currentTimeMillis(), onTarget)
+        store.saveSession(session)
         val decision = BlockEngine.tick(
             config,
             state,
@@ -194,11 +233,10 @@ class BlockerService : AccessibilityService() {
             showOverlay(decision.remainingMs)
             return
         }
-        val watching = config.bubble && onTarget &&
-            BlockEngine.isNight(config, now.hour * 60 + now.minute) &&
-            System.currentTimeMillis() >= state.blockUntil
-        if (watching) {
-            bubble.update(state.totalUsedMs, state.reels, Mood.of(state.usedMs, config.graceMs))
+        if (bubble.previewing) return
+        val night = BlockEngine.isNight(config, now.hour * 60 + now.minute)
+        if (config.bubble && onTarget && System.currentTimeMillis() >= state.blockUntil) {
+            showBubble(config, state, night)
         } else {
             bubble.remove()
         }
@@ -352,6 +390,10 @@ class BlockerService : AccessibilityService() {
         private const val TICK_MS = 5_000L
         private const val CONTENT_THROTTLE_MS = 600L
         private const val OVERLAY_MS = 20_000L
+
+        /** The running service, for the preview button. */
+        var instance: BlockerService? = null
+            private set
 
         /** True when the user has switched the accessibility service on. */
         fun isEnabled(context: Context): Boolean {

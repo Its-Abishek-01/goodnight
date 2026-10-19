@@ -41,11 +41,13 @@ your data with anyone. Google provides the hosting (Firebase), the push notifica
 
 ## Accessibility service (night mode)
 If you turn on night-mode blocking, GoodNight uses Android's Accessibility service.
-During your agreed bedtime hours only, it checks which app is in front, the address in
+During your agreed bedtime hours, it checks which app is in front, the address in
 your browser's address bar and whether YouTube is showing Shorts, so it can pause
 Instagram and YouTube Shorts after a short grace time. It also notices when you swipe
 to the next reel in Instagram Reels or YouTube Shorts, to show a reel count on the watch
-bubble; that count stays on your phone. This happens on your phone. It
+bubble. If the watch bubble is on, this also happens outside bedtime whenever Instagram
+or YouTube Shorts is open, only to show how long you have watched and how many reels.
+These numbers stay on your phone. This happens on your phone. It
 never reads your messages, passwords or what you type, it does not record your browsing
 history, and nothing is uploaded except the counts in the table above. They are sent as they change during the night, so your partner sees them live.
 You are asked to agree before it is turned on, and you can turn it off at any time.

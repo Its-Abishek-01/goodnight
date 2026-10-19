@@ -74,3 +74,48 @@ class WatchBubbleTest {
         assertEquals("12 reels", BubbleSchedule.reelsLabel(12))
     }
 }
+
+class WatchSessionTest {
+    @Test
+    fun timeAddsUpWhileWatching() {
+        val s = WatchSession()
+        WatchSessions.tick(s, 1_000, true)
+        WatchSessions.tick(s, 6_000, true)
+        WatchSessions.tick(s, 11_000, true)
+        assertEquals(10_000, s.watchedMs)
+    }
+
+    @Test
+    fun aShortBreakKeepsTheSession() {
+        val s = WatchSession()
+        WatchSessions.tick(s, 1_000, true)
+        WatchSessions.tick(s, 6_000, true)
+        WatchSessions.addReel(s, 6_000)
+        WatchSessions.tick(s, 11_000, false)
+        WatchSessions.tick(s, 61_000, true)
+        WatchSessions.tick(s, 66_000, true)
+        assertEquals(10_000, s.watchedMs)
+        assertEquals(1, s.reels)
+    }
+
+    @Test
+    fun aLongBreakStartsANewSession() {
+        val s = WatchSession()
+        WatchSessions.tick(s, 1_000, true)
+        WatchSessions.tick(s, 6_000, true)
+        WatchSessions.addReel(s, 6_000)
+        WatchSessions.tick(s, 7_000, false)
+        WatchSessions.tick(s, 6_000 + WatchSessions.END_GAP_MS + 1, true)
+        assertEquals(0, s.watchedMs)
+        assertEquals(0, s.reels)
+    }
+
+    @Test
+    fun dayMoodFollowsTheSessionLength() {
+        assertEquals(Mood.HAPPY, Mood.ofSession(5 * 60_000))
+        assertEquals(Mood.CURIOUS, Mood.ofSession(12 * 60_000))
+        assertEquals(Mood.WORRIED, Mood.ofSession(25 * 60_000))
+        assertEquals(Mood.SLEEPY, Mood.ofSession(40 * 60_000))
+        assertEquals(Mood.GRUMPY, Mood.ofSession(60 * 60_000))
+    }
+}

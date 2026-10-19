@@ -91,6 +91,24 @@ class BlockerStore(context: Context) {
             .apply()
     }
 
+    fun loadSession() = WatchSession(
+        startedAt = p.getLong("w.startedAt", 0),
+        lastAt = p.getLong("w.lastAt", 0),
+        watchedMs = p.getLong("w.watchedMs", 0),
+        reels = p.getInt("w.reels", 0),
+        lastOn = p.getBoolean("w.lastOn", false),
+    )
+
+    fun saveSession(s: WatchSession) {
+        p.edit()
+            .putLong("w.startedAt", s.startedAt)
+            .putLong("w.lastAt", s.lastAt)
+            .putLong("w.watchedMs", s.watchedMs)
+            .putInt("w.reels", s.reels)
+            .putBoolean("w.lastOn", s.lastOn)
+            .apply()
+    }
+
     fun loadState() = BlockState(
         nightKey = p.getString("s.nightKey", "") ?: "",
         usedMs = p.getLong("s.usedMs", 0),

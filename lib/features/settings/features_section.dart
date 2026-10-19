@@ -4,9 +4,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/widgets/cute_loader.dart';
 import '../alarm/wake_sound_cards.dart';
 import '../bedtime/night_times_card.dart';
+import '../blocking/blocker_channel.dart';
 import '../pairing/pair.dart';
 import 'features.dart';
 import 'features_providers.dart';
+
+Future<void> _previewBubble(BuildContext context) async {
+  final messenger = ScaffoldMessenger.of(context);
+  var shown = false;
+  try {
+    shown = await Blocker.previewBubble();
+  } catch (_) {
+    // Not on Android.
+  }
+  if (!shown) {
+    messenger.showSnackBar(const SnackBar(
+      content: Text('Turn on the GoodNight accessibility service first (Night mode setup).'),
+    ));
+  }
+}
 
 /// The feature picker on the Setup tab. Personal features change at once;
 /// shared ones go to the partner for approval.
@@ -59,19 +75,32 @@ class FeaturesSection extends ConsumerWidget {
                     ? null
                     : (v) => setMine(mine.copyWith(nightMode: v)),
               ),
-              if (mine?.nightMode ?? true)
+              if (mine?.nightMode ?? true) ...[
                 SwitchListTile(
                   title: const Text('Watch bubble'),
                   subtitle: const Text(
-                    'A little face peeks from the screen edge on Instagram and Shorts '
-                    'at night, with how long you have watched and how many reels. '
-                    'It gets sleepier as your pause gets closer.',
+                    'A little face peeks from the screen edge whenever Instagram or '
+                    'Shorts is open, with how long you have watched and how many reels. '
+                    'At night it gets sleepier as your pause gets closer.',
                   ),
                   value: mine?.watchBubble ?? true,
                   onChanged: mine == null
                       ? null
                       : (v) => setMine(mine.copyWith(watchBubble: v)),
                 ),
+                if (mine?.watchBubble ?? true)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 0, 16, 8),
+                      child: TextButton.icon(
+                        icon: const Icon(Icons.visibility_outlined),
+                        label: const Text('Preview the bubble'),
+                        onPressed: () => _previewBubble(context),
+                      ),
+                    ),
+                  ),
+              ],
               SwitchListTile(
                 title: const Text('Bedtime reminders'),
                 subtitle: const Text(

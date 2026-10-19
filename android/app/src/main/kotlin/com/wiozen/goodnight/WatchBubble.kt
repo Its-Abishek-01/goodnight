@@ -19,6 +19,57 @@ enum class Mood {
                 else -> GRUMPY
             }
         }
+
+        /** Outside bedtime there is no pause to count down to, so the face follows the session length. */
+        fun ofSession(watchedMs: Long): Mood {
+            val min = watchedMs / 60_000
+            return when {
+                min < 10 -> HAPPY
+                min < 20 -> CURIOUS
+                min < 30 -> WORRIED
+                min < 45 -> SLEEPY
+                else -> GRUMPY
+            }
+        }
+    }
+}
+
+/**
+ * One sitting on Instagram/Shorts at any time of day. It ends after
+ * [WatchSessions.END_GAP_MS] away, so a quick switch to another app does not
+ * start the count again.
+ */
+data class WatchSession(
+    var startedAt: Long = 0,
+    var lastAt: Long = 0,
+    var watchedMs: Long = 0,
+    var reels: Int = 0,
+    var lastOn: Boolean = false,
+)
+
+object WatchSessions {
+    const val END_GAP_MS = 5 * 60_000L
+
+    /** Call on every check; [lastAt] stays at the last moment on a target. */
+    fun tick(s: WatchSession, nowMs: Long, onTarget: Boolean) {
+        if (!onTarget) {
+            s.lastOn = false
+            return
+        }
+        if (s.startedAt == 0L || nowMs - s.lastAt > END_GAP_MS) {
+            s.startedAt = nowMs
+            s.watchedMs = 0
+            s.reels = 0
+            s.lastOn = false
+        }
+        if (s.lastOn) s.watchedMs += (nowMs - s.lastAt).coerceIn(0, BlockEngine.MAX_GAP_MS)
+        s.lastAt = nowMs
+        s.lastOn = true
+    }
+
+    fun addReel(s: WatchSession, nowMs: Long) {
+        tick(s, nowMs, true)
+        s.reels++
     }
 }
 

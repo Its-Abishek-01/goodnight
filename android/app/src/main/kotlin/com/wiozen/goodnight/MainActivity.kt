@@ -50,6 +50,7 @@ class MainActivity : FlutterActivity() {
                         )
                         result.success(null)
                     }
+                    "previewBubble" -> result.success(BlockerService.instance?.previewBubble() ?: false)
                     "getStats" -> {
                         val s = BlockerStore(this).loadState()
                         result.success(

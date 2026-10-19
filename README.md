@@ -63,8 +63,9 @@ streak and settings stay as they are.
 The released app syncs through a shared Firebase project. It stores only your name,
 your pair, bedtimes, check-ins, snooze and block counts, coupons, and the selfies you
 choose to send (readable only by your partner, deleted after a week). The Accessibility
-service checks which app or website address is in front, only during your approved night
-hours, to pause Instagram and Shorts. It never reads messages, passwords or what you
+service checks which app or website address is in front during your approved night
+hours, to pause Instagram and Shorts, and, if the watch bubble is on, whenever Instagram
+or Shorts is open, to show your time and reel count (kept on your phone). It never reads messages, passwords or what you
 type, and it does not record browsing history. To keep all data under your own control,
 build from source with your own Firebase project.
 

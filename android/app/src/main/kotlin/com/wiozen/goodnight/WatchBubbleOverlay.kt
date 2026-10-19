@@ -44,6 +44,10 @@ class WatchBubbleOverlay(
 
     private val tuck = Runnable { slide(false) }
 
+    /** True while [preview] runs; the service leaves the bubble alone meanwhile. */
+    var previewing = false
+        private set
+
     /** Shows or refreshes the bubble with tonight's numbers. */
     fun update(usedMs: Long, reelCount: Int, mood: Mood) {
         if (root == null && !attach()) return
@@ -57,8 +61,39 @@ class WatchBubbleOverlay(
         }
     }
 
+    /**
+     * Shows the bubble over whatever is on screen for a few seconds, going
+     * through every mood with made-up numbers, then tucks it away and removes it.
+     */
+    fun preview(): Boolean {
+        remove()
+        if (!attach()) return false
+        previewing = true
+        val steps = listOf(
+            Triple(Mood.HAPPY, 45_000L, 3),
+            Triple(Mood.CURIOUS, 4 * 60_000L, 17),
+            Triple(Mood.WORRIED, 9 * 60_000L, 34),
+            Triple(Mood.SLEEPY, 14 * 60_000L, 52),
+            Triple(Mood.GRUMPY, 21 * 60_000L, 76),
+        )
+        steps.forEachIndexed { i, (mood, ms, n) ->
+            handler.postDelayed({
+                time.text = BubbleSchedule.timeLabel(ms)
+                reels.text = BubbleSchedule.reelsLabel(n)
+                face.setMood(mood)
+                if (i == 0) slide(true)
+            }, i * PREVIEW_STEP_MS)
+        }
+        val end = steps.size * PREVIEW_STEP_MS
+        handler.postDelayed({ slide(false) }, end)
+        handler.postDelayed({ remove() }, end + 2_500)
+        return true
+    }
+
     fun remove() {
-        handler.removeCallbacks(tuck)
+        previewing = false
+        // Clears the tuck timer and any preview steps.
+        handler.removeCallbacksAndMessages(null)
         anim?.cancel()
         anim = null
         memory = BubbleMemory()
@@ -118,6 +153,7 @@ class WatchBubbleOverlay(
                 cornerRadii = floatArrayOf(radius, radius, 0f, 0f, 0f, 0f, radius, radius)
             }
             setPadding((6 * dp).toInt(), (6 * dp).toInt(), (18 * dp).toInt(), (6 * dp).toInt())
+            alpha = TUCKED_ALPHA
             val size = (FACE_DP * dp).toInt()
             addView(face, LinearLayout.LayoutParams(size, size))
             addView(texts, LinearLayout.LayoutParams(
@@ -164,13 +200,19 @@ class WatchBubbleOverlay(
         out = show
         val peek = ((6 + FACE_DP / 2 + 2) * dp).toInt()
         val target = if (show) 0 else -(v.width - peek)
+        val fromX = params.x
+        val fromAlpha = v.alpha
+        // Tucked away it is see-through, so it does not get in the way.
+        val toAlpha = if (show) 1f else TUCKED_ALPHA
         anim?.cancel()
-        anim = ValueAnimator.ofInt(params.x, target).apply {
+        anim = ValueAnimator.ofFloat(0f, 1f).apply {
             duration = if (show) 420 else 360
             interpolator = if (show) OvershootInterpolator(1.2f) else DecelerateInterpolator()
             addUpdateListener {
                 if (root !== v) return@addUpdateListener
-                params.x = it.animatedValue as Int
+                val k = it.animatedValue as Float
+                params.x = fromX + ((target - fromX) * k).toInt()
+                v.alpha = fromAlpha + (toAlpha - fromAlpha) * k.coerceIn(0f, 1f)
                 try {
                     wm.updateViewLayout(v, params)
                 } catch (_: Exception) {
@@ -223,5 +265,7 @@ class WatchBubbleOverlay(
 
     companion object {
         private const val FACE_DP = 44
+        private const val TUCKED_ALPHA = 0.4f
+        private const val PREVIEW_STEP_MS = 2_200L
     }
 }

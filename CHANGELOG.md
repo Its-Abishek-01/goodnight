@@ -4,6 +4,17 @@ All notable changes to GoodNight. The format follows Keep a Changelog.
 
 ## [Unreleased]
 
+## 0.2.8 - 2026-10-20
+### Changed
+- The watch bubble now shows whenever Instagram or YouTube Shorts is open, not only after bedtime. During the day it shows how long you have been on this sitting and how many reels; at night it still counts down to your pause.
+- When tucked away, the bubble is see-through so it stays out of the way.
+
+### Added
+- "Preview the bubble" on the Us tab shows it on screen for a few seconds, going through every mood.
+
+### Fixed
+- GoodNight's own overlays could be mistaken for the app in front, which could hide the bubble and stop counting Instagram time.
+
 ## 0.2.7 - 2026-10-20
 ### Added
 - Account backup: on the Us tab, create a backup code (shown once as text and a QR code). On a new phone or after a reinstall, tap "Restore with a backup code" on the first screen, type it or scan it from the old phone, and your pair, streak and history come back.
